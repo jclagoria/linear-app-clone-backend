@@ -1,0 +1,79 @@
+schema: backend-schema
+
+context: |
+  Project: <Name of the project>
+  Language: English
+  Domain: <Domain of the project>
+
+  # === TECH-AGNOSTIC CONTEXT ===
+  # Stack, architecture, and deployment docs are generated AFTER tech-selection step.
+  # The tech-selection skill reads tech-agnostic artifacts and fills templates.
+  # See docs/ once tech-selection completes.
+
+  # API Contract (OpenAPI 3.1 — Design-First): docs/api/openapi.yaml
+
+  Tech Research Digest: .agents/skills/repomix-reference/references/tech-research-digest.md
+
+  Skills:
+    Tech selection: .agents/skills/tech-selection/SKILL.md
+    ADR: .agents/skills/architectural-decision-records/SKILL.md
+    Repomix Reference: .agents/skills/repomix-reference/SKILL.md
+
+rules:
+  proposal:
+    - Keep proposal focused on functional scope, motivation, and impact.
+    - Do not include concrete asset paths, icon names, component names, route internals, translation keys, or validator names unless they are essential to scope.
+    - Put technical design detail in design.md (future artifact).
+    - Do not assume technology stack. If not defined in context, use "TBD — pending technology definition" instead of guessing.
+  specs-api:
+    - Define each endpoint as a separate section.
+    - Include method, path, auth requirements, request/response schemas, status codes.
+    - Reference OpenAPI 3.1 structure where applicable.
+    - Do not include business logic, data models, or domain rules.
+    - Use normative language (SHALL, MUST) for binding requirements.
+  specs-business:
+    - Define business rules using BDD/Gherkin style.
+    - Write a Feature block for each capability with Requirement and Scenario sections.
+    - Every scenario MUST use GIVEN/WHEN/THEN format with observable outcomes.
+    - Document data models, entities, and relationships.
+    - Reference specs-api for endpoint definitions.
+    - Use normative language (SHALL, MUST) in requirement descriptions.
+  tech-stack:
+    - Read all available artifacts: proposal, specs-api, specs-business.
+    - Read templates from openspec/schemas/backend-schema/templates/technology/ (fallback: fullstack-schema).
+    - Evaluate at least 2 options per layer (backend runtime, framework, database, cache, messaging, auth, deployment).
+    - Define evaluation criteria: team expertise, ecosystem maturity, performance, scalability, operational complexity, cost.
+    - Fill the docs/ files using the templates: stack-backend.md, architecture-backend.md, deployment.md.
+    - Follow interactive review process before writing files to disk.
+    - Cross-check every tech decision against docs/tech-research-digest.md.
+    - If a choice was rejected in the digest, flag and justify divergence.
+    - If a choice was recommended, confirm alignment.
+    - If not evaluated, note as gap.
+  adr:
+    - One ADR file per significant architectural decision.
+    - File naming: adr/NNNN-title.md (e.g., adr/0001-auth-strategy.md).
+    - Use status lifecycle: Proposed → Accepted → Deprecated → Superseded.
+    - Include context, decision, consequences, and alternatives considered.
+    - Do not repeat implementation details already covered in design docs.
+    - Create adr/manifest.md summarizing all ADRs created or reviewed for the change.
+    - Cross-check each ADR against docs/tech-research-digest.md.
+    - If the digest already documents a decision on the topic, reference it.
+    - If the decision contradicts the digest, REQUIRE explanation for divergence.
+  design-backend:
+    - Stack and architecture are now defined in docs/ (from tech-selection). Reference them.
+    - Record API contracts, data model, and security strategy.
+    - Map every endpoint from specs-api to a concrete route with request/response schemas.
+    - Document data model as migration plan (entities, relationships, indexes).
+    - Include testing strategy per layer (unit, integration, contract).
+    - Validate architecture patterns against docs/tech-research-digest.md.
+    - If a pattern was explicitly rejected in the digest, flag with rationale.
+    - If a pattern was recommended but not adopted, document the reason.
+  tasks-backend:
+    - One concrete deliverable per task with Conventional Commit prefix (feat, fix, test, refactor, chore, docs).
+    - Organize by layer: scaffold, data, business logic, API, events, security, testing.
+    - Include validation tasks for changed behavior.
+    - Leave placeholders for estimated effort or assignee when relevant.
+  review:
+    - Verify all tasks from tasks-backend are complete.
+    - Check that requirements from specs-api and specs-business are met.
+    - Note any gaps, blockers, or deviations from the design.

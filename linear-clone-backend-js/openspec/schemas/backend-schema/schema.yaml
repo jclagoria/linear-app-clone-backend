@@ -1,0 +1,123 @@
+name: backend-schema
+version: 3
+description: |
+  Backend-only schema. Generates proposal → specs-api → specs-business → tech-stack → design-backend → adr → tasks-backend → review.
+
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: |
+      Change proposal describing motivation, scope, and expected impact.
+    template: proposal.md
+    requires: []
+
+  - id: specs-api
+    generates: specs/api/**/*.md
+    description: |
+      API contract definitions: endpoints, request/response schemas, status codes, auth requirements.
+    template: specs/api.md
+    instruction: |
+      Define each endpoint as a separate section.
+      Include method, path, auth requirements, request/response schemas, status codes.
+      Reference OpenAPI 3.1 structure where applicable.
+      Do not include business logic, data models, or domain rules.
+      Use normative language (SHALL, MUST) for binding requirements.
+    requires:
+      - proposal
+
+  - id: specs-business
+    generates: specs/business/**/*.md
+    description: |
+      Business specifications: BDD scenarios, data models, domain rules, security strategy.
+    template: specs/business.md
+    instruction: |
+      Define business rules using BDD/Gherkin style.
+      Write a Feature block for each capability with Requirement and Scenario sections.
+      Every scenario MUST use GIVEN/WHEN/THEN format with observable outcomes.
+      Document data models, entities, and relationships.
+      Reference specs-api for endpoint definitions.
+      Use normative language (SHALL, MUST) in requirement descriptions.
+    requires:
+      - proposal
+      - specs-api
+
+  - id: tech-stack
+    generates: tech-stack.md
+    description: |
+      Backend technology selection. Uses tech-selection skill to evaluate stack,
+      architecture, and deployment options from tech-agnostic artifacts.
+    template: tech-selection/tech-selection.md
+    instruction: |
+      Use the tech-selection skill.
+      Read proposal, specs-api, and specs-business as context.
+      Read templates from openspec/schemas/backend-schema/templates/technology/
+      (stack-templates.md, architecture-templates.md, deployment-templates.md).
+
+      Generate 2-3 files in docs/:
+        docs/stack-backend.md — Backend stack
+        docs/architecture-backend.md — Backend architecture
+        docs/deployment.md — Deployment (if applicable)
+      Follow the interactive review process before writing files.
+      Use the repomix-reference skill to validate decisions against the tech research digest.
+    requires:
+      - specs-api
+      - specs-business
+
+  - id: design-backend
+    generates: design-backend.md
+    description: |
+      Backend technical design: architecture decisions, API contracts, data model,
+      business logic, security, and testing strategy.
+    template: design-backend.md
+    instruction: |
+      Consult specs-api for API contracts and specs-business for data models.
+      Consult docs/architecture-backend.md for architecture and docs/stack-backend.md for stack.
+      Record API contracts, data model, and security strategy.
+      Map every endpoint from specs-api to a concrete route with request/response schemas.
+      Document data model as migration plan (entities, relationships, indexes).
+      Include testing strategy per layer (unit, integration, contract).
+      Use the repomix-reference skill to validate backend architecture patterns against the 
+      tech research digest.
+    requires:
+      - specs-api
+      - specs-business
+      - tech-stack
+
+  - id: adr
+    generates: adr/**/*.md
+    description: |
+      Architecture Decision Records for significant architectural decisions.
+      Each decision SHALL be a separate file: adr/NNNN-title.md.
+      A manifest file (adr/manifest.md) summarizes all ADRs for the change.
+    template: adr.md
+    instruction: |
+      Use the architectural-decision-records skill.
+      Capture significant architectural decisions with context, decision,
+      consequences, and alternatives considered.
+      Consult design-backend for decisions to record.
+      Create one ADR file per decision in adr/ directory.
+      Create adr/manifest.md to summarize all ADRs created or reviewed.
+    requires:
+      - design-backend
+
+  - id: tasks-backend
+    generates: tasks-backend.md
+    description: |
+      Backend implementation tasks: scaffold, data layer, business logic, API,
+      events, security, and testing.
+    template: tasks-backend.md
+    requires:
+      - design-backend
+
+  - id: review
+    generates: review.md
+    description: |
+      Post-implementation review verifying all tasks are complete and
+      requirements are met.
+    template: review.md
+    requires:
+      - tasks-backend
+
+apply:
+  requires:
+    - review
