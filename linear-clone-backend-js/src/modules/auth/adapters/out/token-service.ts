@@ -43,4 +43,25 @@ export class JoseTokenService implements TokenService {
       return { valid: false };
     }
   }
+
+  async verifyRefreshToken(
+    token: string,
+  ): Promise<{ valid: boolean; userId?: string; jti?: string; expiresAt?: Date }> {
+    try {
+      const { payload } = await jwtVerify(token, secret);
+
+      if (payload.type !== 'refresh') {
+        return { valid: false };
+      }
+
+      return {
+        valid: true,
+        userId: payload.sub as string,
+        jti: payload.jti as string,
+        expiresAt: new Date(payload.exp! * 1000),
+      };
+    } catch {
+      return { valid: false };
+    }
+  }
 }
