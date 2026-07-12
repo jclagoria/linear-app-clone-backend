@@ -284,6 +284,90 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
 
 ---
 
+### Refresh Token
+
+```
+POST /api/v1/auth/refresh
+```
+
+Exchanges a valid refresh token for a new token pair. The old refresh token is invalidated (single-use rotation).
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `refreshToken` | string | Yes | The refresh token to rotate |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `TOKEN_EXPIRED` | Refresh token has expired |
+| 401 | `TOKEN_REVOKED` | Refresh token has been revoked or already used |
+| 422 | `VALIDATION_FAILED` | Missing or invalid refreshToken field |
+
+---
+
+### Logout
+
+```
+POST /api/v1/auth/logout
+```
+
+Terminates the user's session and invalidates all refresh tokens. Requires a valid access token. Idempotent — calling multiple times returns success.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "success": true
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+---
+
 ## Authentication
 
 ### JWT Tokens
@@ -336,6 +420,9 @@ All errors follow a consistent structure:
 |------------|-------------|-------------|
 | `VALIDATION_ERROR` | 400 | Request body validation failed |
 | `UNAUTHORIZED` | 401 | Invalid credentials or missing auth |
+| `TOKEN_EXPIRED` | 401 | Refresh token has expired |
+| `TOKEN_REVOKED` | 401 | Refresh token has been revoked or already used |
+| `VALIDATION_FAILED` | 422 | Request body validation failed |
 | `CONFLICT` | 409 | Resource already exists |
 | `SERVER_ERROR` | 500 | Internal server error |
 
