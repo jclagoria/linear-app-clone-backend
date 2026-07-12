@@ -10,9 +10,8 @@ const app = Fastify({
 });
 
 // Register CORS
-const corsOrigins = env.CORS_ORIGINS === '*'
-  ? true
-  : env.CORS_ORIGINS.split(',').map((o) => o.trim());
+const corsOrigins =
+  env.CORS_ORIGINS === '*' ? true : env.CORS_ORIGINS.split(',').map((o) => o.trim());
 
 await app.register(cors, {
   origin: corsOrigins,
