@@ -3,6 +3,10 @@ import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
 import boundaries from 'eslint-plugin-boundaries';
 
+// NOTE: @typescript-eslint/parser does not support TypeScript 7 yet
+// (see: https://github.com/typescript-eslint/typescript-eslint/issues/12518)
+// Using @eslint/js as fallback until typescript-eslint adds TS 7 support.
+
 export default [
   js.configs.recommended,
   prettierConfig,
