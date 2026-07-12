@@ -1,14 +1,12 @@
 schema: backend-schema
 
 context: |
-  Project: <Name of the project>
+  Project: Linear App Clone 
   Language: English
-  Domain: <Domain of the project>
-
-  # === TECH-AGNOSTIC CONTEXT ===
-  # Stack, architecture, and deployment docs are generated AFTER tech-selection step.
-  # The tech-selection skill reads tech-agnostic artifacts and fills templates.
-  # See docs/ once tech-selection completes.
+  Domain: Backend Service for the Linear App Clone
+  Stack: documented in docs/stack-backend.md
+  Architecture: documented in docs/architecture-backend.md
+  Deployment flow: documented in docs/deployment.md
 
   # API Contract (OpenAPI 3.1 — Design-First): docs/api/openapi.yaml
 
