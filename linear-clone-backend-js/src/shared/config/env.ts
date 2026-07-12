@@ -13,4 +13,5 @@ export const env = {
   RATE_LIMIT_LOGIN: parseInt(process.env.RATE_LIMIT_LOGIN || '5', 10),
   RATE_LIMIT_REGISTER: parseInt(process.env.RATE_LIMIT_REGISTER || '3', 10),
   SESSION_LIMIT: parseInt(process.env.SESSION_LIMIT || '10', 10),
+  CORS_ORIGINS: process.env.CORS_ORIGINS || '*',
 };
