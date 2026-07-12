@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import bcrypt from 'bcrypt';
 import { SessionRepository } from './ports/session-repository';
 import { TokenService } from './ports/token-service';
 import { env } from '../../../shared/config/env';
+import { hashToken } from '../../../shared/utils/crypto';
 
 export const RefreshTokenInput = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
@@ -31,9 +31,9 @@ export class RefreshToken {
       throw new TokenExpiredError('Refresh token is invalid or expired');
     }
 
-    // Find session by refresh token hash
+    // Find session by refresh token hash (SHA-256 for deterministic lookup)
     const session = await this.sessionRepository.findByRefreshTokenHash(
-      await bcrypt.hash(validatedInput.refreshToken, 10),
+      hashToken(validatedInput.refreshToken),
     );
 
     if (!session) {
@@ -52,8 +52,8 @@ export class RefreshToken {
     const newAccessToken = await this.tokenService.generateAccessToken(session.userId);
     const newRefreshToken = await this.tokenService.generateRefreshToken(session.userId);
 
-    // Hash new refresh token
-    const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
+    // Hash new refresh token (SHA-256 for deterministic lookups)
+    const newRefreshTokenHash = hashToken(newRefreshToken);
 
     // Delete old session
     await this.sessionRepository.deleteByRefreshTokenHash(session.refreshTokenHash);

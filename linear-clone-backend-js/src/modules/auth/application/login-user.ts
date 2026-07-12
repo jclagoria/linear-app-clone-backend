@@ -5,6 +5,7 @@ import { SessionRepository } from './ports/session-repository';
 import { TokenService } from './ports/token-service';
 import { EventPublisher } from './ports/event-publisher';
 import { env } from '../../../shared/config/env';
+import { hashToken } from '../../../shared/utils/crypto';
 
 export const LoginUserInput = z.object({
   email: z.string().email('Invalid email format'),
@@ -60,8 +61,8 @@ export class LoginUser {
     const accessToken = await this.tokenService.generateAccessToken(user.id);
     const refreshToken = await this.tokenService.generateRefreshToken(user.id);
 
-    // Hash refresh token for storage
-    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    // Hash refresh token for storage (SHA-256 for deterministic lookups)
+    const refreshTokenHash = hashToken(refreshToken);
 
     // Calculate expiry
     const expiresAt = new Date();
