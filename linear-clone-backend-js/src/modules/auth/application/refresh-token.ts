@@ -49,7 +49,6 @@ export class RefreshToken {
     }
 
     // Generate new tokens
-    const newAccessToken = await this.tokenService.generateAccessToken(session.userId);
     const newRefreshToken = await this.tokenService.generateRefreshToken(session.userId);
 
     // Hash new refresh token (SHA-256 for deterministic lookups)
@@ -62,7 +61,7 @@ export class RefreshToken {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
-    await this.sessionRepository.create({
+    const newSession = await this.sessionRepository.create({
       userId: session.userId,
       refreshTokenHash: newRefreshTokenHash,
       ipAddress: session.ipAddress,
@@ -70,6 +69,9 @@ export class RefreshToken {
       rememberMe: session.rememberMe,
       expiresAt,
     });
+
+    // Generate new access token with new session ID
+    const newAccessToken = await this.tokenService.generateAccessToken(session.userId, newSession.id);
 
     return {
       accessToken: newAccessToken,

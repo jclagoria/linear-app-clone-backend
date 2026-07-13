@@ -3,7 +3,7 @@ import { db } from '../../../../shared/database';
 import { sessions, Session, NewSession } from '../../domain/session';
 import { SessionRepository } from '../../application/ports/session-repository';
 import { env } from '../../../../shared/config/env';
-import { eq, asc, sql } from 'drizzle-orm';
+import { eq, asc, desc, sql, and, inArray, gt } from 'drizzle-orm';
 
 const redis = new Redis(env.REDIS_URL);
 
@@ -37,6 +37,59 @@ export class RedisSessionStore implements SessionRepository {
       .select()
       .from(sessions)
       .where(eq(sessions.refreshTokenHash, refreshTokenHash))
+      .limit(1);
+    return result[0] || null;
+  }
+
+  async findById(id: string, userId: string): Promise<Session | null> {
+    const result = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.id, id), eq(sessions.userId, userId)))
+      .limit(1);
+    return result[0] || null;
+  }
+
+  async findByUserId(userId: string): Promise<Session[]> {
+    const now = new Date();
+    const result = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.userId, userId), gt(sessions.expiresAt, now)))
+      .orderBy(desc(sessions.lastActivityAt));
+    return result;
+  }
+
+  async deleteById(id: string, userId: string): Promise<void> {
+    const session = await this.findById(id, userId);
+    if (session) {
+      await redis.del(`session:${session.id}`);
+      await db.delete(sessions).where(and(eq(sessions.id, id), eq(sessions.userId, userId)));
+    }
+  }
+
+  async deleteByIds(ids: string[], userId: string): Promise<void> {
+    if (ids.length === 0) return;
+
+    // Find sessions to delete Redis keys
+    const sessionsToDelete = await db
+      .select()
+      .from(sessions)
+      .where(and(inArray(sessions.id, ids), eq(sessions.userId, userId)));
+
+    for (const session of sessionsToDelete) {
+      await redis.del(`session:${session.id}`);
+    }
+
+    await db.delete(sessions).where(and(inArray(sessions.id, ids), eq(sessions.userId, userId)));
+  }
+
+  async findOldestByUserId(userId: string): Promise<Session | null> {
+    const result = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.userId, userId))
+      .orderBy(asc(sessions.lastActivityAt))
       .limit(1);
     return result[0] || null;
   }

@@ -6,8 +6,13 @@ import { env } from '../../../../shared/config/env';
 const secret = new TextEncoder().encode(env.JWT_SECRET);
 
 export class JoseTokenService implements TokenService {
-  async generateAccessToken(userId: string): Promise<string> {
-    return new SignJWT({ sub: userId, type: 'access' })
+  async generateAccessToken(userId: string, sessionId?: string): Promise<string> {
+    const payload: Record<string, unknown> = { sub: userId, type: 'access' };
+    if (sessionId) {
+      payload.sid = sessionId;
+    }
+
+    return new SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime(env.JWT_ACCESS_EXPIRY)
@@ -26,7 +31,7 @@ export class JoseTokenService implements TokenService {
 
   async verifyAccessToken(
     token: string,
-  ): Promise<{ valid: boolean; userId?: string; expiresAt?: Date }> {
+  ): Promise<{ valid: boolean; userId?: string; sessionId?: string; expiresAt?: Date }> {
     try {
       const { payload } = await jwtVerify(token, secret);
 
@@ -37,6 +42,7 @@ export class JoseTokenService implements TokenService {
       return {
         valid: true,
         userId: payload.sub as string,
+        sessionId: payload.sid as string | undefined,
         expiresAt: new Date(payload.exp! * 1000),
       };
     } catch {

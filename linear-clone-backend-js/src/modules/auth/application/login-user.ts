@@ -54,11 +54,20 @@ export class LoginUser {
     // Check session limit and evict oldest if needed
     const sessionCount = await this.sessionRepository.countByUserId(user.id);
     if (sessionCount >= env.SESSION_LIMIT) {
-      await this.sessionRepository.deleteOldestByUserId(user.id, 1);
+      const oldestSession = await this.sessionRepository.findOldestByUserId(user.id);
+      if (oldestSession) {
+        await this.sessionRepository.deleteById(oldestSession.id, user.id);
+        await this.eventPublisher.publish({
+          type: 'session_evicted',
+          userId: user.id,
+          sessionId: oldestSession.id,
+          reason: 'limit_exceeded',
+          timestamp: new Date(),
+        });
+      }
     }
 
-    // Generate tokens
-    const accessToken = await this.tokenService.generateAccessToken(user.id);
+    // Generate refresh token
     const refreshToken = await this.tokenService.generateRefreshToken(user.id);
 
     // Hash refresh token for storage (SHA-256 for deterministic lookups)
@@ -72,8 +81,8 @@ export class LoginUser {
       expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
     }
 
-    // Create session
-    await this.sessionRepository.create({
+    // Create session first to get session ID
+    const session = await this.sessionRepository.create({
       userId: user.id,
       refreshTokenHash,
       ipAddress: validatedInput.ipAddress,
@@ -81,6 +90,9 @@ export class LoginUser {
       rememberMe: validatedInput.rememberMe,
       expiresAt,
     });
+
+    // Generate access token with session ID
+    const accessToken = await this.tokenService.generateAccessToken(user.id, session.id);
 
     // Emit event
     await this.eventPublisher.publish({

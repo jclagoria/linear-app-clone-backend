@@ -8,6 +8,9 @@ import {
   TokenRevokedError,
 } from '../../application/refresh-token';
 import { LogoutUser } from '../../application/logout-user';
+import { ListSessions, ListSessionsInput } from '../../application/list-sessions';
+import { RevokeSession, RevokeSessionInput, NotFoundError as SessionNotFoundError } from '../../application/revoke-session';
+import { RevokeAllSessions, RevokeAllSessionsInput } from '../../application/revoke-all-sessions';
 import { DrizzleUserRepository } from '../out/drizzle-user-repository';
 import { RedisSessionStore } from '../out/redis-session-store';
 import { JoseTokenService } from '../out/token-service';
@@ -24,6 +27,9 @@ const registerUser = new RegisterUser(userRepository, tokenService, eventPublish
 const loginUser = new LoginUser(userRepository, sessionRepository, tokenService, eventPublisher);
 const refreshToken = new RefreshToken(sessionRepository, tokenService);
 const logoutUser = new LogoutUser(sessionRepository, eventPublisher);
+const listSessions = new ListSessions(sessionRepository);
+const revokeSession = new RevokeSession(sessionRepository, eventPublisher);
+const revokeAllSessions = new RevokeAllSessions(sessionRepository, eventPublisher);
 
 // Request schemas
 const RegisterRequestSchema = z.object({
@@ -41,6 +47,37 @@ const LoginRequestSchema = z.object({
 const RefreshTokenRequestSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
+
+const SessionIdParamsSchema = z.object({
+  sessionId: z.string().uuid('Invalid session ID format'),
+});
+
+// Helper to extract user ID and session ID from access token
+async function getAuthInfo(request: FastifyRequest): Promise<{ userId: string; sessionId?: string } | null> {
+  const authHeader = request.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.substring(7);
+  const tokenResult = await tokenService.verifyAccessToken(token);
+
+  if (!tokenResult.valid || !tokenResult.userId) {
+    return null;
+  }
+
+  return { userId: tokenResult.userId, sessionId: tokenResult.sessionId };
+}
+
+// Helper to get current session's refresh token hash
+async function getCurrentSessionRefreshTokenHash(userId: string, sessionId: string | undefined): Promise<string> {
+  if (!sessionId) {
+    return '';
+  }
+
+  const session = await sessionRepository.findById(sessionId, userId);
+  return session?.refreshTokenHash || '';
+}
 
 export async function authRoutes(app: FastifyInstance) {
   // POST /register with rate limiting
@@ -224,4 +261,142 @@ export async function authRoutes(app: FastifyInstance) {
       throw error;
     }
   });
+
+  // GET /sessions - List all active sessions for the current user
+  app.get(
+    '/sessions',
+    {
+      config: {
+        rateLimit: {
+          max: env.RATE_LIMIT_SESSION_LIST,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const authInfo = await getAuthInfo(request);
+        if (!authInfo) {
+          return reply.status(401).send({
+            error: {
+              code: 'UNAUTHORIZED',
+              message: 'Authentication required',
+            },
+          });
+        }
+
+        const currentRefreshTokenHash = await getCurrentSessionRefreshTokenHash(authInfo.userId, authInfo.sessionId);
+
+        const result = await listSessions.execute({
+          userId: authInfo.userId,
+          currentRefreshTokenHash,
+        });
+
+        return reply.status(200).send({
+          data: result,
+        });
+      } catch (error) {
+        throw error;
+      }
+    },
+  );
+
+  // DELETE /sessions/:sessionId - Revoke a specific session
+  app.delete(
+    '/sessions/:sessionId',
+    {
+      config: {
+        rateLimit: {
+          max: env.RATE_LIMIT_SESSION_REVOKE,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const authInfo = await getAuthInfo(request);
+        if (!authInfo) {
+          return reply.status(401).send({
+            error: {
+              code: 'UNAUTHORIZED',
+              message: 'Authentication required',
+            },
+          });
+        }
+
+        const params = SessionIdParamsSchema.parse(request.params);
+        await revokeSession.execute({
+          userId: authInfo.userId,
+          sessionId: params.sessionId,
+        });
+
+        return reply.status(200).send({
+          data: { success: true },
+        });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return reply.status(400).send({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid input',
+              details: error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+              })),
+            },
+          });
+        }
+
+        if (error instanceof SessionNotFoundError) {
+          return reply.status(404).send({
+            error: {
+              code: 'NOT_FOUND',
+              message: 'Session not found',
+            },
+          });
+        }
+
+        throw error;
+      }
+    },
+  );
+
+  // POST /sessions/revoke-all - Revoke all sessions except current
+  app.post(
+    '/sessions/revoke-all',
+    {
+      config: {
+        rateLimit: {
+          max: env.RATE_LIMIT_SESSION_REVOKE_ALL,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const authInfo = await getAuthInfo(request);
+        if (!authInfo) {
+          return reply.status(401).send({
+            error: {
+              code: 'UNAUTHORIZED',
+              message: 'Authentication required',
+            },
+          });
+        }
+
+        const currentRefreshTokenHash = await getCurrentSessionRefreshTokenHash(authInfo.userId, authInfo.sessionId);
+
+        const result = await revokeAllSessions.execute({
+          userId: authInfo.userId,
+          currentRefreshTokenHash,
+        });
+
+        return reply.status(200).send({
+          data: result,
+        });
+      } catch (error) {
+        throw error;
+      }
+    },
+  );
 }
