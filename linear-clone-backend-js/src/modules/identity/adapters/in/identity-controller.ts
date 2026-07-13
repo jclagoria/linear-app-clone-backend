@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { ZodError } from 'zod';
 import { UpdateProfileRequestSchema, CreateOrganizationRequestSchema, OrganizationIdParamsSchema } from './dto';
 import { GetUserProfile } from '../../application/get-user-profile';
 import { UpdateUserProfile } from '../../application/update-user-profile';
@@ -124,6 +125,19 @@ export async function identityRoutes(app: FastifyInstance) {
           data: { user: result },
         });
       } catch (error) {
+        if (error instanceof ZodError) {
+          return reply.status(400).send({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid input',
+              details: error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+              })),
+            },
+          });
+        }
+
         if (error instanceof ProfileNotFoundError) {
           return reply.status(404).send({
             error: {
@@ -168,6 +182,19 @@ export async function identityRoutes(app: FastifyInstance) {
           data: { organization: result },
         });
       } catch (error) {
+        if (error instanceof ZodError) {
+          return reply.status(400).send({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid input',
+              details: error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+              })),
+            },
+          });
+        }
+
         if (error instanceof OrganizationNameConflictError) {
           return reply.status(409).send({
             error: {
@@ -249,6 +276,19 @@ export async function identityRoutes(app: FastifyInstance) {
           data: { organization: result },
         });
       } catch (error) {
+        if (error instanceof ZodError) {
+          return reply.status(400).send({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid input',
+              details: error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+              })),
+            },
+          });
+        }
+
         if (error instanceof OrganizationNotFoundError) {
           return reply.status(404).send({
             error: {
@@ -303,6 +343,19 @@ export async function identityRoutes(app: FastifyInstance) {
 
         return reply.status(204).send();
       } catch (error) {
+        if (error instanceof ZodError) {
+          return reply.status(400).send({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid input',
+              details: error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+              })),
+            },
+          });
+        }
+
         if (error instanceof OrganizationNotFoundError) {
           return reply.status(404).send({
             error: {
