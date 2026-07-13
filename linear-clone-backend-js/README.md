@@ -37,7 +37,23 @@ src/
 └── shared/
     ├── config/env.ts                  # Environment configuration
     ├── database/index.ts              # Drizzle + pg Pool
-    └── errors/error-handler.ts        # Global error handler
+    ├── errors/
+    │   ├── index.ts                   # Export all error classes
+    │   ├── base-error.ts              # Abstract base error class
+    │   ├── not-found.ts               # NotFoundError (404)
+    │   ├── validation.ts              # ValidationError (400)
+    │   ├── conflict.ts                # ConflictError (409)
+    │   ├── unauthorized.ts            # UnauthorizedError (401)
+    │   ├── forbidden.ts               # ForbiddenError (403)
+    │   ├── business-rule.ts           # BusinessRuleError (422)
+    │   ├── rate-limit.ts              # RateLimitError (429)
+    │   ├── internal.ts                # InternalError (500)
+    │   ├── error-handler.ts           # Global error handler
+    │   └── types.ts                   # Error TypeScript interfaces
+    └── rate-limiting/
+        ├── index.ts                   # Export rate limit plugin
+        ├── rate-limit-plugin.ts       # Fastify rate limit plugin
+        └── in-memory-store.ts         # In-memory rate limit store
 ```
 
 ## Getting Started
@@ -577,9 +593,17 @@ If no other sessions exist, the response is `{ "success": true, "revokedCount": 
 | Global | 100 requests/min per IP |
 | Register | 3 requests/min per IP |
 | Login | 5 requests/min per IP |
+| Refresh | 10 requests/min per IP |
 | List Sessions | 30 requests/min per user |
 | Revoke Session | 30 requests/min per user |
 | Revoke All Sessions | 10 requests/min per user |
+
+**Rate Limit Headers:**
+
+All rate-limited responses include:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Requests remaining in current window
+- `Retry-After`: Seconds to wait (only on 429 responses)
 
 ## Error Handling
 
@@ -589,20 +613,72 @@ All errors follow a consistent structure:
 {
   "error": {
     "code": "ERROR_CODE",
-    "message": "Human-readable description"
+    "message": "Human-readable description",
+    "details": []
   }
 }
 ```
 
-| Error Code | HTTP Status | Description |
-|------------|-------------|-------------|
-| `VALIDATION_ERROR` | 400 | Request body validation failed |
-| `UNAUTHORIZED` | 401 | Invalid credentials or missing auth |
-| `TOKEN_EXPIRED` | 401 | Refresh token has expired |
-| `TOKEN_REVOKED` | 401 | Refresh token has been revoked or already used |
-| `VALIDATION_FAILED` | 422 | Request body validation failed |
-| `CONFLICT` | 409 | Resource already exists |
-| `SERVER_ERROR` | 500 | Internal server error |
+### Error Types
+
+| Error Class | HTTP Status | Code | Description |
+|-------------|-------------|------|-------------|
+| `NotFoundError` | 404 | `NOT_FOUND` | Entity not found |
+| `ValidationError` | 400 | `VALIDATION_ERROR` | Input validation failed |
+| `ConflictError` | 409 | `CONFLICT` | Duplicate resource |
+| `UnauthorizedError` | 401 | `UNAUTHORIZED` | Authentication required |
+| `ForbiddenError` | 403 | `FORBIDDEN` | Insufficient permissions |
+| `BusinessRuleError` | 422 | `BUSINESS_RULE_ERROR` | Domain rule violation |
+| `RateLimitError` | 429 | `RATE_LIMITED` | Too many requests |
+| `InternalError` | 500 | `SERVER_ERROR` | Unexpected server error |
+
+### Error Response Examples
+
+**ValidationError (with details):**
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input provided",
+    "details": [
+      { "field": "email", "message": "Must be a valid email address" }
+    ]
+  }
+}
+```
+
+**NotFoundError:**
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Resource not found"
+  }
+}
+```
+
+**RateLimitError:**
+
+```json
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded. Try again later."
+  }
+}
+```
+
+### Rate Limit Headers
+
+Rate-limited endpoints include the following response headers:
+
+| Header | Description | Example |
+|--------|-------------|---------|
+| `X-RateLimit-Limit` | Maximum requests allowed per window | `5` |
+| `X-RateLimit-Remaining` | Requests remaining in current window | `3` |
+| `Retry-After` | Seconds until next request is allowed (429 response only) | `45` |
 
 ## License
 
