@@ -73,6 +73,9 @@ Required variables:
 | `PORT` | Server port (default: 3000) |
 | `RATE_LIMIT_REGISTER` | Max register requests/min per IP (default: 3) |
 | `RATE_LIMIT_LOGIN` | Max login requests/min per IP (default: 5) |
+| `RATE_LIMIT_SESSION_LIST` | Max session list requests/min per user (default: 30) |
+| `RATE_LIMIT_SESSION_REVOKE` | Max session revoke requests/min per user (default: 30) |
+| `RATE_LIMIT_SESSION_REVOKE_ALL` | Max revoke-all requests/min per user (default: 10) |
 | `SESSION_LIMIT` | Max active sessions per user (default: 10) |
 
 ### Database Setup
@@ -328,30 +331,30 @@ curl -X POST http://localhost:3000/api/v1/auth/refresh \
 | 422 | `VALIDATION_FAILED` | Missing or invalid refreshToken field |
 
 ---
-
+ 
 ### Logout
-
+ 
 ```
 POST /api/v1/auth/logout
 ```
-
+ 
 Terminates the user's session and invalidates all refresh tokens. Requires a valid access token. Idempotent — calling multiple times returns success.
-
+ 
 **cURL:**
-
+ 
 ```bash
 curl -X POST http://localhost:3000/api/v1/auth/logout \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
 ```
-
+ 
 **Headers:**
-
+ 
 | Header | Required | Description |
 |--------|----------|-------------|
 | `Authorization` | Yes | `Bearer <accessToken>` |
-
+ 
 **Response (200):**
-
+ 
 ```json
 {
   "data": {
@@ -359,14 +362,185 @@ curl -X POST http://localhost:3000/api/v1/auth/logout \
   }
 }
 ```
-
+ 
 **Errors:**
-
+ 
 | Status | Code | Message |
 |--------|------|---------|
 | 401 | `UNAUTHORIZED` | Missing or invalid access token |
-
+ 
 ---
+ 
+### List Sessions
+ 
+```
+GET /api/v1/auth/sessions
+```
+ 
+Returns all active sessions for the authenticated user, including device information and which session is the current one.
+ 
+**cURL:**
+ 
+```bash
+curl -X GET http://localhost:3000/api/v1/auth/sessions \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+ 
+**Headers:**
+ 
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+ 
+**Response (200):**
+ 
+```json
+{
+  "data": {
+    "sessions": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)...",
+        "rememberMe": false,
+        "createdAt": "2026-07-10T19:30:00.000Z",
+        "lastActivityAt": "2026-07-13T02:54:39.000Z",
+        "isCurrent": true
+      },
+      {
+        "id": "660e8400-e29b-41d4-a716-446655440001",
+        "ipAddress": "10.0.0.50",
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)...",
+        "rememberMe": true,
+        "createdAt": "2026-07-12T08:15:00.000Z",
+        "lastActivityAt": "2026-07-12T22:10:00.000Z",
+        "isCurrent": false
+      }
+    ]
+  }
+}
+```
+ 
+**Session Object:**
+ 
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (UUID) | Session identifier |
+| `ipAddress` | string | Client IP address (IPv4 or IPv6) |
+| `userAgent` | string | Client device/browser user agent |
+| `rememberMe` | boolean | Whether "Remember Me" was used at login |
+| `createdAt` | string (ISO 8601) | When the session was created |
+| `lastActivityAt` | string (ISO 8601) | Last token refresh time |
+| `isCurrent` | boolean | `true` if this is the session making the request |
+ 
+**Ordering:** Sessions are sorted by `lastActivityAt` descending (most recently active first).
+ 
+**Filtering:** Only non-expired sessions are returned.
+ 
+**Errors:**
+ 
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 500 | `SERVER_ERROR` | Internal server error |
+ 
+**Rate Limit:** 30 requests/minute per user
+ 
+---
+ 
+### Revoke Session
+ 
+```
+DELETE /api/v1/auth/sessions/:sessionId
+```
+ 
+Revokes (terminates) a specific session by its identifier. Revoking the current session is equivalent to logging out.
+ 
+**cURL:**
+ 
+```bash
+curl -X DELETE http://localhost:3000/api/v1/auth/sessions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+ 
+**Headers:**
+ 
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+ 
+**Path Parameters:**
+ 
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string (UUID) | Yes | The session to revoke |
+ 
+**Response (200):**
+ 
+```json
+{
+  "data": {
+    "success": true
+  }
+}
+```
+ 
+**Errors:**
+ 
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Session not found or does not belong to user |
+| 500 | `SERVER_ERROR` | Internal server error |
+ 
+**Rate Limit:** 30 requests/minute per user
+ 
+---
+ 
+### Revoke All Sessions
+ 
+```
+POST /api/v1/auth/sessions/revoke-all
+```
+ 
+Revokes all sessions except the current one, effectively signing out from all other devices while remaining authenticated on the current device.
+ 
+**cURL:**
+ 
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/sessions/revoke-all \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+ 
+**Headers:**
+ 
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+ 
+**Response (200):**
+ 
+```json
+{
+  "data": {
+    "success": true,
+    "revokedCount": 3
+  }
+}
+```
+ 
+**Behavior:** The current session (the one used to make the request) is preserved. All other non-expired sessions for the user are revoked. The `revokedCount` field reflects the number of sessions revoked (excluding the current session).
+ 
+If no other sessions exist, the response is `{ "success": true, "revokedCount": 0 }`.
+ 
+**Errors:**
+ 
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 500 | `SERVER_ERROR` | Internal server error |
+ 
+**Rate Limit:** 10 requests/minute per user
 
 ## Authentication
 
@@ -378,16 +552,17 @@ curl -X POST http://localhost:3000/api/v1/auth/logout \
 | Refresh Token | HS256 | 7 days (30 days with `rememberMe`) | Token renewal |
 
 **Access Token Payload:**
-
+ 
 ```json
 {
   "sub": "user-uuid",
   "type": "access",
+  "sid": "session-uuid",
   "iat": 1720701600,
   "jti": "unique-token-id"
 }
 ```
-
+ 
 ### Session Management
 
 - Sessions are stored in PostgreSQL (authoritative) and cached in Redis (fast lookup)
@@ -396,12 +571,15 @@ curl -X POST http://localhost:3000/api/v1/auth/logout \
 - Refresh tokens are stored as **bcrypt hashes only** — raw tokens are never persisted
 
 ### Rate Limiting
-
+ 
 | Endpoint | Limit |
 |----------|-------|
 | Global | 100 requests/min per IP |
 | Register | 3 requests/min per IP |
 | Login | 5 requests/min per IP |
+| List Sessions | 30 requests/min per user |
+| Revoke Session | 30 requests/min per user |
+| Revoke All Sessions | 10 requests/min per user |
 
 ## Error Handling
 

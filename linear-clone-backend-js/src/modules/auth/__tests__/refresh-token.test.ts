@@ -12,6 +12,11 @@ describe('RefreshToken', () => {
     mockSessionRepository = {
       create: vi.fn(),
       findByRefreshTokenHash: vi.fn(),
+      findById: vi.fn(),
+      findByUserId: vi.fn(),
+      deleteById: vi.fn(),
+      deleteByIds: vi.fn(),
+      findOldestByUserId: vi.fn(),
       deleteByRefreshTokenHash: vi.fn(),
       countByUserId: vi.fn(),
       deleteOldestByUserId: vi.fn(),
