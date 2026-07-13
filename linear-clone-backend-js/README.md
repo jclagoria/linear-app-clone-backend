@@ -26,14 +26,22 @@ src/
 ├── server.ts                          # Entry point
 ├── app.ts                             # Fastify app setup, plugins, routes
 ├── modules/
-│   └── auth/
-│       ├── domain/                    # Entities & schemas (users, sessions)
+│   ├── auth/
+│   │   ├── domain/                    # Entities & schemas (users, sessions)
+│   │   ├── application/               # Use cases + port interfaces
+│   │   │   └── ports/                 # Repository & service interfaces
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers & DTOs (HTTP layer)
+│   │   │   └── out/                   # DB, Redis, JWT implementations
+│   │   └── __tests__/
+│   └── identity/
+│       ├── domain/                    # Entities (user profile, organization, members)
 │       ├── application/               # Use cases + port interfaces
 │       │   └── ports/                 # Repository & service interfaces
 │       ├── adapters/
-│       │   ├── in/                    # Controllers & DTOs (HTTP layer)
-│       │   └── out/                   # DB, Redis, JWT implementations
-│       └── __tests__/
+│       │   ├── in/                    # Controllers, DTOs, middleware
+│       │   └── out/                   # DB implementations
+│       └── __tests__/                 # Unit, integration, contract tests
 └── shared/
     ├── config/env.ts                  # Environment configuration
     ├── database/index.ts              # Drizzle + pg Pool
@@ -558,6 +566,326 @@ If no other sessions exist, the response is `{ "success": true, "revokedCount": 
  
 **Rate Limit:** 10 requests/minute per user
 
+---
+
+### Get User Profile
+
+```
+GET /api/v1/users/me
+```
+
+Returns the authenticated user's profile information.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/users/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "avatarUrl": "https://example.com/avatar.jpg",
+      "createdAt": "2026-07-11T10:00:00.000Z",
+      "updatedAt": "2026-07-13T12:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | User not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Update User Profile
+
+```
+PATCH /api/v1/users/me
+```
+
+Updates the authenticated user's profile information. Only provided fields are updated.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/users/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Doe",
+    "avatarUrl": "https://example.com/new-avatar.jpg"
+  }'
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | No | 1-255 characters |
+| `avatarUrl` | string \| null | No | Valid URL format, or null to clear |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "name": "Jane Doe",
+      "avatarUrl": "https://example.com/new-avatar.jpg",
+      "createdAt": "2026-07-11T10:00:00.000Z",
+      "updatedAt": "2026-07-13T14:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (name or avatarUrl) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | User not found |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### Create Organization
+
+```
+POST /api/v1/organizations
+```
+
+Creates a new organization. The authenticated user becomes the organization owner.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/organizations \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Organization"
+  }'
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | Yes | 1-255 characters, unique |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "organization": {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "My Organization",
+      "createdAt": "2026-07-13T14:00:00.000Z",
+      "updatedAt": "2026-07-13T14:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (name) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 409 | `CONFLICT` | Organization name already exists |
+
+**Rate Limit:** 5 requests/minute per user
+
+---
+
+### List User Organizations
+
+```
+GET /api/v1/organizations
+```
+
+Returns all organizations the authenticated user belongs to.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/organizations \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "organizations": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "name": "My Organization",
+        "createdAt": "2026-07-13T14:00:00.000Z",
+        "updatedAt": "2026-07-13T14:00:00.000Z"
+      },
+      {
+        "id": "660e8400-e29b-41d4-a716-446655440002",
+        "name": "Another Organization",
+        "createdAt": "2026-07-12T10:00:00.000Z",
+        "updatedAt": "2026-07-12T10:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Get Organization Details
+
+```
+GET /api/v1/organizations/:organizationId
+```
+
+Returns details for a specific organization. User must be a member of the organization.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/organizations/550e8400-e29b-41d4-a716-446655440001 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `organizationId` | string (UUID) | Yes | Organization identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "organization": {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "My Organization",
+      "createdAt": "2026-07-13T14:00:00.000Z",
+      "updatedAt": "2026-07-13T14:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not an organization member |
+| 404 | `NOT_FOUND` | Organization not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Delete Organization
+
+```
+DELETE /api/v1/organizations/:organizationId
+```
+
+Soft-deletes an organization and all its members. Only the organization owner can delete an organization.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/organizations/550e8400-e29b-41d4-a716-446655440001 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `organizationId` | string (UUID) | Yes | Organization identifier |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Only organization owner can delete |
+| 404 | `NOT_FOUND` | Organization not found |
+
+**Rate Limit:** 5 requests/minute per user
+
 ## Authentication
 
 ### JWT Tokens
@@ -597,6 +925,12 @@ If no other sessions exist, the response is `{ "success": true, "revokedCount": 
 | List Sessions | 30 requests/min per user |
 | Revoke Session | 30 requests/min per user |
 | Revoke All Sessions | 10 requests/min per user |
+| Get User Profile | 30 requests/min per user |
+| Update User Profile | 10 requests/min per user |
+| Create Organization | 5 requests/min per user |
+| List Organizations | 30 requests/min per user |
+| Get Organization Details | 30 requests/min per user |
+| Delete Organization | 5 requests/min per user |
 
 **Rate Limit Headers:**
 
