@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import { authRoutes } from './modules/auth/adapters/in/auth-controller';
+import { identityRoutes } from './modules/identity/adapters/in/identity-controller';
 import { errorHandler } from './shared/errors/error-handler';
 import { env } from './shared/config/env';
 
@@ -29,6 +30,7 @@ app.setErrorHandler(errorHandler);
 
 // Register routes
 await app.register(authRoutes, { prefix: '/api/v1/auth' });
+await app.register(identityRoutes, { prefix: '/api/v1' });
 
 // Health check
 app.get('/api/health', async () => {
