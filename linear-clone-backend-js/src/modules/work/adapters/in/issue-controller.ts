@@ -89,7 +89,8 @@ const issueStatusQuery: IssueStatusQuery = {
 // Resolve default "Todo" status ID at initialization
 let defaultStatusId = '';
 try {
-  const { issueStatuses } = await import('../../domain/issue-status');
+  const { issueStatuses, DEFAULT_STATUSES, seedDefaultStatuses } = await import('../../domain/issue-status');
+  await seedDefaultStatuses();
   const todoStatus = await db
     .select()
     .from(issueStatuses)
@@ -97,9 +98,11 @@ try {
     .limit(1);
   if (todoStatus[0]) {
     defaultStatusId = todoStatus[0].id;
+  } else {
+    defaultStatusId = DEFAULT_STATUSES.find((s: any) => s.name === 'Todo')?.id || '';
   }
 } catch {
-  // If statuses table doesn't exist yet (migrations not run), default will be set at first use
+  defaultStatusId = '';
 }
 
 // Initialize use cases
