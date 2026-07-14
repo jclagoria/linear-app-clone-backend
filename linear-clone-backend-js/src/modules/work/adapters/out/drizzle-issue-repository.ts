@@ -121,7 +121,7 @@ export class DrizzleIssueRepository implements IssueRepository {
     await db.execute(createSeq);
 
     const getNext = sql`
-      SELECT nextval(${sql.identifier(seqName)}) as seq
+      SELECT nextval(${sql.identifier(seqName)}::regclass) as seq
     `;
     const result = await db.execute(getNext);
 
