@@ -34,14 +34,22 @@ src/
 │   │   │   ├── in/                    # Controllers & DTOs (HTTP layer)
 │   │   │   └── out/                   # DB, Redis, JWT implementations
 │   │   └── __tests__/
-│   └── identity/
-│       ├── domain/                    # Entities (user profile, organization, members)
+│   ├── identity/
+│   │   ├── domain/                    # Entities (user profile, organization, members)
+│   │   ├── application/               # Use cases + port interfaces
+│   │   │   └── ports/                 # Repository & service interfaces
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers, DTOs, middleware
+│   │   │   └── out/                   # DB implementations
+│   │   └── __tests__/                 # Unit, integration, contract tests
+│   └── work/
+│       ├── domain/                    # Entities & schemas (issues, statuses, labels)
 │       ├── application/               # Use cases + port interfaces
-│       │   └── ports/                 # Repository & service interfaces
+│       │   └── ports/                 # Repository & event interfaces
 │       ├── adapters/
-│       │   ├── in/                    # Controllers, DTOs, middleware
-│       │   └── out/                   # DB implementations
-│       └── __tests__/                 # Unit, integration, contract tests
+│       │   ├── in/                    # Controller & DTOs (issue API)
+│       │   └── out/                   # DB repository, event publisher
+│       └── __tests__/                 # Unit tests
 └── shared/
     ├── config/env.ts                  # Environment configuration
     ├── database/index.ts              # Drizzle + pg Pool
@@ -1303,6 +1311,500 @@ curl http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010/mem
 
 **Rate Limit:** 30 requests/minute per user
 
+---
+
+## Issues API
+
+All issue endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### Create Issue
+
+```
+POST /api/v1/issues
+```
+
+Creates a new issue with auto-generated identifier (e.g. `ENG-1`), default status (Todo), and default priority (0).
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/issues \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Implement login page",
+    "description": "Build the login page with email/password",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "priority": 2,
+    "parentId": "660e8400-e29b-41d4-a716-446655440100"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Default | Constraints |
+|-------|------|----------|---------|-------------|
+| `title` | string | Yes | - | 1-255 characters |
+| `description` | string | No | - | - |
+| `teamId` | string (UUID) | Yes | - | User must be a team member |
+| `priority` | number | No | `0` | 0 (none) to 4 (urgent) |
+| `projectId` | string (UUID) | No | - | - |
+| `parentId` | string (UUID) | No | - | Must belong to the same team |
+| `assigneeId` | string (UUID) | No | - | Must be a team member |
+| `cycleId` | string (UUID) | No | - | - |
+| `labelIds` | string[] (UUID) | No | - | - |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "identifier": "ENG-1",
+    "title": "Implement login page",
+    "description": "Build the login page with email/password",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "projectId": null,
+    "assigneeId": null,
+    "priority": 2,
+    "statusId": "550e8400-e29b-41d4-a716-446655440000",
+    "parentId": "660e8400-e29b-41d4-a716-446655440100",
+    "cycleId": null,
+    "sortOrder": 0,
+    "sequence": 1,
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z",
+    "completedAt": null,
+    "canceledAt": null,
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (title, teamId, etc.) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 422 | `BUSINESS_RULE_ERROR` | User is not a team member, or parent issue belongs to a different team |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Get Issue
+
+```
+GET /api/v1/issues/:id
+```
+
+Fetches a single issue by its UUID or string identifier (e.g. `ENG-1`).
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/issues/ENG-1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier (e.g. `ENG-1`) |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "identifier": "ENG-1",
+    "title": "Implement login page",
+    "description": "Build the login page with email/password",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "projectId": null,
+    "assigneeId": null,
+    "priority": 2,
+    "statusId": "550e8400-e29b-41d4-a716-446655440000",
+    "parentId": null,
+    "cycleId": null,
+    "sortOrder": 0,
+    "sequence": 1,
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z",
+    "completedAt": null,
+    "canceledAt": null,
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Update Issue
+
+```
+PATCH /api/v1/issues/:id
+```
+
+Partially updates an issue's fields. Only provided fields are modified.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/issues/ENG-1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Build login page",
+    "priority": 1,
+    "description": null
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `title` | string | No | 1-255 characters |
+| `description` | string \| null | No | Pass `null` to clear |
+| `projectId` | string (UUID) \| null | No | Must belong to the same team |
+| `priority` | number | No | 0 (none) to 4 (urgent) |
+| `cycleId` | string (UUID) \| null | No | - |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "identifier": "ENG-1",
+    "title": "Build login page",
+    "description": null,
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "projectId": null,
+    "assigneeId": null,
+    "priority": 1,
+    "statusId": "550e8400-e29b-41d4-a716-446655440000",
+    "parentId": null,
+    "cycleId": null,
+    "sortOrder": 0,
+    "sequence": 1,
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:30:00.000Z",
+    "completedAt": null,
+    "canceledAt": null,
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (empty title, invalid UUID) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+| 422 | `BUSINESS_RULE_ERROR` | Project belongs to a different team |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Change Issue Status
+
+```
+PATCH /api/v1/issues/:id/status
+```
+
+Transitions an issue to a new status. Validates against the default workflow transition map. Sets `completedAt` when moving to Done/Canceled, clears it when reopening.
+
+**Default Workflow:**
+
+```
+Backlog → Todo → In Progress → Done
+  ↓       ↓          ↓
+Canceled Canceled  Canceled
+```
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/issues/ENG-1/status \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "statusId": "550e8400-e29b-41d4-a716-446655440002"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `statusId` | string (UUID) | Yes | Target status ID |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "identifier": "ENG-1",
+    "title": "Implement login page",
+    "priority": 0,
+    "statusId": "550e8400-e29b-41d4-a716-446655440002",
+    "completedAt": null,
+    "canceledAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (statusId) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+| 422 | `BUSINESS_RULE_ERROR` | Invalid transition (e.g. Todo → Done directly) |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Assign Issue
+
+```
+PATCH /api/v1/issues/:id/assignee
+```
+
+Assigns or unassigns an issue. The assignee must be a member of the same team. Pass `null` to unassign.
+
+**cURL:**
+
+```bash
+# Assign
+curl -X PATCH http://localhost:3000/api/v1/issues/ENG-1/assignee \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "assigneeId": "550e8400-e29b-41d4-a716-446655440020"
+  }'
+
+# Unassign
+curl -X PATCH http://localhost:3000/api/v1/issues/ENG-1/assignee \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "assigneeId": null
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `assigneeId` | string (UUID) \| null | Yes | Must be a team member, or null to unassign |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440100",
+    "identifier": "ENG-1",
+    "title": "Implement login page",
+    "assigneeId": "550e8400-e29b-41d4-a716-446655440020",
+    ...
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (assigneeId) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+| 422 | `BUSINESS_RULE_ERROR` | Assignee is not a team member |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Delete Issue
+
+```
+DELETE /api/v1/issues/:id
+```
+
+Soft-deletes an issue by setting its `deletedAt` timestamp. The issue remains in the database but is excluded from default queries.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/issues/ENG-1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### List Issues
+
+```
+GET /api/v1/issues
+```
+
+Lists issues with filters, cursor-based pagination, and configurable page size. Soft-deleted issues are excluded by default. Results are sorted by priority (desc), then creation date (desc).
+
+**cURL:**
+
+```bash
+# List issues for a team
+curl "http://localhost:3000/api/v1/issues?teamId=550e8400-e29b-41d4-a716-446655440010&limit=20" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+
+# Paginate with cursor
+curl "http://localhost:3000/api/v1/issues?cursor=eyJpZCI6IjU1M...&limit=10" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `teamId` | string (UUID) | No | - | Filter by team |
+| `statusId` | string (UUID) | No | - | Filter by status |
+| `assigneeId` | string (UUID) | No | - | Filter by assignee |
+| `projectId` | string (UUID) | No | - | Filter by project |
+| `cycleId` | string (UUID) | No | - | Filter by cycle |
+| `labelIds` | string | No | - | Comma-separated label UUIDs |
+| `cursor` | string | No | - | Opaque cursor for pagination |
+| `limit` | number | No | `50` | 1-100 |
+| `includeDeleted` | boolean | No | `false` | Include soft-deleted issues |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440100",
+      "identifier": "ENG-1",
+      "title": "Implement login page",
+      "description": null,
+      "teamId": "550e8400-e29b-41d4-a716-446655440010",
+      "projectId": null,
+      "assigneeId": "550e8400-e29b-41d4-a716-446655440020",
+      "priority": 2,
+      "statusId": "550e8400-e29b-41d4-a716-446655440002",
+      "parentId": null,
+      "cycleId": null,
+      "sortOrder": 0,
+      "sequence": 1,
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:30:00.000Z",
+      "completedAt": null,
+      "canceledAt": null,
+      "deletedAt": null
+    }
+  ],
+  "pagination": {
+    "nextCursor": "eyJpZCI6IjU1M...",
+    "hasMore": false
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid query parameters |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Issue Response Object
+
+All issue endpoints return issues with the following structure:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (UUID) | Internal issue ID |
+| `identifier` | string | Human-readable ID (e.g. `ENG-1`) |
+| `title` | string | Issue title |
+| `description` | string \| null | Issue description |
+| `teamId` | string (UUID) | Parent team |
+| `projectId` | string (UUID) \| null | Project assignment |
+| `assigneeId` | string (UUID) \| null | Assigned user |
+| `priority` | number | 0 (none) to 4 (urgent) |
+| `statusId` | string (UUID) | Current status |
+| `parentId` | string (UUID) \| null | Parent issue |
+| `cycleId` | string (UUID) \| null | Cycle assignment |
+| `sortOrder` | number | Manual ordering |
+| `sequence` | number | Per-team sequence number |
+| `createdAt` | string (ISO 8601) | Creation timestamp |
+| `updatedAt` | string (ISO 8601) | Last update timestamp |
+| `completedAt` | string (ISO 8601) \| null | Completion timestamp |
+| `canceledAt` | string (ISO 8601) \| null | Cancellation timestamp |
+| `deletedAt` | string (ISO 8601) \| null | Soft-delete timestamp |
+
 ## Authentication
 
 ### JWT Tokens
@@ -1355,6 +1857,13 @@ curl http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010/mem
 | Add Team Member | 10 requests/min per user |
 | Remove Team Member | 10 requests/min per user |
 | List Team Members | 30 requests/min per user |
+| Create Issue | 60 requests/min per user |
+| Get Issue | 120 requests/min per user |
+| Update Issue | 60 requests/min per user |
+| Change Issue Status | 60 requests/min per user |
+| Assign Issue | 60 requests/min per user |
+| Delete Issue | 30 requests/min per user |
+| List Issues | 60 requests/min per user |
 
 **Rate Limit Headers:**
 
