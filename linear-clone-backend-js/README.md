@@ -886,6 +886,423 @@ No body returned on success.
 
 **Rate Limit:** 5 requests/minute per user
 
+---
+
+### Create Team
+
+```
+POST /api/v1/organizations/:organizationId/teams
+```
+
+Creates a new team within an organization. The authenticated user must be an organization member and becomes the team admin. The team key must be unique within the organization.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/organizations/550e8400-e29b-41d4-a716-446655440001/teams \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Engineering",
+    "key": "ENG"
+  }'
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `organizationId` | string (UUID) | Yes | Organization identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | Yes | 1-255 characters |
+| `key` | string | Yes | 1-10 uppercase letters, unique within org |
+
+> The `key` is automatically uppercased. Lowercase or special characters are rejected.
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "team": {
+      "id": "550e8400-e29b-41d4-a716-446655440010",
+      "organizationId": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "Engineering",
+      "key": "ENG",
+      "memberCount": 1,
+      "createdAt": "2026-07-13T15:00:00.000Z",
+      "updatedAt": "2026-07-13T15:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (name, key) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not an organization member |
+| 409 | `CONFLICT` | Team key already exists in this organization |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### List Teams
+
+```
+GET /api/v1/organizations/:organizationId/teams
+```
+
+Returns all active (non-deleted) teams within an organization. The authenticated user must be an organization member.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/organizations/550e8400-e29b-41d4-a716-446655440001/teams \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `organizationId` | string (UUID) | Yes | Organization identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "teams": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440010",
+        "name": "Engineering",
+        "key": "ENG",
+        "memberCount": 5,
+        "createdAt": "2026-07-13T15:00:00.000Z",
+        "updatedAt": "2026-07-13T15:00:00.000Z"
+      },
+      {
+        "id": "660e8400-e29b-41d4-a716-446655440011",
+        "name": "Design",
+        "key": "DSG",
+        "memberCount": 3,
+        "createdAt": "2026-07-13T15:30:00.000Z",
+        "updatedAt": "2026-07-13T15:30:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not an organization member |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Get Team Details
+
+```
+GET /api/v1/teams/:teamId
+```
+
+Returns details for a specific team. The authenticated user must be a team member.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "team": {
+      "id": "550e8400-e29b-41d4-a716-446655440010",
+      "organizationId": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "Engineering",
+      "key": "ENG",
+      "memberCount": 5,
+      "createdAt": "2026-07-13T15:00:00.000Z",
+      "updatedAt": "2026-07-13T15:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not a team member |
+| 404 | `NOT_FOUND` | Team not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Delete Team
+
+```
+DELETE /api/v1/teams/:teamId
+```
+
+Soft-deletes a team and all its memberships. Only team admins can delete a team. A `TeamDeleted` event is published for downstream consumers (e.g., nullifying team references on issues).
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Only team admins can perform this action |
+| 404 | `NOT_FOUND` | Team not found |
+
+**Rate Limit:** 5 requests/minute per user
+
+---
+
+### Add Team Member
+
+```
+POST /api/v1/teams/:teamId/members
+```
+
+Adds a user to a team with a specified role. The authenticated user must be a team admin. The target user must be a member of the team's organization.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010/members \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "role": "member"
+  }'
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Default | Constraints |
+|-------|------|----------|---------|-------------|
+| `userId` | string (UUID) | Yes | - | User to add, must be an org member |
+| `role` | string | No | `member` | `member` or `admin` |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "member": {
+      "id": "550e8400-e29b-41d4-a716-446655440020",
+      "userId": "550e8400-e29b-41d4-a716-446655440002",
+      "role": "member",
+      "joinedAt": "2026-07-13T16:00:00.000Z"
+    }
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input (userId, role) |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Only team admins can add members |
+| 404 | `NOT_FOUND` | Team not found |
+| 409 | `CONFLICT` | User is already a team member |
+| 422 | `BUSINESS_RULE_ERROR` | User is not an organization member |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### Remove Team Member
+
+```
+DELETE /api/v1/teams/:teamId/members/:userId
+```
+
+Removes a user from a team (soft-delete). The authenticated user must be a team admin. Cannot remove the last admin from the team.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010/members/550e8400-e29b-41d4-a716-446655440002 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+| `userId` | string (UUID) | Yes | Member to remove |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Only team admins can remove members |
+| 404 | `NOT_FOUND` | Team or member not found |
+| 409 | `CONFLICT` | Cannot remove the last admin from the team |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### List Team Members
+
+```
+GET /api/v1/teams/:teamId/members
+```
+
+Returns all active members of a team with their user profile details. The authenticated user must be a team member.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/teams/550e8400-e29b-41d4-a716-446655440010/members \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Headers:**
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer <accessToken>` |
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "members": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440020",
+        "userId": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "admin",
+        "joinedAt": "2026-07-13T15:00:00.000Z"
+      },
+      {
+        "id": "660e8400-e29b-41d4-a716-446655440021",
+        "userId": "550e8400-e29b-41d4-a716-446655440002",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "role": "member",
+        "joinedAt": "2026-07-13T16:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not a team member |
+| 404 | `NOT_FOUND` | Team not found |
+
+**Rate Limit:** 30 requests/minute per user
+
 ## Authentication
 
 ### JWT Tokens
@@ -931,6 +1348,13 @@ No body returned on success.
 | List Organizations | 30 requests/min per user |
 | Get Organization Details | 30 requests/min per user |
 | Delete Organization | 5 requests/min per user |
+| Create Team | 10 requests/min per user |
+| List Teams | 30 requests/min per user |
+| Get Team Details | 30 requests/min per user |
+| Delete Team | 5 requests/min per user |
+| Add Team Member | 10 requests/min per user |
+| Remove Team Member | 10 requests/min per user |
+| List Team Members | 30 requests/min per user |
 
 **Rate Limit Headers:**
 
@@ -962,7 +1386,7 @@ All errors follow a consistent structure:
 | `ConflictError` | 409 | `CONFLICT` | Duplicate resource |
 | `UnauthorizedError` | 401 | `UNAUTHORIZED` | Authentication required |
 | `ForbiddenError` | 403 | `FORBIDDEN` | Insufficient permissions |
-| `BusinessRuleError` | 422 | `BUSINESS_RULE_ERROR` | Domain rule violation |
+| `BusinessRuleError` | 422 | `BUSINESS_RULE_ERROR` | Domain rule violation (e.g. last admin removal, non-org member) |
 | `RateLimitError` | 429 | `RATE_LIMITED` | Too many requests |
 | `InternalError` | 500 | `SERVER_ERROR` | Unexpected server error |
 
