@@ -111,22 +111,12 @@ export class DrizzleIssueRepository implements IssueRepository {
   }
 
   async getNextSequence(teamId: string): Promise<number> {
-    // Use PostgreSQL sequence for atomic increments per team
-    const seqName = `issue_seq_${teamId.replace(/-/g, '_')}`;
+    const result = await db
+      .select({ maxSeq: sql<number>`COALESCE(MAX(${issues.sequence}), 0) + 1` })
+      .from(issues)
+      .where(eq(issues.teamId, teamId));
 
-    // Ensure sequence exists (create if not)
-    const createSeq = sql`
-      CREATE SEQUENCE IF NOT EXISTS ${sql.identifier(seqName)} START 1 INCREMENT 1
-    `;
-    await db.execute(createSeq);
-
-    const getNext = sql`
-      SELECT nextval(${sql.identifier(seqName)}::regclass) as seq
-    `;
-    const result = await db.execute(getNext);
-
-    const rows = result as unknown as { seq: number }[];
-    return rows[0]?.seq || 1;
+    return result[0]?.maxSeq || 1;
   }
 
   async create(issue: NewIssue): Promise<Issue> {
