@@ -3,12 +3,13 @@ import { Pool } from 'pg';
 import { env } from '../config/env';
 import * as authSchema from '../../modules/auth/domain';
 import * as identitySchema from '../../modules/identity/domain';
+import * as workSchema from '../../modules/work/domain';
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
 });
 
-const schema = { ...authSchema, ...identitySchema };
+const schema = { ...authSchema, ...identitySchema, ...workSchema };
 
 export const db = drizzle(pool, { schema });
 
