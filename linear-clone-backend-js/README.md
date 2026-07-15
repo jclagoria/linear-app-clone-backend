@@ -42,13 +42,13 @@ src/
 │   │   │   ├── in/                    # Controllers, DTOs, middleware
 │   │   │   └── out/                   # DB implementations
 │   │   └── __tests__/                 # Unit, integration, contract tests
-│   └── work/
-│       ├── domain/                    # Entities & schemas (issues, statuses, labels)
+│       └── work/
+│       ├── domain/                    # Entities & schemas (issues, statuses, labels, comments, watchers)
 │       ├── application/               # Use cases + port interfaces
 │       │   └── ports/                 # Repository & event interfaces
 │       ├── adapters/
-│       │   ├── in/                    # Controller & DTOs (issue API)
-│       │   └── out/                   # DB repository, event publisher
+│       │   ├── in/                    # Controllers & DTOs (issue, comment, label, watcher APIs)
+│       │   └── out/                   # DB repositories, event publisher
 │       └── __tests__/                 # Unit tests
 └── shared/
     ├── config/env.ts                  # Environment configuration
@@ -1805,9 +1805,721 @@ All issue endpoints return issues with the following structure:
 | `canceledAt` | string (ISO 8601) \| null | Cancellation timestamp |
 | `deletedAt` | string (ISO 8601) \| null | Soft-delete timestamp |
 
-## Authentication
+---
 
-### JWT Tokens
+## Comments API
+
+All comment endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### List Issue Comments
+
+```
+GET /api/v1/issues/:id/comments
+```
+
+Returns all non-deleted comments for an issue.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/issues/ENG-1/comments \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440200",
+      "issueId": "550e8400-e29b-41d4-a716-446655440100",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "body": "This is a comment",
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z",
+      "deletedAt": null
+    }
+  ]
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Create Comment
+
+```
+POST /api/v1/issues/:id/comments
+```
+
+Adds a comment to an issue. The authenticated user must be a team member.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/issues/ENG-1/comments \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "body": "This is a comment"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `body` | string | Yes | Minimum 1 character |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440200",
+    "issueId": "550e8400-e29b-41d4-a716-446655440100",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "body": "This is a comment",
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z",
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Empty body or invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+| 422 | `BUSINESS_RULE_ERROR` | User is not a team member |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Update Comment
+
+```
+PATCH /api/v1/issues/:id/comments/:commentId
+```
+
+Updates a comment's body. Only the comment author can update it.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/issues/ENG-1/comments/550e8400-e29b-41d4-a716-446655440200 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "body": "Updated comment body"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Issue UUID |
+| `commentId` | string (UUID) | Yes | Comment UUID |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `body` | string | Yes | Minimum 1 character |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440200",
+    "issueId": "550e8400-e29b-41d4-a716-446655440100",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "body": "Updated comment body",
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:30:00.000Z",
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Empty body or invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Comment not owned by user |
+| 404 | `NOT_FOUND` | Comment not found |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Delete Comment
+
+```
+DELETE /api/v1/issues/:id/comments/:commentId
+```
+
+Soft-deletes a comment. Only the comment author can delete it.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/issues/ENG-1/comments/550e8400-e29b-41d4-a716-446655440200 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Issue UUID |
+| `commentId` | string (UUID) | Yes | Comment UUID |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Comment not owned by user |
+| 404 | `NOT_FOUND` | Comment not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+## Labels API
+
+All label endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### List Labels
+
+```
+GET /api/v1/labels
+```
+
+Returns all non-deleted workspace labels.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/labels \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440300",
+      "name": "bug",
+      "description": "Something is broken",
+      "color": "#ef4444",
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z",
+      "deletedAt": null
+    }
+  ]
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Create Label
+
+```
+POST /api/v1/labels
+```
+
+Creates a new workspace label with a unique name.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/labels \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "bug",
+    "description": "Something is broken",
+    "color": "#ef4444"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | Yes | 1-100 characters, unique |
+| `description` | string \| null | No | Max 500 characters |
+| `color` | string \| null | No | Max 7 characters (hex color) |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440300",
+    "name": "bug",
+    "description": "Something is broken",
+    "color": "#ef4444",
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z",
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 409 | `CONFLICT` | Label name already exists |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Update Label
+
+```
+PATCH /api/v1/labels/:id
+```
+
+Updates a label's name, description, or color.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/labels/550e8400-e29b-41d4-a716-446655440300 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "bug",
+    "color": "#dc2626"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Label UUID |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | No | 1-100 characters, unique |
+| `description` | string \| null | No | Max 500 characters |
+| `color` | string \| null | No | Max 7 characters (hex color) |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440300",
+    "name": "bug",
+    "color": "#dc2626",
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:30:00.000Z",
+    "deletedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Label not found |
+| 409 | `CONFLICT` | Label name already exists |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Delete Label
+
+```
+DELETE /api/v1/labels/:id
+```
+
+Soft-deletes a label. Existing label-issue associations are preserved but the label is hidden from default queries.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/labels/550e8400-e29b-41d4-a716-446655440300 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Label UUID |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Label not found |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Get Issue Labels
+
+```
+GET /api/v1/issues/:id/labels
+```
+
+Returns all labels attached to an issue.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/issues/ENG-1/labels \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440300",
+      "name": "bug",
+      "description": "Something is broken",
+      "color": "#ef4444",
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z",
+      "deletedAt": null
+    }
+  ]
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Attach Label
+
+```
+POST /api/v1/issues/:id/labels
+```
+
+Attaches a label to an issue. The authenticated user must be a team member.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/issues/ENG-1/labels \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "labelId": "550e8400-e29b-41d4-a716-446655440300"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `labelId` | string (UUID) | Yes | Label UUID |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "issueId": "550e8400-e29b-41d4-a716-446655440100",
+    "labelId": "550e8400-e29b-41d4-a716-446655440300"
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue or label not found |
+| 409 | `CONFLICT` | Label already attached to this issue |
+| 422 | `BUSINESS_RULE_ERROR` | User is not a team member |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Detach Label
+
+```
+DELETE /api/v1/issues/:id/labels/:labelId
+```
+
+Removes a label from an issue.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/issues/ENG-1/labels/550e8400-e29b-41d4-a716-446655440300 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Issue UUID |
+| `labelId` | string (UUID) | Yes | Label UUID |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Label not attached to this issue |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+## Watchers API
+
+All watcher endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### List Watchers
+
+```
+GET /api/v1/issues/:id/watchers
+```
+
+Returns all users watching an issue.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/api/v1/issues/ENG-1/watchers \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440400",
+      "issueId": "550e8400-e29b-41d4-a716-446655440100",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "createdAt": "2026-07-14T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Add Watcher
+
+```
+POST /api/v1/issues/:id/watchers
+```
+
+Adds a user as a watcher on an issue. The authenticated user must be a team member. If `userId` is omitted, the authenticated user is added.
+
+**cURL:**
+
+```bash
+# Add yourself as watcher
+curl -X POST http://localhost:3000/api/v1/issues/ENG-1/watchers \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Add another user as watcher
+curl -X POST http://localhost:3000/api/v1/issues/ENG-1/watchers \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "550e8400-e29b-41d4-a716-446655440020"
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Issue UUID or identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `userId` | string (UUID) | No | Defaults to authenticated user |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440400",
+    "issueId": "550e8400-e29b-41d4-a716-446655440100",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "createdAt": "2026-07-14T10:00:00.000Z"
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Issue not found |
+| 409 | `CONFLICT` | User is already watching this issue |
+| 422 | `BUSINESS_RULE_ERROR` | User is not a team member |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Remove Watcher
+
+```
+DELETE /api/v1/issues/:id/watchers/:userId
+```
+
+Removes a user from an issue's watchers. Only the authenticated user can remove themselves.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/issues/ENG-1/watchers/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string (UUID) | Yes | Issue UUID |
+| `userId` | string (UUID) | Yes | User UUID to remove |
+
+**Response (204):**
+
+No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 404 | `NOT_FOUND` | Watcher not found |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+## Authentication
 
 | Token | Algorithm | Expiry | Usage |
 |-------|-----------|--------|-------|
@@ -1864,6 +2576,20 @@ All issue endpoints return issues with the following structure:
 | Assign Issue | 60 requests/min per user |
 | Delete Issue | 30 requests/min per user |
 | List Issues | 60 requests/min per user |
+| List Issue Comments | 120 requests/min per user |
+| Create Comment | 60 requests/min per user |
+| Update Comment | 60 requests/min per user |
+| Delete Comment | 30 requests/min per user |
+| List Labels | 120 requests/min per user |
+| Create Label | 60 requests/min per user |
+| Update Label | 60 requests/min per user |
+| Delete Label | 30 requests/min per user |
+| Get Issue Labels | 120 requests/min per user |
+| Attach Label | 60 requests/min per user |
+| Detach Label | 60 requests/min per user |
+| List Watchers | 120 requests/min per user |
+| Add Watcher | 60 requests/min per user |
+| Remove Watcher | 60 requests/min per user |
 
 **Rate Limit Headers:**
 

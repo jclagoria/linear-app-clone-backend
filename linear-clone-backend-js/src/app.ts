@@ -4,6 +4,9 @@ import rateLimit from '@fastify/rate-limit';
 import { authRoutes } from './modules/auth/adapters/in/auth-controller';
 import { identityRoutes } from './modules/identity/adapters/in/identity-controller';
 import { issueRoutes } from './modules/work/adapters/in/issue-controller';
+import { commentRoutes } from './modules/work/adapters/in/comment-controller';
+import { labelRoutes } from './modules/work/adapters/in/label-controller';
+import { watcherRoutes } from './modules/work/adapters/in/watcher-controller';
 import { errorHandler } from './shared/errors/error-handler';
 import { env } from './shared/config/env';
 
@@ -33,6 +36,9 @@ app.setErrorHandler(errorHandler);
 await app.register(authRoutes, { prefix: '/api/v1/auth' });
 await app.register(identityRoutes, { prefix: '/api/v1' });
 await app.register(issueRoutes, { prefix: '/api/v1' });
+await app.register(commentRoutes, { prefix: '/api/v1' });
+await app.register(labelRoutes, { prefix: '/api/v1' });
+await app.register(watcherRoutes, { prefix: '/api/v1' });
 
 // Health check
 app.get('/api/health', async () => {
