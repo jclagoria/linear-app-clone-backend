@@ -89,7 +89,8 @@ const issueStatusQuery: IssueStatusQuery = {
 // Resolve default "Todo" status ID at initialization
 let defaultStatusId = '';
 try {
-  const { issueStatuses, DEFAULT_STATUSES, seedDefaultStatuses } = await import('../../domain/issue-status');
+  const { issueStatuses, DEFAULT_STATUSES } = await import('../../domain/issue-status');
+  const { seedDefaultStatuses } = await import('../../../../shared/database/seed-statuses');
   await seedDefaultStatuses();
   const todoStatus = await db
     .select()

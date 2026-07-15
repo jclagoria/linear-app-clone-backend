@@ -1,6 +1,4 @@
 import { pgTable, uuid, varchar, integer, timestamp } from 'drizzle-orm/pg-core';
-import { db } from '../../../shared/database';
-import { eq } from 'drizzle-orm';
 
 export const issueStatuses = pgTable('issue_statuses', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -21,10 +19,3 @@ export const DEFAULT_STATUSES = [
   { id: 'a1b2c3d4-e5f6-4789-abcd-ef0123456005', name: 'Done', type: 'completed', position: 4 },
   { id: 'a1b2c3d4-e5f6-4789-abcd-ef0123456006', name: 'Canceled', type: 'canceled', position: 5 },
 ] as const;
-
-export async function seedDefaultStatuses(): Promise<void> {
-  const existing = await db.select().from(issueStatuses).limit(1);
-  if (existing.length > 0) return;
-
-  await db.insert(issueStatuses).values(DEFAULT_STATUSES).onConflictDoNothing();
-}

@@ -86,3 +86,94 @@ export interface PaginatedResponse<T> {
     hasMore: boolean;
   };
 }
+
+// Comment DTOs
+export const CreateCommentRequestSchema = z.object({
+  body: z.string().min(1, 'Body is required'),
+});
+
+export type CreateCommentRequest = z.infer<typeof CreateCommentRequestSchema>;
+
+export const UpdateCommentRequestSchema = z.object({
+  body: z.string().min(1, 'Body is required'),
+});
+
+export type UpdateCommentRequest = z.infer<typeof UpdateCommentRequestSchema>;
+
+export const CommentIdParamsSchema = z.object({
+  id: z.string().uuid('Invalid issue ID'),
+  commentId: z.string().uuid('Invalid comment ID'),
+});
+
+export type CommentIdParams = z.infer<typeof CommentIdParamsSchema>;
+
+export interface CommentResponse {
+  id: string;
+  issueId: string;
+  userId: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+// Label DTOs
+export const CreateLabelRequestSchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).nullable().optional(),
+  color: z.string().max(7).nullable().optional(),
+});
+
+export type CreateLabelRequest = z.infer<typeof CreateLabelRequestSchema>;
+
+export const UpdateLabelRequestSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).nullable().optional(),
+  color: z.string().max(7).nullable().optional(),
+});
+
+export type UpdateLabelRequest = z.infer<typeof UpdateLabelRequestSchema>;
+
+export const LabelIdParamsSchema = z.object({
+  id: z.string().uuid('Invalid label ID'),
+});
+
+export type LabelIdParams = z.infer<typeof LabelIdParamsSchema>;
+
+export const IssueLabelParamsSchema = z.object({
+  id: z.string().uuid('Invalid issue ID'),
+  labelId: z.string().uuid('Invalid label ID'),
+});
+
+export type IssueLabelParams = z.infer<typeof IssueLabelParamsSchema>;
+
+export interface LabelResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+// Watcher DTOs
+export const AddWatcherRequestSchema = z.object({
+  userId: z.string().uuid().optional(),
+});
+
+export type AddWatcherRequest = z.infer<typeof AddWatcherRequestSchema>;
+
+export const WatcherIdParamsSchema = z.object({
+  id: z.string().uuid('Invalid issue ID'),
+  userId: z.string().uuid('Invalid user ID'),
+});
+
+export type WatcherIdParams = z.infer<typeof WatcherIdParamsSchema>;
+
+export interface WatcherResponse {
+  id: string;
+  issueId: string;
+  userId: string;
+  createdAt: string;
+}

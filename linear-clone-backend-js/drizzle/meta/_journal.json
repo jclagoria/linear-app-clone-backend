@@ -36,6 +36,20 @@
       "when": 1784060035039,
       "tag": "0004_careful_risque",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784075517149,
+      "tag": "0005_little_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784075561362,
+      "tag": "0006_milky_steve_rogers",
+      "breakpoints": true
     }
   ]
 }
