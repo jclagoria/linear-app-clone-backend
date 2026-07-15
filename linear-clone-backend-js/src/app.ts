@@ -8,6 +8,7 @@ import { commentRoutes } from './modules/work/adapters/in/comment-controller';
 import { labelRoutes } from './modules/work/adapters/in/label-controller';
 import { watcherRoutes } from './modules/work/adapters/in/watcher-controller';
 import { workflowRoutes } from './modules/workflow/adapters/in/controller';
+import { projectRoutes } from './modules/project/adapters/in/project-controller';
 import { errorHandler } from './shared/errors/error-handler';
 import { env } from './shared/config/env';
 
@@ -41,6 +42,7 @@ await app.register(commentRoutes, { prefix: '/api/v1' });
 await app.register(labelRoutes, { prefix: '/api/v1' });
 await app.register(watcherRoutes, { prefix: '/api/v1' });
 await app.register(workflowRoutes, { prefix: '/api/v1' });
+await app.register(projectRoutes, { prefix: '/api/v1' });
 
 // Health check
 app.get('/api/health', async () => {

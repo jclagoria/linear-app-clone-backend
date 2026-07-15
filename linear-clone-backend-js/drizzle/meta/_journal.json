@@ -57,6 +57,13 @@
       "when": 1784143689172,
       "tag": "0007_outstanding_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784150578220,
+      "tag": "0008_hot_lester",
+      "breakpoints": true
     }
   ]
 }
