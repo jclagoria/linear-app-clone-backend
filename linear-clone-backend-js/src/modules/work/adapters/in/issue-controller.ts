@@ -17,6 +17,11 @@ import { ListIssues } from '../../application/list-issues';
 import { DrizzleIssueRepository } from '../out/drizzle-issue-repository';
 import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
 import { JoseTokenService } from '../../../identity/adapters/out/token-service';
+import { WorkflowValidationAdapter, WorkflowStateHistoryAdapter } from '../out/workflow-validation-adapter';
+import { DrizzleStateRepository } from '../../../workflow/adapters/out/drizzle-state-repository';
+import { DrizzleTransitionRepository } from '../../../workflow/adapters/out/drizzle-transition-repository';
+import { DrizzleHistoryRepository } from '../../../workflow/adapters/out/drizzle-history-repository';
+import { ValidateTransition } from '../../../workflow/application/validate-transition';
 import { db } from '../../../../shared/database';
 import { teamMembers } from '../../../identity/domain/team-member';
 import { eq, and, isNull } from 'drizzle-orm';
@@ -109,7 +114,15 @@ try {
 // Initialize use cases
 const createIssue = new CreateIssue(issueRepository, teamMemberQuery, projectQuery, teamKeyQuery, defaultStatusId, eventPublisher);
 const updateIssue = new UpdateIssue(issueRepository, projectQuery, eventPublisher);
-const changeIssueStatus = new ChangeIssueStatus(issueRepository, issueStatusQuery, eventPublisher);
+const workflowStateRepo = new DrizzleStateRepository();
+const workflowTransitionRepo = new DrizzleTransitionRepository();
+const workflowHistoryRepo = new DrizzleHistoryRepository();
+const workflowValidationService = new WorkflowValidationAdapter(
+  new ValidateTransition(workflowStateRepo, workflowTransitionRepo),
+);
+const workflowHistoryAdapter = new WorkflowStateHistoryAdapter(workflowHistoryRepo);
+
+const changeIssueStatus = new ChangeIssueStatus(issueRepository, issueStatusQuery, eventPublisher, workflowValidationService, workflowHistoryAdapter);
 const assignIssue = new AssignIssue(issueRepository, teamMemberQuery, eventPublisher);
 const deleteIssue = new DeleteIssue(issueRepository, eventPublisher);
 const listIssues = new ListIssues(issueRepository);

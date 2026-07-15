@@ -1,19 +1,10 @@
 import { z } from 'zod';
 import { IssueRepository } from './ports/issue-repository';
 import { EventPublisher } from './ports/event-publisher';
+import { WorkflowValidationService, StateHistoryService } from './ports/workflow-validation-service';
 import { IssueNotFoundError, InvalidTransitionError } from '../domain/errors';
 
 export type StatusType = 'backlog' | 'unstarted' | 'started' | 'completed' | 'canceled';
-
-// Default workflow transition map
-// Maps current status type -> allowed target status types
-const DEFAULT_WORKFLOW_TRANSITIONS: Record<StatusType, StatusType[]> = {
-  backlog: ['unstarted'],
-  unstarted: ['started'],
-  started: ['started', 'completed'],
-  completed: ['started'], // Reopen
-  canceled: [], // Terminal - no transitions out
-};
 
 export const ChangeIssueStatusInput = z.object({
   statusId: z.string().uuid(),
@@ -38,6 +29,8 @@ export class ChangeIssueStatus {
     private issueRepository: IssueRepository,
     private issueStatusQuery: IssueStatusQuery,
     private eventPublisher: EventPublisher,
+    private workflowValidation?: WorkflowValidationService,
+    private stateHistoryService?: StateHistoryService,
   ) {}
 
   async execute(
@@ -47,13 +40,11 @@ export class ChangeIssueStatus {
   ): Promise<ChangeIssueStatusOutput> {
     const validated = ChangeIssueStatusInput.parse(input);
 
-    // Check issue exists
     const existing = await this.issueRepository.findById(issueId);
     if (!existing) {
       throw new IssueNotFoundError();
     }
 
-    // Get current and target status types
     const currentStatus = await this.issueStatusQuery.getStatusById(existing.statusId);
     const targetStatus = await this.issueStatusQuery.getStatusById(validated.statusId);
 
@@ -61,13 +52,22 @@ export class ChangeIssueStatus {
       throw new InvalidTransitionError('Status not found');
     }
 
-    // Validate transition (allow cancel from any state)
-    if (targetStatus.type !== 'canceled') {
-      const allowedTransitions = DEFAULT_WORKFLOW_TRANSITIONS[currentStatus.type];
-      if (!allowedTransitions.includes(targetStatus.type)) {
+    if (this.workflowValidation) {
+      const validation = await this.workflowValidation.validateTransition({
+        teamId: existing.teamId,
+        issueId,
+        toStateId: validated.statusId,
+        fromStateId: existing.statusId,
+      });
+      if (!validation.valid) {
         throw new InvalidTransitionError(
-          `Cannot transition from '${currentStatus.name}' to '${targetStatus.name}'`,
+          `Cannot transition: ${validation.reason || 'transition_not_allowed'}`,
         );
+      }
+    } else {
+      // Fallback: allow cancel from any state
+      if (currentStatus.type === 'canceled') {
+        throw new InvalidTransitionError('Cannot transition from canceled state');
       }
     }
 
@@ -97,6 +97,15 @@ export class ChangeIssueStatus {
       fromStatusId: existing.statusId,
       toStatusId: validated.statusId,
     });
+
+    if (this.stateHistoryService) {
+      await this.stateHistoryService.recordStatusChange({
+        issueId,
+        fromStateId: existing.statusId,
+        toStateId: validated.statusId,
+        userId,
+      });
+    }
 
     return {
       id: updated.id,
