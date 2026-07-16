@@ -7,12 +7,13 @@ import * as workSchema from '../../modules/work/domain';
 import * as workflowSchema from '../../modules/workflow/domain';
 import * as projectSchema from '../../modules/project/domain';
 import * as cycleSchema from '../../modules/cycle/domain';
+import * as notificationSchema from '../../modules/notification/domain';
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
 });
 
-const schema = { ...authSchema, ...identitySchema, ...workSchema, ...workflowSchema, ...projectSchema, ...cycleSchema };
+const schema = { ...authSchema, ...identitySchema, ...workSchema, ...workflowSchema, ...projectSchema, ...cycleSchema, ...notificationSchema };
 
 export const db = drizzle(pool, { schema });
 

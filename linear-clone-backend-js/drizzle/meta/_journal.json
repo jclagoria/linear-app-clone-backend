@@ -71,6 +71,13 @@
       "when": 1784170153052,
       "tag": "0009_thick_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784214363775,
+      "tag": "0010_goofy_psylocke",
+      "breakpoints": true
     }
   ]
 }

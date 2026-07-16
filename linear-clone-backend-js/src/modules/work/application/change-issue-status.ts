@@ -4,6 +4,15 @@ import { EventPublisher } from './ports/event-publisher';
 import { WorkflowValidationService, StateHistoryService } from './ports/workflow-validation-service';
 import { IssueNotFoundError, InvalidTransitionError } from '../domain/errors';
 
+export interface NotificationService {
+  create(event: {
+    type: 'issue_assigned' | 'issue_mentioned' | 'comment_added' | 'statusChanged' | 'cycle_started' | 'cycle_completed';
+    actorId: string;
+    targetId: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void>;
+}
+
 export type StatusType = 'backlog' | 'unstarted' | 'started' | 'completed' | 'canceled';
 
 export const ChangeIssueStatusInput = z.object({
@@ -31,6 +40,7 @@ export class ChangeIssueStatus {
     private eventPublisher: EventPublisher,
     private workflowValidation?: WorkflowValidationService,
     private stateHistoryService?: StateHistoryService,
+    private notificationService?: NotificationService,
   ) {}
 
   async execute(
@@ -104,6 +114,21 @@ export class ChangeIssueStatus {
         fromStateId: existing.statusId,
         toStateId: validated.statusId,
         userId,
+      });
+    }
+
+    // Send notification for status change
+    if (this.notificationService) {
+      await this.notificationService.create({
+        type: 'statusChanged',
+        actorId: userId,
+        targetId: issueId,
+        metadata: {
+          issueTitle: existing.title,
+          issueIdentifier: existing.identifier,
+          fromStatus: currentStatus.name,
+          toStatus: targetStatus.name,
+        },
       });
     }
 

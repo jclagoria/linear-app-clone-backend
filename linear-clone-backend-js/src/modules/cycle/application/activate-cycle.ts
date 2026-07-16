@@ -8,11 +8,21 @@ import {
   CompletedCycleCannotBeActivatedError,
 } from '../domain/errors';
 
+export interface NotificationService {
+  create(event: {
+    type: 'cycle_started' | 'cycle_completed';
+    actorId: string;
+    targetId: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void>;
+}
+
 export class ActivateCycle {
   constructor(
     private cycleRepository: CycleRepository,
     private teamMemberQuery: TeamMemberQuery,
     private eventPublisher: CycleEventPublisher,
+    private notificationService?: NotificationService,
   ) {}
 
   async execute(id: string, userId: string): Promise<any> {
@@ -65,6 +75,19 @@ export class ActivateCycle {
       cycleId: id,
       teamId: cycle.teamId,
     });
+
+    // Send cycle_started notification
+    if (this.notificationService) {
+      await this.notificationService.create({
+        type: 'cycle_started',
+        actorId: userId,
+        targetId: id,
+        metadata: {
+          cycleName: cycle.name,
+          teamId: cycle.teamId,
+        },
+      });
+    }
 
     return {
       id: updated.id,
