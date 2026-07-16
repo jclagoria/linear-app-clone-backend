@@ -7,11 +7,21 @@ import {
   DraftCycleCannotBeCompletedError,
 } from '../domain/errors';
 
+export interface NotificationService {
+  create(event: {
+    type: 'cycle_started' | 'cycle_completed';
+    actorId: string;
+    targetId: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void>;
+}
+
 export class CompleteCycle {
   constructor(
     private cycleRepository: CycleRepository,
     private teamMemberQuery: TeamMemberQuery,
     private eventPublisher: CycleEventPublisher,
+    private notificationService?: NotificationService,
   ) {}
 
   async execute(id: string, userId: string): Promise<any> {
@@ -45,6 +55,19 @@ export class CompleteCycle {
       cycleId: id,
       teamId: cycle.teamId,
     });
+
+    // Send cycle_completed notification
+    if (this.notificationService) {
+      await this.notificationService.create({
+        type: 'cycle_completed',
+        actorId: userId,
+        targetId: id,
+        metadata: {
+          cycleName: cycle.name,
+          teamId: cycle.teamId,
+        },
+      });
+    }
 
     return {
       id: updated.id,
