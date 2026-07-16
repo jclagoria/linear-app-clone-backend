@@ -17,4 +17,7 @@ export const env = {
   RATE_LIMIT_SESSION_REVOKE_ALL: parseInt(process.env.RATE_LIMIT_SESSION_REVOKE_ALL || '10', 10),
   SESSION_LIMIT: parseInt(process.env.SESSION_LIMIT || '10', 10),
   CORS_ORIGINS: process.env.CORS_ORIGINS || '*',
+  WS_PORT: parseInt(process.env.WS_PORT || '0', 10),
+  WS_AUTH_TIMEOUT_MS: parseInt(process.env.WS_AUTH_TIMEOUT_MS || '5000', 10),
+  WS_MAX_CONNECTIONS: parseInt(process.env.WS_MAX_CONNECTIONS || '1000', 10),
 };
