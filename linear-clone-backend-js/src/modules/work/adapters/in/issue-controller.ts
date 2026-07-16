@@ -66,9 +66,10 @@ const teamKeyQuery: TeamKeyQuery = {
 // Shared project query (reused across use cases)
 const projectQuery: CreateProjectQuery & UpdateProjectQuery = {
   async getProjectTeamId(projectId: string): Promise<string | null> {
-    // Project module not yet built - return null indicating no validation
-    // When projects module exists, inject the real query here
-    return null;
+    const { DrizzleProjectRepository } = await import('../../../project/adapters/out/drizzle-project-repository');
+    const repo = new DrizzleProjectRepository();
+    const project = await repo.findById(projectId);
+    return project ? project.teamId : null;
   },
 };
 
