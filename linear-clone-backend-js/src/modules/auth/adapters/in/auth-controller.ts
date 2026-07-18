@@ -16,6 +16,11 @@ import { RedisSessionStore } from '../out/redis-session-store';
 import { JoseTokenService } from '../out/token-service';
 import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
 import { env } from '../../../../shared/config/env';
+import {
+  setRefreshTokenCookie,
+  clearRefreshTokenCookie,
+  getRefreshTokenCookie,
+} from '../../../../shared/cookie';
 
 // Initialize dependencies
 const userRepository = new DrizzleUserRepository();
@@ -44,8 +49,9 @@ const LoginRequestSchema = z.object({
   rememberMe: z.boolean().optional().default(false),
 });
 
+// RefreshTokenRequestSchema - refreshToken is optional in body (cookie is preferred)
 const RefreshTokenRequestSchema = z.object({
-  refreshToken: z.string().min(1, 'Refresh token is required'),
+  refreshToken: z.string().optional(),
 });
 
 const SessionIdParamsSchema = z.object({
@@ -96,8 +102,14 @@ export async function authRoutes(app: FastifyInstance) {
         const input = RegisterRequestSchema.parse(request.body);
         const result = await registerUser.execute(input);
 
+        // Set refresh token as HttpOnly cookie
+        setRefreshTokenCookie(reply, result.refreshToken);
+
         return reply.status(201).send({
-          data: result,
+          data: {
+            user: result.user,
+            accessToken: result.accessToken,
+          },
         });
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -150,8 +162,14 @@ export async function authRoutes(app: FastifyInstance) {
           userAgent,
         });
 
+        // Set refresh token as HttpOnly cookie
+        setRefreshTokenCookie(reply, result.refreshToken, body.rememberMe);
+
         return reply.status(200).send({
-          data: result,
+          data: {
+            user: result.user,
+            accessToken: result.accessToken,
+          },
         });
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -184,27 +202,32 @@ export async function authRoutes(app: FastifyInstance) {
   // POST /refresh - Token refresh endpoint
   app.post('/refresh', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const body = RefreshTokenRequestSchema.parse(request.body);
-      const result = await refreshToken.execute(body);
+      // Read refreshToken from cookie first, then body fallback
+      const refreshTokenFromCookie = getRefreshTokenCookie(request);
+      const body = request.body as { refreshToken?: string };
+      const refreshTokenValue = refreshTokenFromCookie || body?.refreshToken;
 
-      return reply.status(200).send({
-        data: result,
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
+      if (!refreshTokenValue) {
         return reply.status(422).send({
           error: {
             code: 'VALIDATION_FAILED',
-            message: 'Invalid input',
-            details: error.issues.map((e) => ({
-              field: e.path.join('.'),
-              message: e.message,
-            })),
+            message: 'Refresh token is required',
           },
         });
       }
 
+      const result = await refreshToken.execute({ refreshToken: refreshTokenValue });
+
+      // Set rotated refresh token as new HttpOnly cookie
+      setRefreshTokenCookie(reply, result.refreshToken);
+
+      return reply.status(200).send({
+        data: { accessToken: result.accessToken },
+      });
+    } catch (error) {
       if (error instanceof TokenExpiredError) {
+        // Clear expired token cookie
+        clearRefreshTokenCookie(reply);
         return reply.status(401).send({
           error: {
             code: 'TOKEN_EXPIRED',
@@ -214,6 +237,8 @@ export async function authRoutes(app: FastifyInstance) {
       }
 
       if (error instanceof TokenRevokedError) {
+        // Clear revoked token cookie
+        clearRefreshTokenCookie(reply);
         return reply.status(401).send({
           error: {
             code: 'TOKEN_REVOKED',
@@ -253,6 +278,9 @@ export async function authRoutes(app: FastifyInstance) {
       }
 
       await logoutUser.execute({ userId: tokenResult.userId });
+
+      // Clear refresh token cookie
+      clearRefreshTokenCookie(reply);
 
       return reply.status(200).send({
         data: { success: true },

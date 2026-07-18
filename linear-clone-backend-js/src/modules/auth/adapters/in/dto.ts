@@ -25,7 +25,16 @@ export const AuthResponseSchema = z.object({
   data: z.object({
     user: UserObjectSchema,
     accessToken: z.string(),
-    refreshToken: z.string(),
+  }),
+});
+
+export const RefreshRequestSchema = z.object({
+  refreshToken: z.string().optional(),
+});
+
+export const RefreshResponseSchema = z.object({
+  data: z.object({
+    accessToken: z.string(),
   }),
 });
 
@@ -49,4 +58,6 @@ export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type UserObject = z.infer<typeof UserObjectSchema>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+export type RefreshRequest = z.infer<typeof RefreshRequestSchema>;
+export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;

@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import cookie from '@fastify/cookie';
 import { authRoutes } from './modules/auth/adapters/in/auth-controller';
 import { identityRoutes } from './modules/identity/adapters/in/identity-controller';
 import { issueRoutes } from './modules/work/adapters/in/issue-controller';
@@ -26,6 +27,9 @@ await app.register(cors, {
   origin: corsOrigins,
   credentials: true,
 });
+
+// Register cookie parser
+await app.register(cookie);
 
 // Register rate limiting
 await app.register(rateLimit, {
