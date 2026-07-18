@@ -16,6 +16,7 @@ export const env = {
   RATE_LIMIT_SESSION_REVOKE: parseInt(process.env.RATE_LIMIT_SESSION_REVOKE || '30', 10),
   RATE_LIMIT_SESSION_REVOKE_ALL: parseInt(process.env.RATE_LIMIT_SESSION_REVOKE_ALL || '10', 10),
   SESSION_LIMIT: parseInt(process.env.SESSION_LIMIT || '10', 10),
+  REFRESH_COOKIE_SECURE: process.env.NODE_ENV === 'production' ? true : false,
   CORS_ORIGINS: process.env.CORS_ORIGINS || '*',
   WS_PORT: parseInt(process.env.WS_PORT || '0', 10),
   WS_AUTH_TIMEOUT_MS: parseInt(process.env.WS_AUTH_TIMEOUT_MS || '5000', 10),

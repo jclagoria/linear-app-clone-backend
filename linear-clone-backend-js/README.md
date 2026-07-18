@@ -12,7 +12,7 @@ REST API backend for a Linear-inspired project management application. Built wit
 | ORM | Drizzle ORM |
 | Database | PostgreSQL 16 |
 | Cache | Redis (Upstash) |
-| Auth | JWT (`jose`), bcrypt |
+| Auth | JWT (`jose`), bcrypt, HttpOnly cookies (`@fastify/cookie`) |
 | Validation | Zod |
 | Testing | Vitest |
 | Linting | ESLint + Prettier |
@@ -42,14 +42,42 @@ src/
 │   │   │   ├── in/                    # Controllers, DTOs, middleware
 │   │   │   └── out/                   # DB implementations
 │   │   └── __tests__/                 # Unit, integration, contract tests
-│       └── work/
-│       ├── domain/                    # Entities & schemas (issues, statuses, labels, comments, watchers)
-│       ├── application/               # Use cases + port interfaces
-│       │   └── ports/                 # Repository & event interfaces
+│   ├── work/
+│   │   ├── domain/                    # Entities & schemas (issues, statuses, labels, comments, watchers)
+│   │   ├── application/               # Use cases + port interfaces
+│   │   │   └── ports/                 # Repository & event interfaces
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers & DTOs (issue, comment, label, watcher APIs)
+│   │   │   └── out/                   # DB repositories, event publisher
+│   │   └── __tests__/                 # Unit tests
+│   ├── workflow/
+│   │   ├── domain/                    # Entities (states, transitions, history)
+│   │   ├── application/               # Use cases
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers & DTOs
+│   │   │   └── out/                   # DB repositories
+│   │   └── __tests__/
+│   ├── project/
+│   │   ├── domain/                    # Entities & errors
+│   │   ├── application/               # Use cases (create, update, status, progress, issue mgmt)
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers & DTOs
+│   │   │   └── out/                   # DB repositories, event publisher
+│   │   └── __tests__/
+│   ├── cycle/
+│   │   ├── domain/                    # Entities & errors
+│   │   ├── application/               # Use cases (CRUD, activate, complete)
+│   │   ├── adapters/
+│   │   │   ├── in/                    # Controllers & DTOs
+│   │   │   └── out/                   # DB repositories, event publisher
+│   │   └── __tests__/
+│   └── notification/
+│       ├── domain/                    # Entities & errors
+│       ├── application/               # Use cases (list, mark read, preferences)
 │       ├── adapters/
-│       │   ├── in/                    # Controllers & DTOs (issue, comment, label, watcher APIs)
+│       │   ├── in/                    # Controllers & DTOs
 │       │   └── out/                   # DB repositories, event publisher
-│       └── __tests__/                 # Unit tests
+│       └── __tests__/
 └── shared/
     ├── config/env.ts                  # Environment configuration
     ├── database/index.ts              # Drizzle + pg Pool
@@ -66,6 +94,7 @@ src/
     │   ├── internal.ts                # InternalError (500)
     │   ├── error-handler.ts           # Global error handler
     │   └── types.ts                   # Error TypeScript interfaces
+    ├── cookie.ts                    # Refresh token HttpOnly cookie helpers
     └── rate-limiting/
         ├── index.ts                   # Export rate limit plugin
         ├── rate-limit-plugin.ts       # Fastify rate limit plugin
@@ -102,6 +131,7 @@ Required variables:
 | `DATABASE_URL` | PostgreSQL connection string |
 | `REDIS_URL` | Redis connection string |
 | `JWT_SECRET` | Secret key for JWT signing (min 32 chars) |
+| `NODE_ENV` | Environment (`development`, `production`). Affects cookie `Secure` flag. |
 | `PORT` | Server port (default: 3000) |
 | `RATE_LIMIT_REGISTER` | Max register requests/min per IP (default: 3) |
 | `RATE_LIMIT_LOGIN` | Max login requests/min per IP (default: 5) |
@@ -171,7 +201,7 @@ curl http://localhost:3000/api/health
 POST /api/v1/auth/register
 ```
 
-Creates a new user account and returns JWT tokens.
+Creates a new user account and returns JWT tokens. The refresh token is set as an HttpOnly cookie.
 
 **cURL:**
 
@@ -204,11 +234,15 @@ curl -X POST http://localhost:3000/api/v1/auth/register \
       "name": "John Doe",
       "createdAt": "2026-07-11T10:00:00.000Z"
     },
-    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+    "accessToken": "eyJhbGciOiJIUzI1NiIs..."
+  },
+  "cookies": {
+    "refreshToken": "(HttpOnly, Secure, SameSite=Strict, Path=/api/v1/auth/refresh)"
   }
 }
 ```
+
+> The `refreshToken` is set as an HttpOnly cookie (not returned in the body). The cookie path is scoped to `/api/v1/auth/refresh`.
 
 **Errors:**
 
@@ -250,7 +284,7 @@ curl -X POST http://localhost:3000/api/v1/auth/register \
 POST /api/v1/auth/login
 ```
 
-Authenticates a user and returns JWT tokens. Supports "Remember Me" for extended refresh token lifetime.
+Authenticates a user and returns JWT tokens. The refresh token is set as an HttpOnly cookie. Supports "Remember Me" for extended refresh token lifetime.
 
 **cURL:**
 
@@ -293,11 +327,12 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
       "email": "user@example.com",
       "name": "John Doe"
     },
-    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+    "accessToken": "eyJhbGciOiJIUzI1NiIs..."
   }
 }
 ```
+
+> The `refreshToken` is set as an HttpOnly cookie (`refreshToken`) scoped to `/api/v1/auth/refresh`. When `rememberMe` is `true`, the cookie Max-Age extends to 30 days.
 
 **Errors:**
 
@@ -325,11 +360,16 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
 POST /api/v1/auth/refresh
 ```
 
-Exchanges a valid refresh token for a new token pair. The old refresh token is invalidated (single-use rotation).
+Exchanges a valid refresh token for a new access token with single-use rotation. The refresh token is read from the `refreshToken` HttpOnly cookie first, with a body field as fallback.
 
 **cURL:**
 
 ```bash
+# Using HttpOnly cookie (preferred — no body needed)
+curl -X POST http://localhost:3000/api/v1/auth/refresh \
+  -H "Cookie: refreshToken=eyJhbGciOiJIUzI1NiIs..."
+
+# Fallback: using body (for clients without cookie support)
 curl -X POST http://localhost:3000/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
@@ -337,30 +377,33 @@ curl -X POST http://localhost:3000/api/v1/auth/refresh \
   }'
 ```
 
-**Request Body:**
+**Request Body (fallback only):**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `refreshToken` | string | Yes | The refresh token to rotate |
+| `refreshToken` | string | No | Fallback if cookie is absent |
+
+> The `refreshToken` cookie (HttpOnly, Secure, SameSite=Strict) takes precedence. Only provide `refreshToken` in the body when cookie access is unavailable.
 
 **Response (200):**
 
 ```json
 {
   "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+    "accessToken": "eyJhbGciOiJIUzI1NiIs..."
   }
 }
 ```
+
+> A new `refreshToken` cookie is set on each refresh (rotation). The old cookie is invalidated.
 
 **Errors:**
 
 | Status | Code | Message |
 |--------|------|---------|
-| 401 | `TOKEN_EXPIRED` | Refresh token has expired |
-| 401 | `TOKEN_REVOKED` | Refresh token has been revoked or already used |
-| 422 | `VALIDATION_FAILED` | Missing or invalid refreshToken field |
+| 401 | `TOKEN_EXPIRED` | Refresh token has expired (cookie cleared) |
+| 401 | `TOKEN_REVOKED` | Refresh token has been revoked or already used (cookie cleared) |
+| 422 | `VALIDATION_FAILED` | Refresh token is required (no cookie, no body) |
 
 ---
  
@@ -370,7 +413,7 @@ curl -X POST http://localhost:3000/api/v1/auth/refresh \
 POST /api/v1/auth/logout
 ```
  
-Terminates the user's session and invalidates all refresh tokens. Requires a valid access token. Idempotent — calling multiple times returns success.
+Terminates the user's session, clears the refresh token cookie, and invalidates all refresh tokens. Requires a valid access token. Idempotent — calling multiple times returns success.
  
 **cURL:**
  
@@ -2519,12 +2562,1164 @@ No body returned on success.
 
 ---
 
+## Workflow API
+
+All workflow endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### List Workflow States
+
+```
+GET /workspaces/:workspaceId/teams/:teamId/workflow/states
+```
+
+Returns all workflow states for a team.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/states \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workspaceId` | string (UUID) | Yes | Workspace identifier |
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440500",
+      "teamId": "550e8400-e29b-41d4-a716-446655440010",
+      "name": "Todo",
+      "type": "unstarted",
+      "position": 0,
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z"
+    }
+  ],
+  "total": 5
+}
+```
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Create Workflow State
+
+```
+POST /workspaces/:workspaceId/teams/:teamId/workflow/states
+```
+
+Creates a new workflow state. Requires team admin role.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/states \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "In Review",
+    "type": "in_progress",
+    "position": 2
+  }'
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workspaceId` | string (UUID) | Yes | Workspace identifier |
+| `teamId` | string (UUID) | Yes | Team identifier |
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | Yes | 1-100 characters |
+| `type` | string | Yes | `unstarted`, `in_progress`, `completed`, or `canceled` |
+| `position` | number | No | Integer >= 0 |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440501",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "In Review",
+    "type": "in_progress",
+    "position": 2,
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z"
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 403 | `FORBIDDEN` | Only team admins can perform this action |
+| 409 | `CONFLICT` | Duplicate state name |
+| 422 | `BUSINESS_RULE_ERROR` | Multiple canceled states not allowed |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Update Workflow State
+
+```
+PUT /workspaces/:workspaceId/teams/:teamId/workflow/states/:stateId
+```
+
+Updates a workflow state's name, type, or position. Requires team admin role.
+
+**cURL:**
+
+```bash
+curl -X PUT http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/states/550e8400-e29b-41d4-a716-446655440500 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Backlog",
+    "position": 0
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | No | 1-100 characters |
+| `type` | string | No | `unstarted`, `in_progress`, `completed`, or `canceled` |
+| `position` | number | No | Integer >= 0 |
+
+**Response (200):** Returns the updated state object.
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Delete Workflow State
+
+```
+DELETE /workspaces/:workspaceId/teams/:teamId/workflow/states/:stateId
+```
+
+Deletes a workflow state. Cannot delete states that are in use by issues. Requires team admin role.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/states/550e8400-e29b-41d4-a716-446655440500 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (204):** No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 403 | `FORBIDDEN` | Only team admins can perform this action |
+| 404 | `NOT_FOUND` | State not found |
+| 409 | `CONFLICT` | State is in use by issues |
+
+**Rate Limit:** 15 requests/minute per user
+
+---
+
+### List Transitions
+
+```
+GET /workspaces/:workspaceId/teams/:teamId/workflow/transitions
+```
+
+Returns all allowed transitions (from state → to state) for a team.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/transitions \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `fromStateId` | string (UUID) | No | Filter by source state |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440600",
+      "fromStateId": "550e8400-e29b-41d4-a716-446655440500",
+      "toStateId": "550e8400-e29b-41d4-a716-446655440501",
+      "createdAt": "2026-07-14T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Rate Limit:** 120 requests/minute per user
+
+---
+
+### Create Transition
+
+```
+POST /workspaces/:workspaceId/teams/:teamId/workflow/transitions
+```
+
+Creates an allowed transition between two states. Requires team admin role.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/transitions \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fromStateId": "550e8400-e29b-41d4-a716-446655440500",
+    "toStateId": "550e8400-e29b-41d4-a716-446655440501"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `fromStateId` | string (UUID) | Yes | Source state ID |
+| `toStateId` | string (UUID) | Yes | Target state ID |
+
+**Response (201):** Returns the created transition object.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 403 | `FORBIDDEN` | Only team admins can perform this action |
+| 404 | `NOT_FOUND` | State not found |
+| 409 | `CONFLICT` | Duplicate transition |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Delete Transition
+
+```
+DELETE /workspaces/:workspaceId/teams/:teamId/workflow/transitions/:transitionId
+```
+
+Deletes an allowed transition. Requires team admin role.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/transitions/550e8400-e29b-41d4-a716-446655440600 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (204):** No body returned on success.
+
+**Rate Limit:** 15 requests/minute per user
+
+---
+
+### Validate Transition
+
+```
+POST /workspaces/:workspaceId/teams/:teamId/workflow/validate-transition
+```
+
+Checks whether a transition from an issue's current state to a target state is allowed.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/workspaces/550e8400-e29b-41d4-a716-446655440001/teams/550e8400-e29b-41d4-a716-446655440010/workflow/validate-transition \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "issueId": "550e8400-e29b-41d4-a716-446655440100",
+    "toStateId": "550e8400-e29b-41d4-a716-446655440501"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `issueId` | string (UUID) | Yes | Issue to check transition for |
+| `toStateId` | string (UUID) | Yes | Target state ID |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "valid": true
+  }
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Get Issue State History
+
+```
+GET /issues/:issueId/workflow/history
+```
+
+Returns the state transition history for an issue.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/issues/550e8400-e29b-41d4-a716-446655440100/workflow/history \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `issueId` | string (UUID) | Yes | Issue UUID |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `cursor` | string | No | - | Opaque cursor for pagination |
+| `limit` | number | No | - | 1-100 |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440700",
+      "issueId": "550e8400-e29b-41d4-a716-446655440100",
+      "fromStateId": null,
+      "toStateId": "550e8400-e29b-41d4-a716-446655440500",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "createdAt": "2026-07-14T10:00:00.000Z"
+    }
+  ],
+  "nextCursor": null
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+## Projects API
+
+All project endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### Create Project
+
+```
+POST /projects
+```
+
+Creates a new project within a team.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/projects \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "Sprint 24",
+    "description": "Q3 planning sprint",
+    "startDate": "2026-07-20",
+    "targetDate": "2026-08-20"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+| `name` | string | Yes | 1-255 characters |
+| `description` | string | No | - |
+| `startDate` | string | No | ISO date |
+| `targetDate` | string | No | ISO date |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440800",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "Sprint 24",
+    "description": "Q3 planning sprint",
+    "status": "planned",
+    "startDate": "2026-07-20T00:00:00.000Z",
+    "targetDate": "2026-08-20T00:00:00.000Z",
+    "progress": 0,
+    "issueCount": 0,
+    "completedIssueCount": 0,
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z"
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 401 | `UNAUTHORIZED` | Missing or invalid access token |
+| 403 | `FORBIDDEN` | Not a team member |
+| 422 | `BUSINESS_RULE_ERROR` | Date validation error |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### List Projects
+
+```
+GET /projects
+```
+
+Returns projects with cursor-based pagination.
+
+**cURL:**
+
+```bash
+curl "http://localhost:3000/projects?teamId=550e8400-e29b-41d4-a716-446655440010&status=planned&limit=20" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `teamId` | string (UUID) | Yes | - | Filter by team |
+| `status` | string | No | - | `planned`, `in_progress`, `completed`, `canceled` |
+| `cursor` | string | No | - | Opaque cursor for pagination |
+| `limit` | number | No | `20` | 1-100 |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440800",
+      "teamId": "550e8400-e29b-41d4-a716-446655440010",
+      "name": "Sprint 24",
+      "description": "Q3 planning sprint",
+      "status": "planned",
+      "startDate": "2026-07-20T00:00:00.000Z",
+      "targetDate": "2026-08-20T00:00:00.000Z",
+      "progress": 0,
+      "issueCount": 0,
+      "completedIssueCount": 0,
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "nextCursor": null,
+    "hasMore": false
+  }
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Get Project
+
+```
+GET /projects/:projectId
+```
+
+Returns a single project with progress data.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):** Returns the project object with progress metrics.
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Update Project
+
+```
+PATCH /projects/:projectId
+```
+
+Partially updates a project's fields.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sprint 24 - Extended",
+    "description": null
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | No | 1-255 characters |
+| `description` | string \| null | No | Pass null to clear |
+| `startDate` | string \| null | No | Pass null to clear |
+| `targetDate` | string \| null | No | Pass null to clear |
+
+**Response (200):** Returns the updated project object.
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Change Project Status
+
+```
+PATCH /projects/:projectId/status
+```
+
+Transitions a project to a new status.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800/status \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "in_progress"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `status` | string | Yes | `planned`, `in_progress`, `completed`, or `canceled` |
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 403 | `BUSINESS_RULE_ERROR` | Invalid status transition |
+| 403 | `FORBIDDEN` | Only admins can cancel projects |
+| 422 | `BUSINESS_RULE_ERROR` | Cannot reopen completed project |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Get Project Progress
+
+```
+GET /projects/:projectId/progress
+```
+
+Returns aggregated progress metrics for a project.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800/progress \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "projectId": "550e8400-e29b-41d4-a716-446655440800",
+    "totalIssues": 10,
+    "completedIssues": 4,
+    "progress": 40
+  }
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Add Issue to Project
+
+```
+POST /projects/:projectId/issues
+```
+
+Adds an issue to a project. The issue and project must belong to the same team.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800/issues \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "issueId": "550e8400-e29b-41d4-a716-446655440100"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `issueId` | string (UUID) | Yes | Must belong to the same team |
+
+**Response (200):** Returns the updated project object.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 409 | `CONFLICT` | Issue already in project |
+| 422 | `BUSINESS_RULE_ERROR` | Issue belongs to a different team |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Remove Issue from Project
+
+```
+DELETE /projects/:projectId/issues/:issueId
+```
+
+Removes an issue from a project (sets its `projectId` to null).
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800/issues/550e8400-e29b-41d4-a716-446655440100 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):** Returns the updated project object.
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Delete Project
+
+```
+DELETE /projects/:projectId
+```
+
+Rejects (cancels) a project. Hard deletion is not allowed.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/projects/550e8400-e29b-41d4-a716-446655440800 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (204):** No body returned on success.
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+## Cycles API
+
+All cycle endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### Create Cycle
+
+```
+POST /cycles
+```
+
+Creates a new cycle with draft status.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/cycles \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "Sprint 24",
+    "description": "Q3 development sprint",
+    "startDate": "2026-07-20",
+    "endDate": "2026-08-02"
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `teamId` | string (UUID) | Yes | Team identifier |
+| `name` | string | Yes | 1-255 characters |
+| `description` | string | No | - |
+| `startDate` | string | Yes | ISO date |
+| `endDate` | string | Yes | ISO date |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440900",
+    "teamId": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "Sprint 24",
+    "description": "Q3 development sprint",
+    "status": "draft",
+    "startDate": "2026-07-20",
+    "endDate": "2026-08-02",
+    "createdAt": "2026-07-14T10:00:00.000Z",
+    "updatedAt": "2026-07-14T10:00:00.000Z",
+    "completedAt": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | Invalid input |
+| 403 | `FORBIDDEN` | Not a team member |
+| 422 | `BUSINESS_RULE_ERROR` | Date validation error, or start date in the past |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Get Cycle
+
+```
+GET /cycles/:cycleId
+```
+
+Returns a single cycle by ID.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/cycles/550e8400-e29b-41d4-a716-446655440900 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):** Returns the cycle object.
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### List Cycles for Team
+
+```
+GET /teams/:teamId/cycles
+```
+
+Returns cycles for a team with cursor-based pagination.
+
+**cURL:**
+
+```bash
+curl "http://localhost:3000/teams/550e8400-e29b-41d4-a716-446655440010/cycles?status=active&limit=20" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `status` | string | No | - | `draft`, `active`, or `completed` |
+| `cursor` | string | No | - | Opaque cursor for pagination |
+| `limit` | number | No | `20` | 1-100 |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440900",
+      "teamId": "550e8400-e29b-41d4-a716-446655440010",
+      "name": "Sprint 24",
+      "status": "active",
+      "startDate": "2026-07-20",
+      "endDate": "2026-08-02",
+      "createdAt": "2026-07-14T10:00:00.000Z",
+      "updatedAt": "2026-07-14T10:00:00.000Z",
+      "completedAt": null
+    }
+  ],
+  "pagination": {
+    "nextCursor": null,
+    "hasMore": false
+  }
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Update Cycle
+
+```
+PATCH /cycles/:cycleId
+```
+
+Partially updates a cycle's fields.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/cycles/550e8400-e29b-41d4-a716-446655440900 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sprint 24 - Extended",
+    "description": null
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `name` | string | No | 1-255 characters |
+| `description` | string \| null | No | Pass null to clear |
+| `startDate` | string | No | ISO date |
+| `endDate` | string | No | ISO date |
+
+**Response (200):** Returns the updated cycle object.
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+### Activate Cycle
+
+```
+POST /cycles/:cycleId/activate
+```
+
+Activates a draft cycle, making it the active cycle for the team.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/cycles/550e8400-e29b-41d4-a716-446655440900/activate \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):** Returns the activated cycle object (status becomes `active`).
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 422 | `BUSINESS_RULE_ERROR` | Completed cycle cannot be activated |
+| 422 | `BUSINESS_RULE_ERROR` | Invalid status transition |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### Complete Cycle
+
+```
+POST /cycles/:cycleId/complete
+```
+
+Marks an active cycle as completed.
+
+**cURL:**
+
+```bash
+curl -X POST http://localhost:3000/cycles/550e8400-e29b-41d4-a716-446655440900/complete \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):** Returns the completed cycle object (status becomes `completed`).
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 422 | `BUSINESS_RULE_ERROR` | Draft cycle cannot be completed |
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### Delete Cycle
+
+```
+DELETE /cycles/:cycleId
+```
+
+Deletes a draft cycle. Active cycles cannot be deleted.
+
+**cURL:**
+
+```bash
+curl -X DELETE http://localhost:3000/cycles/550e8400-e29b-41d4-a716-446655440900 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (204):** No body returned on success.
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 422 | `BUSINESS_RULE_ERROR` | Active cycle cannot be deleted |
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
+## Notifications API
+
+All notification endpoints require authentication via `Authorization: Bearer <accessToken>`.
+
+### List Notifications
+
+```
+GET /notifications
+```
+
+Returns notifications for the authenticated user with cursor-based pagination.
+
+**cURL:**
+
+```bash
+curl "http://localhost:3000/notifications?filter=unread&limit=20" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `filter` | string | No | - | `read` or `unread` |
+| `cursor` | string | No | - | Opaque cursor for pagination |
+| `limit` | number | No | `20` | 1-100 |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655441000",
+      "type": "issue_assigned",
+      "title": "You were assigned to ENG-1",
+      "body": "Implement login page",
+      "link": "/issues/ENG-1",
+      "readAt": null,
+      "createdAt": "2026-07-14T10:00:00.000Z"
+    }
+  ],
+  "unreadCount": 5,
+  "pagination": {
+    "hasMore": false,
+    "nextCursor": null
+  }
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 422 | `VALIDATION_ERROR` | Invalid filter value |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Mark Notification as Read
+
+```
+PATCH /notifications/:id/read
+```
+
+Marks a single notification as read. Only the notification owner can mark it.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/notifications/550e8400-e29b-41d4-a716-446655441000/read \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true
+}
+```
+
+**Errors:**
+
+| Status | Code | Message |
+|--------|------|---------|
+| 403 | `FORBIDDEN` | Notification does not belong to user |
+| 404 | `NOT_FOUND` | Notification not found |
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Mark All Notifications as Read
+
+```
+PATCH /notifications/read-all
+```
+
+Marks all unread notifications as read for the authenticated user.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/notifications/read-all \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "updatedCount": 5
+}
+```
+
+**Rate Limit:** 10 requests/minute per user
+
+---
+
+### Get Notification Preferences
+
+```
+GET /notifications/preferences
+```
+
+Returns the authenticated user's notification preferences.
+
+**cURL:**
+
+```bash
+curl http://localhost:3000/notifications/preferences \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "inApp": true,
+    "email": true,
+    "types": {
+      "issue_assigned": true,
+      "issue_commented": true,
+      "issue_status_changed": false
+    }
+  }
+}
+```
+
+**Rate Limit:** 60 requests/minute per user
+
+---
+
+### Update Notification Preferences
+
+```
+PATCH /notifications/preferences
+```
+
+Updates notification preferences for the authenticated user.
+
+**cURL:**
+
+```bash
+curl -X PATCH http://localhost:3000/notifications/preferences \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inApp": true,
+    "email": false,
+    "types": {
+      "issue_assigned": true
+    }
+  }'
+```
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `inApp` | boolean | No | Enable/disable in-app notifications |
+| `email` | boolean | No | Enable/disable email notifications |
+| `types` | object | No | Per-type toggle (`Record<string, boolean>`) |
+
+**Response (200):** Returns the updated preferences object.
+
+**Rate Limit:** 30 requests/minute per user
+
+---
+
 ## Authentication
 
-| Token | Algorithm | Expiry | Usage |
-|-------|-----------|--------|-------|
-| Access Token | HS256 | 15 minutes | API authorization |
-| Refresh Token | HS256 | 7 days (30 days with `rememberMe`) | Token renewal |
+| Token | Algorithm | Expiry | Transport | Usage |
+|-------|-----------|--------|-----------|-------|
+| Access Token | HS256 | 15 minutes | Authorization header (`Bearer`) | API authorization |
+| Refresh Token | HS256 | 7 days (30 days with `rememberMe`) | HttpOnly cookie (`refreshToken`) | Token renewal |
 
 **Access Token Payload:**
  
@@ -2590,6 +3785,36 @@ No body returned on success.
 | List Watchers | 120 requests/min per user |
 | Add Watcher | 60 requests/min per user |
 | Remove Watcher | 60 requests/min per user |
+| List Workflow States | 120 requests/min per user |
+| Create Workflow State | 30 requests/min per user |
+| Update Workflow State | 30 requests/min per user |
+| Delete Workflow State | 15 requests/min per user |
+| List Transitions | 120 requests/min per user |
+| Create Transition | 30 requests/min per user |
+| Delete Transition | 15 requests/min per user |
+| Validate Transition | 60 requests/min per user |
+| Get Issue State History | 60 requests/min per user |
+| Create Project | 30 requests/min per user |
+| List Projects | 60 requests/min per user |
+| Get Project | 60 requests/min per user |
+| Update Project | 30 requests/min per user |
+| Change Project Status | 30 requests/min per user |
+| Get Project Progress | 60 requests/min per user |
+| Add Issue to Project | 30 requests/min per user |
+| Remove Issue from Project | 30 requests/min per user |
+| Delete Project | 10 requests/min per user |
+| Create Cycle | 30 requests/min per user |
+| Get Cycle | 60 requests/min per user |
+| List Cycles | 60 requests/min per user |
+| Update Cycle | 30 requests/min per user |
+| Activate Cycle | 10 requests/min per user |
+| Complete Cycle | 10 requests/min per user |
+| Delete Cycle | 30 requests/min per user |
+| List Notifications | 60 requests/min per user |
+| Mark Notification Read | 60 requests/min per user |
+| Mark All Notifications Read | 10 requests/min per user |
+| Get Notification Preferences | 60 requests/min per user |
+| Update Notification Preferences | 30 requests/min per user |
 
 **Rate Limit Headers:**
 

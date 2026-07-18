@@ -2,14 +2,15 @@ import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 
 // Request/Response schemas based on specs-api/auth.md
+// Refresh token can come from cookie or body — body field is optional
 const RefreshTokenRequestSchema = z.object({
-  refreshToken: z.string().min(1, 'Refresh token is required'),
+  refreshToken: z.string().optional(),
 });
 
+// Refresh response no longer includes refreshToken — it's set as HttpOnly cookie
 const RefreshTokenResponseSchema = z.object({
   data: z.object({
     accessToken: z.string(),
-    refreshToken: z.string(),
   }),
 });
 
@@ -37,16 +38,9 @@ describe('POST /api/v1/auth/refresh — Contract Tests', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject missing refreshToken field', () => {
+    it('should accept empty body (cookie will be used instead)', () => {
       const result = RefreshTokenRequestSchema.safeParse({});
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject empty refreshToken string', () => {
-      const result = RefreshTokenRequestSchema.safeParse({
-        refreshToken: '',
-      });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('should reject non-string refreshToken', () => {
@@ -58,11 +52,10 @@ describe('POST /api/v1/auth/refresh — Contract Tests', () => {
   });
 
   describe('Response Schema', () => {
-    it('should match successful refresh response', () => {
+    it('should match successful refresh response (no refreshToken in body)', () => {
       const response = {
         data: {
           accessToken: 'eyJhbGciOiJIUzI1NiIs...',
-          refreshToken: 'eyJhbGciOiJIUzI1NiIs...',
         },
       };
       const result = RefreshTokenResponseSchema.safeParse(response);
