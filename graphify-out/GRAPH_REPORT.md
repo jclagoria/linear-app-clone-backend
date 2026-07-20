@@ -1,16 +1,16 @@
 # Graph Report - linear-app-clone-backend  (2026-07-20)
 
 ## Corpus Check
-- 495 files · ~209,037 words
+- 495 files · ~210,063 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4955 nodes · 6382 edges · 317 communities (294 shown, 23 thin omitted)
+- 4974 nodes · 6401 edges · 317 communities (294 shown, 23 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 9 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0418f86a`
+- Built from commit: `5b51891a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -357,7 +357,7 @@ Nodes (3): CodeGraph, graphify, Mandatory Project Rules
 
 ### Community 1 - "index.ts"
 Cohesion: 0.06
-Nodes (39): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+31 more)
+Nodes (41): app, MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription (+33 more)
 
 ### Community 2 - "errors.ts"
 Cohesion: 0.06
@@ -528,8 +528,8 @@ Cohesion: 0.06
 Nodes (31): Data Schema: IssueLabel (junction), Data Schema: Label, Endpoint: Attach Label to Issue, Endpoint: Create Label, Endpoint: Delete Label, Endpoint: Detach Label from Issue, Endpoint: Get Issue Labels, Endpoint: List Labels (+23 more)
 
 ### Community 44 - "auth-controller.ts"
-Cohesion: 0.10
-Nodes (24): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser (+16 more)
+Cohesion: 0.11
+Nodes (22): authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser, logoutUser (+14 more)
 
 ### Community 45 - "create-issue.ts"
 Cohesion: 0.08
@@ -653,7 +653,7 @@ Nodes (22): Add Team Member, API Endpoints, Create Organization, Create Team, De
 
 ### Community 75 - "TokenService"
 Cohesion: 0.12
-Nodes (9): TokenService, ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput, ValidateToken, ValidateTokenInput (+1 more)
+Nodes (10): TokenService, RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, ValidateToken (+2 more)
 
 ### Community 76 - "index.ts"
 Cohesion: 0.15
@@ -784,8 +784,8 @@ Cohesion: 0.12
 Nodes (16): Auth — Business Specification (Cookie Migration), Behaviour, Business Rules, CookieConfig, Data Model, Requirement: LoginSetsHttpOnlyCookie, Requirement: LogoutClearsCookie, Requirement: RefreshReadsFromCookie (+8 more)
 
 ### Community 108 - "Auth — Business Specification"
-Cohesion: 0.12
-Nodes (16): Auth — Business Specification, Behaviour, Business Rules, Data Model, Relationships, Requirement: Refresh Token Rotation, Requirement: Session Termination, Scenario: Idempotent logout (double call) (+8 more)
+Cohesion: 0.07
+Nodes (27): Auth — Business Specification, Behaviour, Business Rules, CookieConfig, Data Model, Relationships, Requirement: LoginSetsHttpOnlyCookie, Requirement: LogoutClearsCookie (+19 more)
 
 ### Community 109 - "errors.ts"
 Cohesion: 0.22
@@ -844,8 +844,8 @@ Cohesion: 0.14
 Nodes (14): scripts, build, db:generate, db:migrate, db:push, db:studio, dev, format (+6 more)
 
 ### Community 123 - "refresh-token.ts"
-Cohesion: 0.19
-Nodes (8): RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, hashToken(), verifyTokenHash()
+Cohesion: 0.24
+Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
 ### Community 124 - "ProjectRepository"
 Cohesion: 0.26
@@ -1060,8 +1060,8 @@ Cohesion: 0.18
 Nodes (10): Architecture, Backend, Backup & Recovery, CI/CD, Deployment, Frontend, Infrastructure, Monitoring (+2 more)
 
 ### Community 177 - "Endpoint: Logout"
-Cohesion: 0.18
-Nodes (10): Auth — API Contract, Endpoint: Logout, Endpoint: Refresh Token, Errors, Errors, Idempotency, Request, Request (+2 more)
+Cohesion: 0.11
+Nodes (18): Auth — API Contract, Endpoint: Login, Endpoint: Logout, Endpoint: Token Refresh, Errors, Errors, Errors, Idempotency (+10 more)
 
 ### Community 178 - "list-notifications.ts"
 Cohesion: 0.24
@@ -1108,8 +1108,8 @@ Cohesion: 0.20
 Nodes (10): Create Transition, Create Workflow State, Delete Transition, Delete Workflow State, Get Issue State History, List Transitions, List Workflow States, Update Workflow State (+2 more)
 
 ### Community 189 - "login-user.ts"
-Cohesion: 0.24
-Nodes (5): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError
+Cohesion: 0.22
+Nodes (7): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError, hashToken(), verifyTokenHash()
 
 ### Community 190 - "create-organization.ts"
 Cohesion: 0.24
@@ -1484,24 +1484,24 @@ Cohesion: 0.50
 Nodes (3): ErrorResponseSchema, RefreshTokenRequestSchema, RefreshTokenResponseSchema
 
 ## Knowledge Gaps
-- **2780 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+2775 more)
+- **2795 isolated node(s):** `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created`, `Decisions Not Recorded`, `Architecture Decisions` (+2790 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `auth-controller.ts` to `session-controller.ts`, `index.ts`, `LabelRepository`, `refresh-token.ts`, `login-user.ts`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **Why does `SessionRepository` connect `SessionRepository` to `session-controller.ts`, `refresh-token.ts`, `login-user.ts`, `EventPublisher`?**
+- **Why does `env` connect `index.ts` to `session-controller.ts`, `LabelRepository`, `TokenService`, `auth-controller.ts`, `login-user.ts`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `EventPublisher` connect `add-team-member.ts` to `TeamRepository`, `errors.ts`, `OrganizationMemberRepository`, `create-organization.ts`, `create-team.ts`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `InvalidCycleStatusTransitionError` connect `activate-cycle.test.ts` to `CycleRepository`, `cycle-controller.ts`, `TeamMemberQuery`, `errors.ts`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **What connects `name`, `version`, `type` to the rest of the system?**
-  _2780 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created` to the rest of the system?**
+  _2795 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `index.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.0612859097127223 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05787545787545788 - nodes in this community are weakly interconnected._
 - **Should `errors.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.055288461538461536 - nodes in this community are weakly interconnected._
 - **Should `comment-controller.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.05478750640040963 - nodes in this community are weakly interconnected._
+- **Should `index.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.08941176470588236 - nodes in this community are weakly interconnected._
