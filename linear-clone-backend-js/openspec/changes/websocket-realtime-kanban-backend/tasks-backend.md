@@ -114,8 +114,8 @@
 - [x] Rate limiting: Add subscription rate limit (100/minute per connection)
   - [x] Track subscribe/unsubscribe counts per connection in `InMemoryConnectionRepository`
   - [x] Return `{ type: 'error', code: 'rate_limited', message: '...' }` when exceeded
-- [ ] Input sanitization: Zod validation on all inbound messages (covered in API Layer)
-- [ ] Connection limits: Enforce `WS_MAX_CONNECTIONS` (already implemented)
+- [x] Input sanitization: Zod validation on all inbound messages (covered in API Layer)
+- [x] Connection limits: Enforce `WS_MAX_CONNECTIONS` (already implemented)
 
 ## Testing
 
@@ -136,13 +136,15 @@
   - [x] Test subscribe with forbidden channel → `forbidden` error
   - [x] Test idempotent subscribe → success (no error)
   - [x] Test unsubscribe → success
-- [ ] Test `AuthenticateConnection` (enhanced)
-  - [ ] Test auto-subscription to user channel
-  - [ ] Test auto-subscription to team channels
-  - [ ] Test auto-subscription to issue channels
-  - [ ] Test graceful handling of query failures
+- [x] Test `AuthenticateConnection` (enhanced)
+  - [x] Test auto-subscription to user channel
+  - [x] Test auto-subscription to team channels
+  - [x] Test auto-subscription to issue channels
+  - [x] Test graceful handling of query failures
 
 ### Integration Tests
+
+> **Deferred** — requires Testcontainers / full DB setup, too heavy for current environment.
 
 - [ ] Test full flow: Connect → Auth → Subscribe → Event broadcast
 - [ ] Test channel validation flow: Auth → Subscribe to forbidden channel → Error
@@ -160,7 +162,7 @@
 - [x] Self-review: Verify all tasks completed
 - [x] PR checklist:
   - [x] All unit tests pass
-  - [x] All integration tests pass
+  - [ ] All integration tests pass (deferred — see Integration Tests section)
   - [x] TypeScript compiles without errors
   - [x] ESLint passes
   - [x] No security vulnerabilities introduced

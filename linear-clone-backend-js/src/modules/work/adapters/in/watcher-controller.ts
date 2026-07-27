@@ -8,7 +8,8 @@ import { AddWatcher } from '../../application/add-watcher';
 import { RemoveWatcher } from '../../application/remove-watcher';
 import { ListWatchers } from '../../application/list-watchers';
 import { DrizzleWatcherRepository } from '../out/drizzle-watcher-repository';
-import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
+import { WorkToGatewayBridge } from '../../../gateway/adapters/out/work-to-gateway-bridge';
+import { sharedEventEmitter } from '../../../../shared/events/shared-event-emitter';
 import { db } from '../../../../shared/database';
 import { teamMembers } from '../../../identity/domain/team-member';
 import { issues } from '../../domain/issue';
@@ -20,7 +21,7 @@ import {
 import { JoseTokenService } from '../../../identity/adapters/out/token-service';
 
 const watcherRepository = new DrizzleWatcherRepository();
-const eventPublisher = new InMemoryEventPublisher();
+const eventPublisher = new WorkToGatewayBridge(sharedEventEmitter);
 const tokenService = new JoseTokenService();
 
 const teamMemberQuery = {

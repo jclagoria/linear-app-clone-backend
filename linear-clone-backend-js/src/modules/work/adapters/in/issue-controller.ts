@@ -15,7 +15,8 @@ import { AssignIssue, TeamMemberQuery as AssignTeamMemberQuery } from '../../app
 import { DeleteIssue } from '../../application/delete-issue';
 import { ListIssues } from '../../application/list-issues';
 import { DrizzleIssueRepository } from '../out/drizzle-issue-repository';
-import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
+import { WorkToGatewayBridge } from '../../../gateway/adapters/out/work-to-gateway-bridge';
+import { sharedEventEmitter } from '../../../../shared/events/shared-event-emitter';
 import { JoseTokenService } from '../../../identity/adapters/out/token-service';
 import { WorkflowValidationAdapter, WorkflowStateHistoryAdapter } from '../out/workflow-validation-adapter';
 import { DrizzleStateRepository } from '../../../workflow/adapters/out/drizzle-state-repository';
@@ -35,7 +36,7 @@ import {
 
 // Initialize dependencies
 const issueRepository = new DrizzleIssueRepository();
-const eventPublisher = new InMemoryEventPublisher();
+const eventPublisher = new WorkToGatewayBridge(sharedEventEmitter);
 const tokenService = new JoseTokenService();
 
 // Shared team membership query (reused across use cases)

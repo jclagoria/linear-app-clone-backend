@@ -4,14 +4,11 @@ import type { SubscriptionRepository } from './ports/out/subscription-repository
 /**
  * Auto-subscription logic:
  * When a user authenticates, they are automatically subscribed to:
- * 1. Their own user channel (already done in AuthenticateConnection)
- * 2. Team channels for teams they belong to
- * 3. Issue channels for issues they watch or are assigned to
+ * 1. Their own user channel (always)
+ * 2. Team channels for teams they belong to (via TeamQueryPort)
+ * 3. Issue channels for issues they watch or are assigned to (via IssueQueryPort)
  *
- * Tasks 2 and 3 require cross-module queries (identity/team, work/watcher)
- * and should be implemented when those integrations are available.
- *
- * For now, this provides a utility for manual subscription scenarios.
+ * Cross-module queries are provided via AuthenticateConnection constructor ports.
  */
 
 export async function autoSubscribeUserChannels(

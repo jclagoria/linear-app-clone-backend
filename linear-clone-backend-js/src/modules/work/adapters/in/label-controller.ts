@@ -14,7 +14,8 @@ import { AttachLabel } from '../../application/attach-label';
 import { DetachLabel } from '../../application/detach-label';
 import { GetIssueLabels } from '../../application/get-issue-labels';
 import { DrizzleLabelRepository } from '../out/drizzle-label-repository';
-import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
+import { WorkToGatewayBridge } from '../../../gateway/adapters/out/work-to-gateway-bridge';
+import { sharedEventEmitter } from '../../../../shared/events/shared-event-emitter';
 import { db } from '../../../../shared/database';
 import { teamMembers } from '../../../identity/domain/team-member';
 import { issues } from '../../domain/issue';
@@ -27,7 +28,7 @@ import {
 import { JoseTokenService } from '../../../identity/adapters/out/token-service';
 
 const labelRepository = new DrizzleLabelRepository();
-const eventPublisher = new InMemoryEventPublisher();
+const eventPublisher = new WorkToGatewayBridge(sharedEventEmitter);
 const tokenService = new JoseTokenService();
 
 const teamMemberQuery = {

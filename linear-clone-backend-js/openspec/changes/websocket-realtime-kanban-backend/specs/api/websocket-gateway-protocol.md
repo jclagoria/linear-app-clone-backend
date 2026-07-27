@@ -59,9 +59,9 @@
 
 | Code | Condition | Description |
 |------|-----------|-------------|
-| `authentication_timeout` | No `authenticate` received within timeout | Connection closed with code `4001` |
+| `auth_failed` | No `authenticate` received within timeout | Connection closed with code `4001` |
 | `invalid_token` | JWT validation failed | Token expired, malformed, or revoked |
-| `invalid_message` | Malformed JSON or unknown message type | Message rejected |
+| `invalid_message_format` | Malformed JSON or unknown message type | Message rejected |
 
 ---
 
@@ -203,9 +203,9 @@
 
 | Code | Condition | Response |
 |------|-----------|----------|
-| 4001 | Authentication timeout | `{ "type": "error", "code": "authentication_timeout", "message": "..." }` |
+| 4001 | Authentication timeout | `{ "type": "error", "code": "auth_failed", "message": "..." }` |
 | 4002 | Invalid token | `{ "type": "error", "code": "invalid_token", "message": "..." }` |
-| 4003 | Invalid message format | `{ "type": "error", "code": "invalid_message", "message": "..." }` |
+| 4003 | Invalid message format | `{ "type": "error", "code": "invalid_message_format", "message": "..." }` |
 | 4004 | Invalid channel format | `{ "type": "error", "code": "invalid_channel", "message": "..." }` |
 | 4005 | Channel access denied | `{ "type": "error", "code": "forbidden", "message": "..." }` |
 
