@@ -5,7 +5,6 @@ import { MessageHandler } from './adapters/in/message-handler';
 import { InMemoryConnectionRepository } from './adapters/out/in-memory-connection-repository';
 import { InMemorySubscriptionRepository } from './adapters/out/in-memory-subscription-repository';
 import { RedisOnlineStatus } from './adapters/out/redis-online-status';
-import { InProcessEventEmitter } from './adapters/out/in-process-event-emitter';
 import { JoseTokenVerifier } from './adapters/out/jwt-token-verifier';
 import { WorkToGatewayBridge } from './adapters/out/work-to-gateway-bridge';
 import { ModuleChannelValidator } from './adapters/out/module-channel-validator';
@@ -17,6 +16,7 @@ import { HandleDisconnect } from './application/handle-disconnect';
 import { env } from '../../shared/config/env';
 import { DrizzleTeamQueryPort } from '../identity/adapters/out/drizzle-team-query-port';
 import { DrizzleIssueQueryPort } from '../work/adapters/out/drizzle-issue-query-port';
+import { sharedEventEmitter } from '../../shared/events/shared-event-emitter';
 
 let gatewayServer: GatewayWebSocketServer | null = null;
 
@@ -51,8 +51,8 @@ export async function setupGateway(app: FastifyInstance): Promise<void> {
   // Token verification
   const tokenVerifier = new JoseTokenVerifier();
 
-  // Event emitter for cross-module broadcasting
-  const eventEmitter = new InProcessEventEmitter();
+  // Use shared event emitter (same instance used by work module controllers)
+  const eventEmitter = sharedEventEmitter;
 
   // Cross-module query ports
   const teamQueryPort = new DrizzleTeamQueryPort();

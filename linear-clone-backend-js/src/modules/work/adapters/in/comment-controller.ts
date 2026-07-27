@@ -10,7 +10,8 @@ import { UpdateComment } from '../../application/update-comment';
 import { DeleteComment } from '../../application/delete-comment';
 import { ListIssueComments } from '../../application/list-issue-comments';
 import { DrizzleCommentRepository } from '../out/drizzle-comment-repository';
-import { InMemoryEventPublisher } from '../out/in-memory-event-publisher';
+import { WorkToGatewayBridge } from '../../../gateway/adapters/out/work-to-gateway-bridge';
+import { sharedEventEmitter } from '../../../../shared/events/shared-event-emitter';
 import { DrizzleIssueRepository } from '../out/drizzle-issue-repository';
 import { db } from '../../../../shared/database';
 import { teamMembers } from '../../../identity/domain/team-member';
@@ -25,7 +26,7 @@ import { JoseTokenService } from '../../../identity/adapters/out/token-service';
 
 const commentRepository = new DrizzleCommentRepository();
 const issueRepository = new DrizzleIssueRepository();
-const eventPublisher = new InMemoryEventPublisher();
+const eventPublisher = new WorkToGatewayBridge(sharedEventEmitter);
 const tokenService = new JoseTokenService();
 
 const teamMemberQuery = {
