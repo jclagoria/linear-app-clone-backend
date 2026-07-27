@@ -82,6 +82,7 @@ describe('CreateIssue', () => {
       {
         title: 'Test issue',
         teamId: TEAM_ID,
+        priority: 0,
       },
       USER_ID,
     );
@@ -97,7 +98,7 @@ describe('CreateIssue', () => {
 
   it('should reject empty title', async () => {
     await expect(
-      createIssue.execute({ title: '', teamId: TEAM_ID }, USER_ID),
+      createIssue.execute({ title: '', teamId: TEAM_ID, priority: 0 }, USER_ID),
     ).rejects.toThrow(EmptyTitleError);
   });
 
@@ -105,7 +106,7 @@ describe('CreateIssue', () => {
     mockTeamMemberQuery.isTeamMember.mockResolvedValue(false);
 
     await expect(
-      createIssue.execute({ title: 'Test', teamId: TEAM_ID }, USER_ID),
+      createIssue.execute({ title: 'Test', teamId: TEAM_ID, priority: 0 }, USER_ID),
     ).rejects.toThrow(NotTeamMemberError);
   });
 
@@ -118,7 +119,7 @@ describe('CreateIssue', () => {
 
     await expect(
       createIssue.execute(
-        { title: 'Test', teamId: TEAM_ID, parentId: PARENT_ID },
+        { title: 'Test', teamId: TEAM_ID, parentId: PARENT_ID, priority: 0 },
         USER_ID,
       ),
     ).rejects.toThrow(TeamMismatchError);
@@ -131,7 +132,7 @@ describe('CreateIssue', () => {
 
     await expect(
       createIssue.execute(
-        { title: 'Test', teamId: TEAM_ID, assigneeId: ASSIGNEE_ID },
+        { title: 'Test', teamId: TEAM_ID, assigneeId: ASSIGNEE_ID, priority: 0 },
         USER_ID,
       ),
     ).rejects.toThrow(NotTeamMemberError);
@@ -160,7 +161,7 @@ describe('CreateIssue', () => {
     });
 
     const result = await createIssue.execute(
-      { title: 'Test', teamId: TEAM_ID },
+      { title: 'Test', teamId: TEAM_ID, priority: 0 },
       USER_ID,
     );
 
