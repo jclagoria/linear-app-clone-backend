@@ -43,16 +43,18 @@ describe('MessageHandler', () => {
       'conn-1',
     );
 
-    expect(result).toBeNull(); // no explicit ack
+    expect(result).toBe(JSON.stringify({ type: 'subscribed', channel: 'team:abc' }));
   });
 
   it('should handle unsubscribe message', async () => {
+    vi.mocked(unsubscribe.execute).mockResolvedValue({ success: true });
+
     const result = await handler.handle(
       JSON.stringify({ type: 'unsubscribe', channel: 'team:abc' }),
       'conn-1',
     );
 
-    expect(result).toBeNull();
+    expect(result).toBe(JSON.stringify({ type: 'unsubscribed', channel: 'team:abc' }));
     expect(unsubscribe.execute).toHaveBeenCalledWith('conn-1', 'team:abc');
   });
 
@@ -68,14 +70,14 @@ describe('MessageHandler', () => {
   it('should return error for invalid JSON', async () => {
     const result = await handler.handle('not json', 'conn-1');
 
-    expect(result).toBe(JSON.stringify({ type: 'error', message: 'invalid_json' }));
+    expect(result).toBe(JSON.stringify({ type: 'error', code: 'invalid_json', message: 'Invalid JSON' }));
   });
 
   it('should return error for missing type field', async () => {
     const result = await handler.handle(JSON.stringify({}), 'conn-1');
 
     expect(result).toBe(
-      JSON.stringify({ type: 'error', message: 'validation_error: missing or invalid type field' }),
+      JSON.stringify({ type: 'error', code: 'validation_error', message: 'Missing or invalid type field' }),
     );
   });
 
@@ -100,6 +102,34 @@ describe('MessageHandler', () => {
       'conn-1',
     );
 
-    expect(result).toBe(JSON.stringify({ type: 'error', message: 'invalid_token' }));
+    expect(result).toBe(JSON.stringify({ type: 'error', code: 'auth_failed', message: 'invalid_token' }));
+  });
+
+  it('should handle subscribe failure', async () => {
+    vi.mocked(subscribe.execute).mockResolvedValue({
+      success: false,
+      error: 'forbidden',
+    });
+
+    const result = await handler.handle(
+      JSON.stringify({ type: 'subscribe', channel: 'team:abc' }),
+      'conn-1',
+    );
+
+    expect(result).toBe(JSON.stringify({ type: 'error', code: 'forbidden', message: 'Subscribe failed' }));
+  });
+
+  it('should handle unsubscribe failure', async () => {
+    vi.mocked(unsubscribe.execute).mockResolvedValue({
+      success: false,
+      error: 'rate_limited',
+    });
+
+    const result = await handler.handle(
+      JSON.stringify({ type: 'unsubscribe', channel: 'team:abc' }),
+      'conn-1',
+    );
+
+    expect(result).toBe(JSON.stringify({ type: 'error', code: 'rate_limited', message: 'Unsubscribe failed' }));
   });
 });

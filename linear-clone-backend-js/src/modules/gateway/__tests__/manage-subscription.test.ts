@@ -2,11 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ManageSubscription } from '../application/manage-subscription';
 import type { ConnectionRepository } from '../application/ports/out/connection-repository';
 import type { SubscriptionRepository } from '../application/ports/out/subscription-repository';
+import type { ChannelValidator } from '../application/ports/in/channel-validator';
 import { ConnectionStatus } from '../domain/connection';
 
 describe('ManageSubscription', () => {
   let connectionRepo: ConnectionRepository;
   let subscriptionRepo: SubscriptionRepository;
+  let channelValidator: ChannelValidator;
   let useCase: ManageSubscription;
 
   beforeEach(() => {
@@ -26,16 +28,21 @@ describe('ManageSubscription', () => {
       removeAllForConnection: vi.fn(),
     };
 
-    useCase = new ManageSubscription(connectionRepo, subscriptionRepo);
+    channelValidator = {
+      validateChannelAccess: vi.fn(),
+    };
+
+    useCase = new ManageSubscription(connectionRepo, subscriptionRepo, channelValidator);
   });
 
-  it('should subscribe to valid channel', async () => {
+  it('should subscribe to valid channel with access', async () => {
     vi.mocked(connectionRepo.findById).mockResolvedValue({
       id: 'conn-1',
       userId: 'user-1',
       ws: null as any,
       status: ConnectionStatus.Connected,
     });
+    vi.mocked(channelValidator.validateChannelAccess).mockResolvedValue(true);
 
     const result = await useCase.execute('conn-1', 'team:abc-123');
 
@@ -60,6 +67,22 @@ describe('ManageSubscription', () => {
     expect(result.error).toBe('connection_not_found');
   });
 
+  it('should reject channel without access', async () => {
+    vi.mocked(connectionRepo.findById).mockResolvedValue({
+      id: 'conn-1',
+      userId: 'user-1',
+      ws: null as any,
+      status: ConnectionStatus.Connected,
+    });
+    vi.mocked(channelValidator.validateChannelAccess).mockResolvedValue(false);
+
+    const result = await useCase.execute('conn-1', 'team:abc-123');
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('forbidden');
+    expect(subscriptionRepo.add).not.toHaveBeenCalled();
+  });
+
   it('should be idempotent on duplicate subscribe', async () => {
     vi.mocked(connectionRepo.findById).mockResolvedValue({
       id: 'conn-1',
@@ -67,6 +90,7 @@ describe('ManageSubscription', () => {
       ws: null as any,
       status: ConnectionStatus.Connected,
     });
+    vi.mocked(channelValidator.validateChannelAccess).mockResolvedValue(true);
 
     const result1 = await useCase.execute('conn-1', 'team:abc-123');
     expect(result1.success).toBe(true);

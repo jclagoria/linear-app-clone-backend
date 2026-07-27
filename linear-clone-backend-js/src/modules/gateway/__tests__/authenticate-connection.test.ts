@@ -4,12 +4,16 @@ import type { ConnectionRepository } from '../application/ports/out/connection-r
 import type { SubscriptionRepository } from '../application/ports/out/subscription-repository';
 import type { OnlineStatus } from '../application/ports/out/online-status';
 import type { TokenVerifier } from '../application/ports/out/token-verifier';
+import type { TeamQueryPort } from '../../identity/application/ports/out/team-query-port';
+import type { IssueQueryPort } from '../../work/application/ports/out/issue-query-port';
 
 describe('AuthenticateConnection', () => {
   let connectionRepo: ConnectionRepository;
   let subscriptionRepo: SubscriptionRepository;
   let onlineStatus: OnlineStatus;
   let tokenVerifier: TokenVerifier;
+  let teamQueryPort: TeamQueryPort;
+  let issueQueryPort: IssueQueryPort;
   let useCase: AuthenticateConnection;
 
   beforeEach(() => {
@@ -39,11 +43,23 @@ describe('AuthenticateConnection', () => {
       verify: vi.fn(),
     };
 
+    teamQueryPort = {
+      getUserTeamIds: vi.fn(),
+      isUserMember: vi.fn(),
+    };
+
+    issueQueryPort = {
+      getUserIssueIds: vi.fn(),
+      isUserWatchingOrAssigned: vi.fn(),
+    };
+
     useCase = new AuthenticateConnection(
       connectionRepo,
       subscriptionRepo,
       onlineStatus,
       tokenVerifier,
+      teamQueryPort,
+      issueQueryPort,
     );
   });
 
@@ -52,6 +68,8 @@ describe('AuthenticateConnection', () => {
       valid: true,
       userId: 'user-1',
     });
+    vi.mocked(teamQueryPort.getUserTeamIds).mockResolvedValue(['team-1', 'team-2']);
+    vi.mocked(issueQueryPort.getUserIssueIds).mockResolvedValue(['issue-1']);
 
     const result = await useCase.execute('valid-token', 'conn-1');
 
@@ -64,7 +82,67 @@ describe('AuthenticateConnection', () => {
         userId: 'user-1',
       }),
     );
+    expect(onlineStatus.setOnline).toHaveBeenCalledWith('user-1');
+  });
+
+  it('should auto-subscribe to user channel', async () => {
+    vi.mocked(tokenVerifier.verify).mockResolvedValue({
+      valid: true,
+      userId: 'user-1',
+    });
+    vi.mocked(teamQueryPort.getUserTeamIds).mockResolvedValue([]);
+    vi.mocked(issueQueryPort.getUserIssueIds).mockResolvedValue([]);
+
+    await useCase.execute('valid-token', 'conn-1');
+
     expect(subscriptionRepo.add).toHaveBeenCalledWith('conn-1', 'user:user-1');
+  });
+
+  it('should auto-subscribe to team channels', async () => {
+    vi.mocked(tokenVerifier.verify).mockResolvedValue({
+      valid: true,
+      userId: 'user-1',
+    });
+    vi.mocked(teamQueryPort.getUserTeamIds).mockResolvedValue(['team-1', 'team-2']);
+    vi.mocked(issueQueryPort.getUserIssueIds).mockResolvedValue([]);
+
+    await useCase.execute('valid-token', 'conn-1');
+
+    expect(subscriptionRepo.add).toHaveBeenCalledWith('conn-1', 'team:team-1');
+    expect(subscriptionRepo.add).toHaveBeenCalledWith('conn-1', 'team:team-2');
+  });
+
+  it('should auto-subscribe to issue channels', async () => {
+    vi.mocked(tokenVerifier.verify).mockResolvedValue({
+      valid: true,
+      userId: 'user-1',
+    });
+    vi.mocked(teamQueryPort.getUserTeamIds).mockResolvedValue([]);
+    vi.mocked(issueQueryPort.getUserIssueIds).mockResolvedValue(['issue-1', 'issue-2']);
+
+    await useCase.execute('valid-token', 'conn-1');
+
+    expect(subscriptionRepo.add).toHaveBeenCalledWith('conn-1', 'issue:issue-1');
+    expect(subscriptionRepo.add).toHaveBeenCalledWith('conn-1', 'issue:issue-2');
+  });
+
+  it('should handle query failures gracefully', async () => {
+    vi.mocked(tokenVerifier.verify).mockResolvedValue({
+      valid: true,
+      userId: 'user-1',
+    });
+    vi.mocked(teamQueryPort.getUserTeamIds).mockRejectedValue(new Error('DB error'));
+    vi.mocked(issueQueryPort.getUserIssueIds).mockRejectedValue(new Error('DB error'));
+
+    const result = await useCase.execute('valid-token', 'conn-1');
+
+    // Should still succeed even if queries fail
+    expect(result.success).toBe(true);
+    // User channel subscription happens before the try-catch, so it should be called
+    // But since the queries fail, autoSubscribeUserChannels is not called
+    // The user channel subscription is handled in autoSubscribeUserChannels, not directly here
+    // So when queries fail, we just log and continue
+    expect(connectionRepo.save).toHaveBeenCalled();
     expect(onlineStatus.setOnline).toHaveBeenCalledWith('user-1');
   });
 
