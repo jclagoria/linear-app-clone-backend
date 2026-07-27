@@ -1,6 +1,6 @@
-# Gateway — WebSocket Protocol Contract
+# WebSocket Gateway — API Contract
 
-## Connection
+## Endpoint: WebSocket Connection
 
 - **Protocol**: WebSocket over HTTP/HTTPS
 - **Path**: `/ws`
@@ -15,17 +15,12 @@
 4. After authentication, client may send `subscribe`/`unsubscribe` messages
 5. Server pushes `event` messages to subscribed channels
 
-## Message: Authenticate
-
-- **Direction**: Client → Server
-- **Purpose**: Authenticate the WebSocket connection
-
-### Request
+### Request — `authenticate` Message
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"authenticate"` |
-| `token` | string | Yes | JWT access token (Bearer token from login/register) |
+| type | string | yes | MUST be `"authenticate"` |
+| token | string | yes | JWT access token (Bearer token from login/register) |
 
 #### Example
 
@@ -36,12 +31,12 @@
 }
 ```
 
-### Response (success)
+### Response — `authenticated` Message
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"authenticated"` |
-| `userId` | string (UUID) | Yes | Authenticated user identifier |
+| type | string | yes | MUST be `"authenticated"` |
+| userId | string (UUID) | yes | Authenticated user identifier |
 
 #### Example
 
@@ -52,25 +47,32 @@
 }
 ```
 
-### Response (failure)
+### Response — `error` Message (on auth failure)
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"error"` |
-| `code` | string | Yes | Error code |
-| `message` | string | Yes | Human-readable error description |
+| type | string | yes | MUST be `"error"` |
+| code | string | yes | Error code |
+| message | string | yes | Human-readable error description |
 
-## Message: Subscribe
+#### Error Codes
 
-- **Direction**: Client → Server
-- **Purpose**: Subscribe to a channel for real-time events
+| Code | Condition | Description |
+|------|-----------|-------------|
+| `auth_failed` | No `authenticate` received within timeout | Connection closed with code `4001` |
+| `invalid_token` | JWT validation failed | Token expired, malformed, or revoked |
+| `invalid_message_format` | Malformed JSON or unknown message type | Message rejected |
 
-### Request
+---
+
+## Endpoint: Channel Subscription
+
+### Request — `subscribe` Message
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"subscribe"` |
-| `channel` | string | Yes | Channel identifier in format `{type}:{id}` |
+| type | string | yes | MUST be `"subscribe"` |
+| channel | string | yes | Channel identifier in format `{type}:{id}` |
 
 #### Channel Formats
 
@@ -99,8 +101,8 @@
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"subscribed"` |
-| `channel` | string | Yes | The channel that was subscribed |
+| type | string | yes | MUST be `"subscribed"` |
+| channel | string | yes | The channel that was subscribed |
 
 #### Example
 
@@ -118,17 +120,16 @@
 | `invalid_channel` | Channel format does not match pattern | Malformed channel identifier |
 | `forbidden` | User does not have access to channel | Not a team member, not watching/assigned to issue |
 
-## Message: Unsubscribe
+---
 
-- **Direction**: Client → Server
-- **Purpose**: Unsubscribe from a channel
+## Endpoint: Channel Unsubscription
 
-### Request
+### Request — `unsubscribe` Message
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"unsubscribe"` |
-| `channel` | string | Yes | Channel identifier to unsubscribe from |
+| type | string | yes | MUST be `"unsubscribe"` |
+| channel | string | yes | Channel identifier to unsubscribe from |
 
 #### Example
 
@@ -143,42 +144,24 @@
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"unsubscribed"` |
-| `channel` | string | Yes | The channel that was unsubscribed |
+| type | string | yes | MUST be `"unsubscribed"` |
+| channel | string | yes | The channel that was unsubscribed |
 
-## Message: Ping / Pong
+---
 
-- **Direction**: Client → Server / Server → Client
-- **Purpose**: Keep connection alive
+## Endpoint: Event Broadcasting (Server → Client)
 
-### Request
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"ping"` |
-
-### Response
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `type` | string | `"pong"` |
-
-## Message: Event
-
-- **Direction**: Server → Client
-- **Purpose**: Deliver real-time event to subscribed client
-
-### Payload
+### Response — `event` Message
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | Yes | MUST be `"event"` |
-| `channel` | string | Yes | Channel the event belongs to |
-| `event` | string | Yes | Event type identifier |
-| `data` | object | Yes | Event payload |
-| `timestamp` | string (ISO 8601) | Yes | When the event occurred |
+| type | string | yes | MUST be `"event"` |
+| channel | string | yes | Channel the event belongs to |
+| event | string | yes | Event type identifier |
+| data | object | yes | Event payload |
+| timestamp | string (ISO 8601) | yes | When the event occurred |
 
-### Event Types
+#### Event Types
 
 | Event | Channel | Data Schema | Description |
 |-------|---------|-------------|-------------|
@@ -214,6 +197,8 @@
 }
 ```
 
+---
+
 ## Errors — Standard Error Response
 
 | Code | Condition | Response |
@@ -224,16 +209,6 @@
 | 4004 | Invalid channel format | `{ "type": "error", "code": "invalid_channel", "message": "..." }` |
 | 4005 | Channel access denied | `{ "type": "error", "code": "forbidden", "message": "..." }` |
 
-### Error Code Details
-
-| Code | Condition | Description |
-|------|-----------|-------------|
-| `auth_failed` | No `authenticate` received within timeout | Connection closed with code `4001` |
-| `invalid_token` | JWT validation failed | Token expired, malformed, or revoked |
-| `invalid_message_format` | Malformed JSON or unknown message type | Message rejected |
-| `invalid_channel` | Channel format does not match pattern | Malformed channel identifier |
-| `forbidden` | User does not have access to channel | Not a team member, not watching/assigned to issue |
-
 ### WebSocket Close Codes
 
 | Code | Reason | Description |
@@ -242,19 +217,3 @@
 | 4001 | Authentication timeout | No valid `authenticate` within timeout |
 | 4002 | Authentication failed | Invalid or expired token |
 | 4003 | Protocol error | Malformed messages or policy violation |
-
-## Channel Types
-
-| Channel Pattern | Description | Auto-subscribed |
-|----------------|-------------|-----------------|
-| `team:{teamId}` | Team-wide events | Yes, for all team members |
-| `issue:{issueId}` | Issue-specific events | Yes, for watchers and assignees |
-| `user:{userId}` | User-specific events | Yes, for the authenticated user |
-
-## Auto-Subscription
-
-Upon successful authentication, the server SHALL automatically subscribe the connection to:
-
-1. All `team:{id}` channels for teams the user belongs to
-2. All `issue:{id}` channels for issues the user is watching or assigned to
-3. The `user:{userId}` channel for the authenticated user
