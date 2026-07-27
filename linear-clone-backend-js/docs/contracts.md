@@ -259,39 +259,78 @@ Add Comment:
 **WebSocket Connection:**
 ```
 Connection:
-  URL: ws://localhost:3000
-  Auth: Token sent in first message
-
-Messages (Client → Server):
-  { type: "authenticate", token: "jwt-token" }
-  { type: "subscribe", channel: "team:uuid" }
-  { type: "unsubscribe", channel: "team:uuid" }
-  { type: "ping" }
-
-Messages (Server → Client):
-  { type: "authenticated", userId: "uuid" }
-  { type: "event", channel: "team:uuid", event: "issue.created", data: {...} }
-  { type: "pong" }
-  { type: "error", message: "..." }
+  URL: ws://localhost:3000/path/ws
+  Auth: Token sent in first message (must authenticate within 5s)
+  Max Connections: 1000 (configurable via WS_MAX_CONNECTIONS)
 ```
 
-**Event Types:**
+**Client → Server Messages:**
+| Type | Fields | Description |
+|------|--------|-------------|
+| `authenticate` | `token` | Authenticate with JWT |
+| `subscribe` | `channel` | Subscribe to a channel |
+| `unsubscribe` | `channel` | Unsubscribe from a channel |
+| `ping` | — | Keep-alive ping |
+
+**Server → Client Messages:**
+| Type | Fields | Description |
+|------|--------|-------------|
+| `authenticated` | `userId`, `connectionId` | Authentication success |
+| `subscribed` | `channel` | Subscription confirmed |
+| `unsubscribed` | `channel` | Unsubscription confirmed |
+| `pong` | — | Response to ping |
+| `error` | `code`, `message` | Error response (see error codes) |
+| `event` | `channel`, `event`, `data`, `timestamp`, `userId` | Real-time event broadcast |
+
+**Error Codes (WebSocket):**
+| Code | Description |
+|------|-------------|
+| `invalid_json` | Message is not valid JSON |
+| `invalid_message_format` | Message is not an object |
+| `validation_error` | Message failed schema validation |
+| `unknown_message_type` | Unrecognized message type |
+| `auth_failed` | Authentication failed |
+| `invalid_token` | JWT token is invalid or expired |
+| `subscribe_failed` | Subscribe operation failed |
+| `unsubscribe_failed` | Unsubscribe operation failed |
+| `invalid_channel` | Channel format is invalid |
+| `forbidden` | User lacks access to the channel |
+| `connection_not_found` | Connection ID not found |
+| `unauthenticated` | Connection not authenticated (auth timeout) |
+| `rate_limited` | Rate limit exceeded |
+
+**Event Interface:**
 ```typescript
-interface RealtimeEvent {
-  type: string;           // Event type (issue.created, etc.)
-  channel: string;        // Channel (team:uuid, issue:uuid)
-  data: any;             // Event payload
-  timestamp: string;     // ISO timestamp
-  userId: string;        // User who triggered event
+interface GatewayEvent {
+  type: 'event';              // Always 'event'
+  channel: string;            // Channel (team:uuid, issue:uuid, user:uuid)
+  event: string;              // Event type (issue.created, etc.)
+  data: Record<string, unknown>;  // Event payload
+  timestamp: string;          // ISO 8601 timestamp
+  userId: string;             // User who triggered event
 }
 ```
 
 **Event Channels:**
 | Channel | Scope | Events |
 |---------|-------|--------|
-| `team:{teamId}` | All team members | issue.*, cycle.* |
-| `issue:{issueId}` | Issue watchers | comment.*, statusChanged |
-| `user:{userId}` | Specific user | notification.*, assignment |
+| `team:{teamId}` | All team members | `issue.*`, `label.*`, `project.*`, `cycle.*`, `team.member_*` |
+| `issue:{issueId}` | Issue watchers/assignees | `comment.*`, `watcher.*` |
+| `user:{userId}` | Specific user only | `user.online`, `user.offline`, `session.revoked`, `notification.created` |
+
+**Auto-Subscription:** On authentication, the Gateway automatically subscribes the connection to:
+- `user:{userId}` — their own user channel
+- `team:{teamId}` — all teams they belong to
+- `issue:{issueId}` — all issues they're watching or assigned to
+
+**Channel Access Validation:**
+| Channel Type | Rule |
+|--------------|------|
+| `team:{teamId}` | User must be a team member |
+| `issue:{issueId}` | User must be watching or assigned to the issue |
+| `user:{userId}` | User can only subscribe to their own channel |
+
+**Rate Limiting:** 100 subscribe/unsubscribe messages per minute per connection.
 
 ---
 
@@ -488,12 +527,12 @@ Frontend                     Backend                    WebSocket
    │                            │                          │
    │  200 OK                    │                          │
    │ <───────────────────────── │                          │
-   │                            │                          │
-   │                            │  StatusChanged event     │
-   │                            │ ───────────────────────> │
-   │                            │                          │
-   │  Confirm optimistic        │                          │
-   │ <──────────────────────────────────────────────────── │
+    │                            │                          │
+    │                            │  issue.updated event     │
+    │                            │ ───────────────────────> │
+    │                            │                          │
+    │  Confirm optimistic        │                          │
+    │ <──────────────────────────────────────────────────── │
    │                            │                          │
 ```
 
@@ -555,13 +594,13 @@ Frontend                     Backend                    WebSocket
 | Module | Depends On | Used By |
 |--------|------------|---------|
 | Auth | None | All modules |
-| Identity | Auth | Work, Project, Cycle |
-| Work | Auth, Identity | Workflow, Project, Cycle |
+| Identity | Auth | Work, Project, Cycle, Gateway |
+| Work | Auth, Identity | Workflow, Project, Cycle, Gateway |
 | Workflow | Work | Work |
 | Project | Work | Work |
 | Cycle | Work | Work |
 | Notification | Work, Identity | Gateway |
-| Gateway | Auth | Realtime (frontend) |
+| Gateway | Auth, Identity, Work, Notification | Realtime (frontend) |
 
 **Dependency Rules:**
 - Auth module has no dependencies

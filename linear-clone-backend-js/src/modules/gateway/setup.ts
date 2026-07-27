@@ -7,11 +7,16 @@ import { InMemorySubscriptionRepository } from './adapters/out/in-memory-subscri
 import { RedisOnlineStatus } from './adapters/out/redis-online-status';
 import { InProcessEventEmitter } from './adapters/out/in-process-event-emitter';
 import { JoseTokenVerifier } from './adapters/out/jwt-token-verifier';
+import { WorkToGatewayBridge } from './adapters/out/work-to-gateway-bridge';
+import { ModuleChannelValidator } from './adapters/out/module-channel-validator';
+import { ConnectionRateLimiter } from './adapters/out/connection-rate-limiter';
 import { AuthenticateConnection } from './application/authenticate-connection';
 import { ManageSubscription } from './application/manage-subscription';
 import { BroadcastEvent } from './application/broadcast-event';
 import { HandleDisconnect } from './application/handle-disconnect';
 import { env } from '../../shared/config/env';
+import { DrizzleTeamQueryPort } from '../identity/adapters/out/drizzle-team-query-port';
+import { DrizzleIssueQueryPort } from '../work/adapters/out/drizzle-issue-query-port';
 
 let gatewayServer: GatewayWebSocketServer | null = null;
 
@@ -49,17 +54,34 @@ export async function setupGateway(app: FastifyInstance): Promise<void> {
   // Event emitter for cross-module broadcasting
   const eventEmitter = new InProcessEventEmitter();
 
+  // Cross-module query ports
+  const teamQueryPort = new DrizzleTeamQueryPort();
+  const issueQueryPort = new DrizzleIssueQueryPort();
+
+  // Channel validator for access control
+  const channelValidator = new ModuleChannelValidator(teamQueryPort, issueQueryPort);
+
+  // Rate limiter for subscribe/unsubscribe operations
+  const rateLimiter = new ConnectionRateLimiter(100, 60 * 1000); // 100 requests per minute
+
+  // Work-to-Gateway event bridge
+  const workToGatewayBridge = new WorkToGatewayBridge(eventEmitter);
+
   // Use cases
   const authenticateConnection = new AuthenticateConnection(
     connectionRepo,
     subscriptionRepo,
     onlineStatus,
     tokenVerifier,
+    teamQueryPort,
+    issueQueryPort,
   );
 
   const manageSubscription = new ManageSubscription(
     connectionRepo,
     subscriptionRepo,
+    channelValidator,
+    rateLimiter,
   );
 
   const broadcastEvent = new BroadcastEvent(
@@ -99,4 +121,14 @@ export async function setupGateway(app: FastifyInstance): Promise<void> {
   );
 
   app.log.info('Gateway WebSocket server initialized');
+
+  // Export the bridge for work module integration
+  app.decorate('workToGatewayBridge', workToGatewayBridge);
+}
+
+// Type augmentation for FastifyInstance
+declare module 'fastify' {
+  interface FastifyInstance {
+    workToGatewayBridge: WorkToGatewayBridge;
+  }
 }

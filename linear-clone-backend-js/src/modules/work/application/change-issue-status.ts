@@ -75,9 +75,23 @@ export class ChangeIssueStatus {
         );
       }
     } else {
-      // Fallback: allow cancel from any state
+      // Fallback: basic transition validation when no workflow service is provided
       if (currentStatus.type === 'canceled') {
         throw new InvalidTransitionError('Cannot transition from canceled state');
+      }
+
+      // Define allowed transitions (unstarted -> started -> completed)
+      const allowedTransitions: Record<string, string[]> = {
+        unstarted: ['started', 'canceled'],
+        started: ['completed', 'canceled'],
+        completed: ['started', 'canceled'],
+      };
+
+      const allowed = allowedTransitions[currentStatus.type] || [];
+      if (!allowed.includes(targetStatus.type)) {
+        throw new InvalidTransitionError(
+          `Cannot transition from ${currentStatus.type} to ${targetStatus.type}`,
+        );
       }
     }
 

@@ -24,7 +24,7 @@ describe('ListIssues', () => {
       pagination: { nextCursor: null, hasMore: false },
     });
 
-    const result = await listIssues.execute({});
+    const result = await listIssues.execute({ limit: 50, includeDeleted: false });
 
     expect(mockIssueRepo.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ includeDeleted: false }),
@@ -40,7 +40,7 @@ describe('ListIssues', () => {
       pagination: { nextCursor: null, hasMore: false },
     });
 
-    await listIssues.execute({ teamId: 'a1b2c3d4-e5f6-4789-abcd-ef0123456701' });
+    await listIssues.execute({ teamId: 'a1b2c3d4-e5f6-4789-abcd-ef0123456701', limit: 50, includeDeleted: false });
 
     expect(mockIssueRepo.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ teamId: 'a1b2c3d4-e5f6-4789-abcd-ef0123456701' }),
@@ -55,7 +55,7 @@ describe('ListIssues', () => {
       pagination: { nextCursor: null, hasMore: false },
     });
 
-    await listIssues.execute({ limit: 50 });
+    await listIssues.execute({ limit: 50, includeDeleted: false });
 
     expect(mockIssueRepo.findMany).toHaveBeenCalledWith(
       expect.anything(),
@@ -70,7 +70,7 @@ describe('ListIssues', () => {
       pagination: { nextCursor: 'cursor-2', hasMore: false },
     });
 
-    await listIssues.execute({ cursor: 'cursor-1' });
+    await listIssues.execute({ cursor: 'cursor-1', limit: 50, includeDeleted: false });
 
     expect(mockIssueRepo.findMany).toHaveBeenCalledWith(
       expect.anything(),
@@ -85,7 +85,7 @@ describe('ListIssues', () => {
       pagination: { nextCursor: null, hasMore: false },
     });
 
-    await listIssues.execute({});
+    await listIssues.execute({ limit: 50, includeDeleted: false });
 
     expect(mockIssueRepo.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ includeDeleted: false }),

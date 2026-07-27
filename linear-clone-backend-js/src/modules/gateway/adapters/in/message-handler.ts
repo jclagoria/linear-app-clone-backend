@@ -1,4 +1,4 @@
-import { ClientMessageSchema } from '../../domain/message';
+import { ClientMessageSchema, ErrorCode, createErrorMessage, createSubscribedMessage, createUnsubscribedMessage } from '../../domain/message';
 import type { AuthenticateUseCase } from '../../application/ports/in/authenticate-use-case';
 import type { SubscribeUseCase } from '../../application/ports/in/subscribe-use-case';
 import type { UnsubscribeUseCase } from '../../application/ports/in/unsubscribe-use-case';
@@ -15,16 +15,16 @@ export class MessageHandler {
     try {
       parsed = JSON.parse(raw);
     } catch {
-      return JSON.stringify({ type: 'error', message: 'invalid_json' });
+      return JSON.stringify(createErrorMessage(ErrorCode.INVALID_JSON, 'Invalid JSON'));
     }
 
     if (typeof parsed !== 'object' || parsed === null) {
-      return JSON.stringify({ type: 'error', message: 'invalid_message_format' });
+      return JSON.stringify(createErrorMessage(ErrorCode.INVALID_MESSAGE_FORMAT, 'Invalid message format'));
     }
 
     // Check type field exists first
     if (!parsed.type || typeof parsed.type !== 'string') {
-      return JSON.stringify({ type: 'error', message: 'validation_error: missing or invalid type field' });
+      return JSON.stringify(createErrorMessage(ErrorCode.VALIDATION_ERROR, 'Missing or invalid type field'));
     }
 
     const result = ClientMessageSchema.safeParse(parsed);
@@ -33,12 +33,14 @@ export class MessageHandler {
       const issues = result.error.issues;
       if (issues.length > 0) {
         const first = issues[0];
-        return JSON.stringify({
-          type: 'error',
-          message: `validation_error: ${first.path.join('.')} — ${first.message}`,
-        });
+        return JSON.stringify(
+          createErrorMessage(
+            ErrorCode.VALIDATION_ERROR,
+            `${first.path.join('.')} — ${first.message}`,
+          ),
+        );
       }
-      return JSON.stringify({ type: 'error', message: 'validation_error' });
+      return JSON.stringify(createErrorMessage(ErrorCode.VALIDATION_ERROR, 'Validation error'));
     }
 
     const msg = result.data;
@@ -53,21 +55,23 @@ export class MessageHandler {
             connectionId: authResult.connectionId,
           });
         }
-        return JSON.stringify({ type: 'error', message: authResult.error ?? 'auth_failed' });
+        return JSON.stringify(createErrorMessage(ErrorCode.AUTH_FAILED, authResult.error ?? 'Authentication failed'));
       }
 
       case 'subscribe': {
         const subResult = await this.subscribeUseCase.execute(connectionId, msg.channel);
         if (!subResult.success) {
-          return JSON.stringify({ type: 'error', message: subResult.error ?? 'subscribe_failed' });
+          return JSON.stringify(createErrorMessage(subResult.error ?? ErrorCode.SUBSCRIBE_FAILED, 'Subscribe failed'));
         }
-        // No explicit ack on successful subscribe
-        return null;
+        return JSON.stringify(createSubscribedMessage(msg.channel));
       }
 
       case 'unsubscribe': {
-        await this.unsubscribeUseCase.execute(connectionId, msg.channel);
-        return null;
+        const unsubResult = await this.unsubscribeUseCase.execute(connectionId, msg.channel);
+        if (!unsubResult.success) {
+          return JSON.stringify(createErrorMessage(unsubResult.error ?? ErrorCode.UNSUBSCRIBE_FAILED, 'Unsubscribe failed'));
+        }
+        return JSON.stringify(createUnsubscribedMessage(msg.channel));
       }
 
       case 'ping': {
@@ -75,7 +79,7 @@ export class MessageHandler {
       }
 
       default:
-        return JSON.stringify({ type: 'error', message: 'unknown_message_type' });
+        return JSON.stringify(createErrorMessage(ErrorCode.UNKNOWN_MESSAGE_TYPE, 'Unknown message type'));
     }
   }
 }

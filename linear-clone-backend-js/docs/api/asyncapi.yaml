@@ -1,0 +1,610 @@
+asyncapi: '3.0.0'
+info:
+  title: Linear Clone WebSocket Gateway
+  description: >
+    Real-time event gateway for the Linear Clone application.
+
+    Provides live updates for issues, comments, labels, watchers, projects,
+    cycles, teams, and user status via WebSocket.
+
+    ## Connection Lifecycle
+
+    1. Connect to `ws://<host>/ws`
+    2. Send an `authenticate` message with your JWT access token within 5 seconds
+       (configurable via `WS_AUTH_TIMEOUT_MS`). Unauthenticated connections are
+       closed with an `auth_timeout` error.
+    3. On successful authentication, you receive an `authenticated` response and
+       are automatically subscribed to:
+       - Your personal user channel (`user:<userId>`)
+       - Team channels for all teams you belong to (`team:<teamId>`)
+       - Issue channels for issues you are assigned to or watch (`issue:<issueId>`)
+
+    ## Channels
+
+    - `team:<teamId>` — all issues, labels, and team membership events for a team
+    - `issue:<issueId>` — comments, watchers, and issue-specific updates
+    - `user:<userId>` — user-targeted notifications and status events
+
+    Channel access is validated on subscribe: you must be a team member for
+    `team:<id>` channels, and the issue must belong to a team you're a member of
+    for `issue:<id>` channels.
+
+    ## Rate Limiting
+
+    Each connection is limited to **100 messages per minute** for subscribe and
+    unsubscribe operations. Exceeding this limit returns a `rate_limited` error
+    response.
+
+    ## Max Connections
+
+    The server enforces a maximum connection limit (default: 1000, configurable
+    via `WS_MAX_CONNECTIONS`). When at capacity, new connections receive HTTP 503.
+
+    ## Origin Validation
+
+    Connections are validated against allowed origins (configurable via
+    `CORS_ORIGINS`). Invalid origins receive HTTP 403.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: dev@example.com
+  license:
+    name: ISC
+
+servers:
+  production:
+    url: ws://localhost:3000/ws
+    description: Development WebSocket server
+    protocol: ws
+    protocolVersion: '13'
+    variables:
+      host:
+        default: localhost
+        description: Server hostname
+      port:
+        default: '3000'
+        description: Server port
+
+channels:
+  teamChannel:
+    address: 'team:{teamId}'
+    description: >
+      Subscribe to all events for a team: issue changes, label updates,
+      and team membership changes.
+    parameters:
+      teamId:
+        description: UUID of the team to subscribe to
+        schema:
+          type: string
+          format: uuid
+
+  issueChannel:
+    address: 'issue:{issueId}'
+    description: >
+      Subscribe to all events for a specific issue: comments, watchers,
+      and issue field changes.
+    parameters:
+      issueId:
+        description: UUID of the issue to subscribe to
+        schema:
+          type: string
+          format: uuid
+
+  userChannel:
+    address: 'user:{userId}'
+    description: >
+      Subscribe to user-targeted events: notifications, online status,
+      and session events.
+    parameters:
+      userId:
+        description: UUID of the user (auto-subscribed on authentication)
+        schema:
+          type: string
+          format: uuid
+
+operations:
+
+  # ── Client Operations (send) ──
+
+  authenticate:
+    action: send
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Authenticate the connection. Must be sent within 5 seconds of connecting.
+      On success, the server responds with `authenticated` and auto-subscribes
+      to the user's channels.
+    summary: Authenticate connection with JWT access token
+    traits:
+      - $ref: '#/components/operationTraits/sendMessage'
+    messages:
+      - $ref: '#/components/messages/AuthenticateMessage'
+
+  subscribe:
+    action: send
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Subscribe to a channel to receive real-time events. The server validates
+      channel access before confirming subscription.
+    summary: Subscribe to a channel
+    traits:
+      - $ref: '#/components/operationTraits/sendMessage'
+    messages:
+      - $ref: '#/components/messages/SubscribeMessage'
+
+  unsubscribe:
+    action: send
+    channel: $ref: '#/channels/teamChannel'
+    description: Unsubscribe from a previously subscribed channel.
+    summary: Unsubscribe from a channel
+    traits:
+      - $ref: '#/components/operationTraits/sendMessage'
+    messages:
+      - $ref: '#/components/messages/UnsubscribeMessage'
+
+  ping:
+    action: send
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Send a ping to keep the connection alive. The server responds with `pong`.
+    summary: Ping the server
+    traits:
+      - $ref: '#/components/operationTraits/sendMessage'
+    messages:
+      - $ref: '#/components/messages/PingMessage'
+
+  # ── Server Operations (receive) ──
+
+  receiveAuthenticated:
+    action: receive
+    channel: $ref: '#/channels/userChannel'
+    description: >
+      Received after successful authentication. Includes the user ID and
+      connection ID. Auto-subscriptions to team/issue channels happen
+      before this response is sent.
+    summary: Authentication successful
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/AuthenticatedMessage'
+
+  receiveSubscribed:
+    action: receive
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Received when a subscribe request is confirmed. Also received for
+      each auto-subscription after authentication.
+    summary: Subscription confirmed
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/SubscribedMessage'
+
+  receiveUnsubscribed:
+    action: receive
+    channel: $ref: '#/channels/teamChannel'
+    description: Received when an unsubscribe request is confirmed.
+    summary: Unsubscription confirmed
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/UnsubscribedMessage'
+
+  receivePong:
+    action: receive
+    channel: $ref: '#/channels/teamChannel'
+    description: Received in response to a `ping` message.
+    summary: Pong response
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/PongMessage'
+
+  receiveError:
+    action: receive
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Received when a message fails validation or an operation is rejected.
+      Contains an error code and human-readable message. The connection is
+      closed after authentication errors.
+    summary: Error response
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/ErrorMessage'
+
+  receiveEvent:
+    action: receive
+    channel: $ref: '#/channels/teamChannel'
+    description: >
+      Real-time event broadcast. The event type and channel determine the
+      payload structure. Events are only sent to channels the client is
+      subscribed to.
+    summary: Real-time event
+    traits:
+      - $ref: '#/components/operationTraits/receiveMessage'
+    messages:
+      - $ref: '#/components/messages/EventMessage'
+
+components:
+
+  operationTraits:
+    sendMessage:
+      summary: Client sends a message to the server
+      description: All client messages are JSON objects with a `type` field.
+    receiveMessage:
+      summary: Server sends a message to the client
+      description: All server messages are JSON objects with a `type` field.
+
+  messages:
+
+    # ── Client → Server Messages ──
+
+    AuthenticateMessage:
+      name: AuthenticateMessage
+      title: Authenticate
+      description: >
+        Authenticate the WebSocket connection. Must be sent within the auth
+        timeout window (default: 5 seconds). On failure, the connection is closed.
+      payload:
+        type: object
+        required:
+          - type
+          - token
+        properties:
+          type:
+            type: string
+            const: authenticate
+            description: Message type identifier
+          token:
+            type: string
+            minLength: 1
+            description: JWT access token from login/register
+      examples:
+        - name: Successful authentication
+          payload:
+            type: authenticate
+            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+
+    SubscribeMessage:
+      name: SubscribeMessage
+      title: Subscribe
+      description: >
+        Subscribe to a channel to receive real-time events. Channel access is
+        validated: you must be a team member for `team:<id>`, and the issue
+        must belong to a team you're a member of for `issue:<id>`.
+      payload:
+        type: object
+        required:
+          - type
+          - channel
+        properties:
+          type:
+            type: string
+            const: subscribe
+            description: Message type identifier
+          channel:
+            type: string
+            pattern: '^(team|issue|user):.+$'
+            description: 'Channel to subscribe to (e.g., `team:<uuid>`, `issue:<uuid>`, `user:<uuid>`)'
+      examples:
+        - name: Subscribe to team channel
+          payload:
+            type: subscribe
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+        - name: Subscribe to issue channel
+          payload:
+            type: subscribe
+            channel: 'issue:550e8400-e29b-41d4-a716-446655440001'
+
+    UnsubscribeMessage:
+      name: UnsubscribeMessage
+      title: Unsubscribe
+      description: Unsubscribe from a previously subscribed channel.
+      payload:
+        type: object
+        required:
+          - type
+          - channel
+        properties:
+          type:
+            type: string
+            const: unsubscribe
+            description: Message type identifier
+          channel:
+            type: string
+            pattern: '^(team|issue|user):.+$'
+            description: Channel to unsubscribe from
+      examples:
+        - name: Unsubscribe from team channel
+          payload:
+            type: unsubscribe
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+
+    PingMessage:
+      name: PingMessage
+      title: Ping
+      description: >
+        Keep-alive ping. The server responds with `pong`. Recommended every
+        30 seconds to maintain connection health.
+      payload:
+        type: object
+        required:
+          - type
+        properties:
+          type:
+            type: string
+            const: ping
+            description: Message type identifier
+      examples:
+        - name: Ping
+          payload:
+            type: ping
+
+    # ── Server → Client Messages ──
+
+    AuthenticatedMessage:
+      name: AuthenticatedMessage
+      title: Authenticated
+      description: >
+        Sent after successful authentication. Includes the authenticated
+        user's ID and the server-assigned connection ID. Auto-subscriptions
+        to team/issue channels are completed before this message is sent.
+      payload:
+        type: object
+        required:
+          - type
+          - userId
+          - connectionId
+        properties:
+          type:
+            type: string
+            const: authenticated
+            description: Message type identifier
+          userId:
+            type: string
+            format: uuid
+            description: Authenticated user's ID
+          connectionId:
+            type: string
+            format: uuid
+            description: Server-assigned connection ID
+      examples:
+        - name: Authentication success
+          payload:
+            type: authenticated
+            userId: '550e8400-e29b-41d4-a716-446655440010'
+            connectionId: 'a1b2c3d4-e5f6-4789-abcd-ef0123456789'
+
+    SubscribedMessage:
+      name: SubscribedMessage
+      title: Subscribed
+      description: >
+        Sent when a subscription is confirmed. Also sent for each
+        auto-subscription after authentication (user channel, team channels,
+        issue channels).
+      payload:
+        type: object
+        required:
+          - type
+          - channel
+        properties:
+          type:
+            type: string
+            const: subscribed
+            description: Message type identifier
+          channel:
+            type: string
+            description: The channel you are now subscribed to
+      examples:
+        - name: Subscribed to team
+          payload:
+            type: subscribed
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+
+    UnsubscribedMessage:
+      name: UnsubscribedMessage
+      title: Unsubscribed
+      description: Sent when an unsubscription is confirmed.
+      payload:
+        type: object
+        required:
+          - type
+          - channel
+        properties:
+          type:
+            type: string
+            const: unsubscribed
+            description: Message type identifier
+          channel:
+            type: string
+            description: The channel you are now unsubscribed from
+      examples:
+        - name: Unsubscribed from team
+          payload:
+            type: unsubscribed
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+
+    PongMessage:
+      name: PongMessage
+      title: Pong
+      description: Sent in response to a `ping` message.
+      payload:
+        type: object
+        required:
+          - type
+        properties:
+          type:
+            type: string
+            const: pong
+            description: Message type identifier
+      examples:
+        - name: Pong
+          payload:
+            type: pong
+
+    ErrorMessage:
+      name: ErrorMessage
+      title: Error
+      description: >
+        Sent when a message fails validation or an operation is rejected.
+        The connection is closed after authentication errors and invalid
+        JSON errors.
+      payload:
+        type: object
+        required:
+          - type
+          - code
+          - message
+        properties:
+          type:
+            type: string
+            const: error
+            description: Message type identifier
+          code:
+            type: string
+            enum:
+              - invalid_json
+              - invalid_message_format
+              - validation_error
+              - unknown_message_type
+              - auth_failed
+              - invalid_token
+              - subscribe_failed
+              - unsubscribe_failed
+              - invalid_channel
+              - forbidden
+              - connection_not_found
+              - unauthenticated
+              - rate_limited
+            description: Machine-readable error code
+          message:
+            type: string
+            description: Human-readable error description
+      examples:
+        - name: Authentication failed
+          payload:
+            type: error
+            code: auth_failed
+            message: 'Authentication failed'
+        - name: Rate limited
+          payload:
+            type: error
+            code: rate_limited
+            message: 'Rate limit exceeded'
+        - name: Forbidden
+          payload:
+            type: error
+            code: forbidden
+            message: 'Channel access denied'
+        - name: Invalid channel
+          payload:
+            type: error
+            code: invalid_channel
+            message: 'Invalid channel format'
+        - name: Auth timeout
+          payload:
+            type: error
+            code: unauthenticated
+            message: 'auth_timeout'
+
+    EventMessage:
+      name: EventMessage
+      title: Event
+      description: >
+        Real-time event broadcast. Sent to all connections subscribed to the
+        event's channel. The `event` field indicates the event type, and `data`
+        contains the event payload.
+      payload:
+        type: object
+        required:
+          - type
+          - channel
+          - event
+          - data
+          - timestamp
+          - userId
+        properties:
+          type:
+            type: string
+            const: event
+            description: Message type identifier
+          channel:
+            type: string
+            description: 'Channel the event was published to (e.g., `team:<uuid>`)'
+          event:
+            type: string
+            enum:
+              - issue.created
+              - issue.updated
+              - issue.deleted
+              - issue.assigned
+              - comment.created
+              - comment.updated
+              - comment.deleted
+              - label.created
+              - label.updated
+              - label.deleted
+              - watcher.added
+              - watcher.removed
+              - project.created
+              - project.updated
+              - cycle.created
+              - cycle.updated
+              - team.member_added
+              - team.member_removed
+              - user.online
+              - user.offline
+              - session.revoked
+              - notification.created
+            description: Event type identifier
+          data:
+            type: object
+            additionalProperties: true
+            description: Event payload (varies by event type)
+          timestamp:
+            type: string
+            format: date-time
+            description: ISO 8601 timestamp of when the event occurred
+          userId:
+            type: string
+            format: uuid
+            description: ID of the user who triggered the event
+      examples:
+        - name: Issue created
+          payload:
+            type: event
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+            event: issue.created
+            data:
+              id: '550e8400-e29b-41d4-a716-446655440001'
+              identifier: ENG-1
+              title: New feature request
+              teamId: '550e8400-e29b-41d4-a716-446655440000'
+              statusId: '550e8400-e29b-41d4-a716-446655440002'
+              priority: 0
+            timestamp: '2026-07-26T12:00:00.000Z'
+            userId: '550e8400-e29b-41d4-a716-446655440010'
+        - name: Comment created
+          payload:
+            type: event
+            channel: 'issue:550e8400-e29b-41d4-a716-446655440001'
+            event: comment.created
+            data:
+              id: '550e8400-e29b-41d4-a716-446655440020'
+              issueId: '550e8400-e29b-41d4-a716-446655440001'
+              userId: '550e8400-e29b-41d4-a716-446655440010'
+              body: Looks good to me!
+            timestamp: '2026-07-26T12:05:00.000Z'
+            userId: '550e8400-e29b-41d4-a716-446655440010'
+        - name: Issue status changed
+          payload:
+            type: event
+            channel: 'team:550e8400-e29b-41d4-a716-446655440000'
+            event: issue.updated
+            data:
+              id: '550e8400-e29b-41d4-a716-446655440001'
+              identifier: ENG-1
+              statusId: '550e8400-e29b-41d4-a716-446655440003'
+              completedAt: '2026-07-26T12:10:00.000Z'
+            timestamp: '2026-07-26T12:10:00.000Z'
+            userId: '550e8400-e29b-41d4-a716-446655440010'
