@@ -26,18 +26,60 @@ info:
 
     ## WebSocket Gateway
 
-    Real-time events are available at `ws://<host>/ws`. After connecting, send
-    an
+    Real-time events are available at `ws://<host>/ws` (path: `/ws`).
 
-    `authenticate` message with your access token, then subscribe to channels
+    ### Connection Lifecycle
 
-    (`team:<id>`, `issue:<id>`, `user:<id>`) to receive live updates.
+    1. Connect to `ws://<host>/ws`
+    2. Send an `authenticate` message with your JWT access token within 5 seconds
+       (configurable via `WS_AUTH_TIMEOUT_MS`). Unauthenticated connections are
+       closed.
+    3. On successful authentication, you are automatically subscribed to channels
+       for all teams you belong to (`team:<teamId>`).
+
+    ### Channels
+
+    Subscribe to channels to receive live updates:
+
+    - `team:<teamId>` — all issues in a team (auto-subscribed on auth for your
+      teams)
+    - `issue:<issueId>` — updates for a specific issue
+    - `user:<userId>` — events targeted at a specific user
+
+    Channel access is validated: you must be a team member to subscribe to a
+    `team:<id>` channel, and the issue must belong to a team you're a member of
+    for `issue:<id>`.
+
+    ### Rate Limiting
+
+    Each connection is limited to **100 messages per minute**. Exceeding this
+    limit results in a `rate_limited` error response and eventual disconnection.
+
+    ### Message Format
+
+    All messages are JSON. Server responses include a `type` field:
+
+    - `authenticated` — successful authentication
+    - `subscribed` — successfully subscribed to a channel
+    - `unsubscribed` — successfully unsubscribed from a channel
+    - `error` — error response with `code` and `message`
+
+    ### Error Codes
+
+    - `unauthorized` — missing or invalid authentication
+    - `forbidden` — channel access denied
+    - `invalid_message` — malformed message
+    - `rate_limited` — rate limit exceeded
+    - `channel_required` — subscribe/unsubscribe missing channel field
+    - `already_subscribed` — duplicate subscription
+    - `not_subscribed` — unsubscribe from non-subscribed channel
   version: 1.0.0
   contact:
     email: dev@example.com
   license:
     name: ISC
 tags:
+  - name: Health
   - name: Authentication
   - name: Sessions
   - name: Users
@@ -53,6 +95,30 @@ tags:
   - name: Cycles
   - name: Notifications
 paths:
+  /api/health:
+    get:
+      summary: Health check
+      deprecated: false
+      description: Returns the server health status. No authentication required.
+      operationId: healthCheck
+      tags:
+        - Health
+      parameters: []
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+              example:
+                status: ok
+      security: []
   /api/v1/auth/register:
     post:
       summary: Register a new user

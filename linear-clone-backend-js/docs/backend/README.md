@@ -1246,66 +1246,149 @@ Handle real-time communication and WebSocket connections.
 
 ### 8.1 Connection Management
 
-**Behavior:** Handle client connection and disconnection.
+**Behavior:** Handle client connection, authentication, and disconnection.
 
 | Aspect | Description |
 |--------|-------------|
 | Operations | Connect, Disconnect, Authenticate |
 | Input | Connection request, authentication token |
 | Validation | Token valid, user exists |
-| Side Effects | Connection registered, user marked online |
+| Side Effects | Connection registered, auto-subscribed to user/team/issue channels, user marked online |
 | Output | Connection ID |
 | Errors | Invalid token, user not found |
 
 **Rules:**
-- Connections must authenticate within 5 seconds (configurable per deployment)
-- Unauthenticated connections are dropped
-- Server sends `{ type: "error", message: "..." }` before closing connection
+- Connections must authenticate within 5 seconds (configurable via `WS_AUTH_TIMEOUT_MS`)
+- Unauthenticated connections are dropped with `{ type: "error", code: "unauthenticated", message: "auth_timeout" }`
+- Server sends `{ type: "error", code: "...", message: "..." }` before closing on any error
 - Multiple connections per user are allowed
+- Maximum connections enforced via `WS_MAX_CONNECTIONS` (default: 1000); new connections receive HTTP 503 when at capacity
+- Origin validation via `CORS_ORIGINS`; invalid origins receive HTTP 403
+
+**Environment Variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WS_AUTH_TIMEOUT_MS` | `5000` | Milliseconds to send authenticate message after connect |
+| `WS_MAX_CONNECTIONS` | `1000` | Maximum simultaneous WebSocket connections |
+| `CORS_ORIGINS` | `*` | Comma-separated allowed origins for WebSocket upgrade |
 
 ---
 
 ### 8.2 Event Broadcasting
 
-**Behavior:** Send events to relevant connected clients.
+**Behavior:** Send events to relevant connected clients via channel-based pub/sub.
 
 | Aspect | Description |
 |--------|-------------|
-| Input | Event type, payload, target (user, team, issue) |
+| Input | GatewayEvent (channel, event type, data, userId, timestamp) |
 | Validation | Event type valid |
-| Side Effects | Message sent to matching connections |
+| Side Effects | Message sent to all connections subscribed to the event's channel |
 | Output | Number of recipients |
 | Errors | None |
 
-**Broadcasting Rules:**
-- Team events → All team members
-- Issue events → Users watching or assigned (looked up from `issue_watchers` table + issue assignee)
-- User events → Specific user only
+**Event Sources:**
+- **Work Module** → `WorkToGatewayBridge` adapter bridges work events (issues, comments, labels, watchers) to the Gateway's event emitter
+- **Notification Module** → Sends notification events directly to the Gateway
+- **Auth/Identity Module** → Sends user online/offline and session revocation events
+
+**Channel Routing Rules:**
+
+| Event Type | Channel | Description |
+|------------|---------|-------------|
+| `issue.*` (created, updated, deleted, assigned) | `team:{teamId}` | All team members see issue changes |
+| `comment.*` (created, updated, deleted) | `issue:{issueId}` | Issue watchers/assignees see comments |
+| `label.*` (created, updated, deleted) | `team:{teamId}` | All team members see label changes |
+| `watcher.*` (added, removed) | `issue:{issueId}` | Issue watchers see watcher changes |
+| `project.*` (created, updated) | `team:{teamId}` | All team members see project changes |
+| `cycle.*` (created, updated) | `team:{teamId}` | All team members see cycle changes |
+| `team.member_*` (added, removed) | `team:{teamId}` | All team members see membership changes |
+| `user.*` (online, offline) | `user:{userId}` | Specific user only |
+| `session.revoked` | `user:{userId}` | Specific user only |
+| `notification.created` | `user:{userId}` | Specific user only |
+
+**Event Payload Format:**
+```json
+{
+  "type": "event",
+  "channel": "team:<teamId>",
+  "event": "issue.created",
+  "data": { "id": "...", "identifier": "ENG-1", "title": "..." },
+  "timestamp": "2026-07-26T12:00:00.000Z",
+  "userId": "<actorUserId>"
+}
+```
 
 ---
 
 ### 8.3 Channel Subscription
 
-**Behavior:** Subscribe/unsubscribe to specific channels.
+**Behavior:** Subscribe/unsubscribe to specific channels for real-time event delivery.
 
 | Aspect | Description |
 |--------|-------------|
 | Operations | Subscribe, Unsubscribe |
 | Input | Connection ID, channel name |
-| Validation | Connection exists, channel valid |
+| Validation | Connection exists, channel valid, access authorized |
 | Side Effects | Subscription record updated |
-| Output | Confirmation |
-| Errors | Connection not found, invalid channel |
+| Output | Confirmation (`subscribed`/`unsubscribed` message) |
+| Errors | Connection not found, invalid channel, forbidden, rate limited |
 
 **Channel Types:**
 - `team:{teamId}` — Team-wide events (auto-subscribed for all team members on connection)
-- `issue:{issueId}` — Issue-specific events (auto-subscribed for watchers and assignees via `issue_watchers` table)
+- `issue:{issueId}` — Issue-specific events (auto-subscribed for watchers and assignees via `issue_watchers` table + issue assignee lookup)
 - `user:{userId}` — User-specific events (auto-subscribed for the authenticated user)
 
-**Auto-Subscription:** When a user connects, the Gateway automatically subscribes their connection to:
-- All `team:{teamId}` channels for teams they belong to
-- All `issue:{issueId}` channels for issues they're watching or assigned to (via `issue_watchers` + issue assignee lookup)
+**Auto-Subscription:** When a user connects and authenticates, the Gateway automatically subscribes their connection to:
 - Their own `user:{userId}` channel
+- All `team:{teamId}` channels for teams they belong to (queried via `TeamQueryPort.getUserTeamIds`)
+- All `issue:{issueId}` channels for issues they're watching or assigned to (queried via `IssueQueryPort.getUserIssueIds`)
+
+**Channel Access Validation:** Subscribe requests are validated before confirming:
+| Channel Type | Validation Rule |
+|--------------|-----------------|
+| `team:{teamId}` | User must be a member of the team (`TeamQueryPort.isUserMember`) |
+| `issue:{issueId}` | User must be watching or assigned to the issue (`IssueQueryPort.isUserWatchingOrAssigned`) |
+| `user:{userId}` | User can only subscribe to their own user channel |
+
+**Rate Limiting:** Each connection is limited to **100 subscribe/unsubscribe messages per minute** (`ConnectionRateLimiter`). Exceeding this limit returns a `{ type: "error", code: "rate_limited", message: "Rate limit exceeded" }` response. The rate limit window resets every 60 seconds.
+
+**WebSocket Protocol Messages:**
+
+*Client → Server:*
+| Type | Fields | Description |
+|------|--------|-------------|
+| `authenticate` | `token` | Authenticate with JWT (must be sent within auth timeout) |
+| `subscribe` | `channel` | Subscribe to a channel |
+| `unsubscribe` | `channel` | Unsubscribe from a channel |
+| `ping` | — | Keep-alive ping |
+
+*Server → Client:*
+| Type | Fields | Description |
+|------|--------|-------------|
+| `authenticated` | `userId`, `connectionId` | Authentication success |
+| `subscribed` | `channel` | Subscription confirmed |
+| `unsubscribed` | `channel` | Unsubscription confirmed |
+| `pong` | — | Response to ping |
+| `error` | `code`, `message` | Error response (see error codes below) |
+| `event` | `channel`, `event`, `data`, `timestamp`, `userId` | Real-time event broadcast |
+
+**Error Codes:**
+| Code | Description |
+|------|-------------|
+| `invalid_json` | Message is not valid JSON |
+| `invalid_message_format` | Message is not an object |
+| `validation_error` | Message failed schema validation |
+| `unknown_message_type` | Unrecognized message type |
+| `auth_failed` | Authentication failed |
+| `invalid_token` | JWT token is invalid or expired |
+| `subscribe_failed` | Subscribe operation failed |
+| `unsubscribe_failed` | Unsubscribe operation failed |
+| `invalid_channel` | Channel format is invalid |
+| `forbidden` | User lacks access to the channel |
+| `connection_not_found` | Connection ID not found |
+| `unauthenticated` | Connection not authenticated (auth timeout) |
+| `rate_limited` | Rate limit exceeded |
 
 ---
 ---
@@ -1461,7 +1544,7 @@ Provide cross-cutting concerns and shared utilities.
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        WORK MODULE                              │
-│  Manages issues, comments, labels                               │
+│  Manages issues, comments, labels, watchers                     │
 └───────┬──────────────────┬──────────────────┬───────────────────┘
         │                  │                  │
         │ publishes        │ consumes         │ consumes
@@ -1486,7 +1569,14 @@ Provide cross-cutting concerns and shared utilities.
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      GATEWAY MODULE                             │
-│  Broadcasts real-time events to clients                         │
+│  Broadcasts real-time events to clients via WebSocket           │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  WorkToGatewayBridge (adapter)                          │   │
+│  │  Bridges Work Module events → Gateway event emitter     │   │
+│  │  Routes: issue→team channel, comment→issue channel,     │   │
+│  │          label→team channel, watcher→issue channel       │   │
+│  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
