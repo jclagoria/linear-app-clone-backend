@@ -1,16 +1,16 @@
-# Graph Report - linear-app-clone-backend  (2026-07-20)
+# Graph Report - linear-app-clone-backend  (2026-07-27)
 
 ## Corpus Check
-- 495 files · ~210,063 words
+- 511 files · ~224,616 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4974 nodes · 6401 edges · 317 communities (294 shown, 23 thin omitted)
+- 5242 nodes · 6700 edges · 335 communities (312 shown, 23 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 9 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5b51891a`
+- Built from commit: `ae849f1e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -138,7 +138,7 @@
 - Tasks — Project Module CRUD & Progress (Backend)
 - Architecture
 - scripts
-- refresh-token.ts
+- WebSocket Gateway — API Contract
 - ProjectRepository
 - Deployment — Linear App Clone Backend
 - Use Hexagonal Architecture
@@ -237,7 +237,7 @@
 - Cycles API
 - Labels API
 - Getting Started
-- NotOrganizationMemberError
+- Tasks — WebSocket Real-Time Kanban Backend
 - validators.ts
 - 1. Auth Module
 - 8. Gateway Module
@@ -321,6 +321,23 @@
 - list-team-members.contract.test.ts
 - list-teams.contract.test.ts
 - update-profile.contract.test.ts
+- ADR-0001: In-Process Event Bridge (Work → Gateway)
+- ADR-0002: Channel Access Validation via Port Queries
+- ADR-0003: Auto-Subscription on Authentication
+- Review — WebSocket Real-Time Kanban Backend
+- Tech Selection — WebSocket Real-Time Kanban Backend
+- ADR Manifest — WebSocket Real-Time Kanban Backend
+- WebSocket Real-Time Backend Changes for Kanban
+- work/application/ports/event-publisher.ts
+- CommentRepository
+- SessionRepository
+- register-user.ts
+- create-team.ts
+- Requirement: Issue Channel Access
+- channel.ts
+- Requirement: Issue Channel Subscription
+- Requirement: Issue Event Broadcasting
+- Requirement: OnlineStatus
 
 ## God Nodes (most connected - your core abstractions)
 1. `EventPublisher` - 32 edges
@@ -335,37 +352,37 @@
 10. `TeamRepository` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `autoSubscribeUserChannels()` --calls--> `formatChannel()`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/gateway/application/auto-subscription.ts → linear-clone-backend-js/src/modules/gateway/domain/channel.ts
-- `CreateWorkflowStateInput` --references--> `WorkflowStateType`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/workflow/application/create-workflow-state.ts → linear-clone-backend-js/src/modules/workflow/domain/default-workflow.ts
-- `UpdateWorkflowStateInput` --references--> `WorkflowStateType`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/workflow/application/update-workflow-state.ts → linear-clone-backend-js/src/modules/workflow/domain/default-workflow.ts
-- `authRoutes()` --calls--> `clearRefreshTokenCookie()`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/auth/adapters/in/auth-controller.ts → linear-clone-backend-js/src/shared/cookie.ts
-- `authRoutes()` --calls--> `getRefreshTokenCookie()`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/auth/adapters/in/auth-controller.ts → linear-clone-backend-js/src/shared/cookie.ts
+- `sessionRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/auth/adapters/in/session-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `cycleRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/cycle/adapters/in/cycle-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `start()` --calls--> `setupGateway()`  [EXTRACTED]
+  linear-clone-backend-js/src/server.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `identityRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/identity/adapters/in/identity-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `notificationRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/notification/adapters/in/notification-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (317 total, 23 thin omitted)
+## Communities (335 total, 23 thin omitted)
 
 ### Community 0 - "AGENTS.md"
 Cohesion: 0.50
 Nodes (3): CodeGraph, graphify, Mandatory Project Rules
 
 ### Community 1 - "index.ts"
-Cohesion: 0.06
-Nodes (41): app, MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription (+33 more)
+Cohesion: 0.04
+Nodes (48): Behaviour, Business Rules, Channel, Data Model, Feature: Auto-Subscription on Authentication, Feature: Channel Access Validation, Feature: Event Broadcasting, GatewayEvent (+40 more)
 
 ### Community 2 - "errors.ts"
-Cohesion: 0.06
-Nodes (39): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+31 more)
+Cohesion: 0.07
+Nodes (27): AD-1: In-Process Event Bridge (Work → Gateway), AD-2: Channel Access Validation via Port Queries, AD-3: Auto-Subscription on Authentication, API Contracts, Architecture Decisions, AuthenticateConnection (Enhanced), Business Logic, Comment Created/Updated/Deleted (+19 more)
 
 ### Community 3 - "comment-controller.ts"
 Cohesion: 0.05
-Nodes (33): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+25 more)
+Nodes (34): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+26 more)
 
 ### Community 4 - "index.ts"
 Cohesion: 0.09
@@ -373,15 +390,15 @@ Nodes (18): BaseError, BusinessRuleError, ConflictError, errorHandler(), Forbidd
 
 ### Community 5 - "watcher-controller.ts"
 Cohesion: 0.06
-Nodes (28): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+20 more)
+Nodes (29): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+21 more)
 
 ### Community 6 - "issue-controller.ts"
-Cohesion: 0.05
-Nodes (47): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+39 more)
+Cohesion: 0.04
+Nodes (52): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+44 more)
 
 ### Community 7 - "LabelRepository"
 Cohesion: 0.08
-Nodes (17): GetIssueLabels, ListLabels, LabelRepository, issueComments, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES (+9 more)
+Nodes (18): GetIssueLabels, ListLabels, LabelRepository, issues, IssueLabel, issueLabels, NewIssueLabel, NewIssue (+10 more)
 
 ### Community 8 - "identity-controller.ts"
 Cohesion: 0.06
@@ -496,8 +513,8 @@ Cohesion: 0.06
 Nodes (33): Behaviour, Business Rules, Channel, Connection, Data Model, Event, Gateway — Business Specification, Requirement: AuthTimeout (+25 more)
 
 ### Community 36 - "Behaviour"
-Cohesion: 0.06
-Nodes (33): Behaviour, Business Rules, Channel, Connection, Data Model, Event, Gateway — Business Specification, Requirement: AuthTimeout (+25 more)
+Cohesion: 0.15
+Nodes (13): Behaviour, Requirement: ConnectionTracking, Requirement: IssueBroadcast, Requirement: MultiConnection, Requirement: SubscribeChannel, Requirement: TeamBroadcast, Scenario: Connection ID assigned on auth, Scenario: Issue event reaches watchers and assignee (+5 more)
 
 ### Community 37 - "errors.ts"
 Cohesion: 0.11
@@ -528,12 +545,12 @@ Cohesion: 0.06
 Nodes (31): Data Schema: IssueLabel (junction), Data Schema: Label, Endpoint: Attach Label to Issue, Endpoint: Create Label, Endpoint: Delete Label, Endpoint: Detach Label from Issue, Endpoint: Get Issue Labels, Endpoint: List Labels (+23 more)
 
 ### Community 44 - "auth-controller.ts"
-Cohesion: 0.11
-Nodes (22): authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser, logoutUser (+14 more)
+Cohesion: 0.09
+Nodes (28): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser (+20 more)
 
 ### Community 45 - "create-issue.ts"
 Cohesion: 0.08
-Nodes (16): CreateIssue, CreateIssueInput, CreateIssueInputType, CreateIssueOutput, ProjectQuery, TeamKeyQuery, TeamMemberQuery, ProjectQuery (+8 more)
+Nodes (23): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, CreateIssue, CreateIssueInput, CreateIssueInputType (+15 more)
 
 ### Community 46 - "Team — API Contract"
 Cohesion: 0.06
@@ -612,8 +629,8 @@ Cohesion: 0.08
 Nodes (24): Auth — Session Management Business Specification, Behaviour, Business Rules, Data Model, Relationships, Requirement: Automatic Session Eviction, Requirement: List Active Sessions, Requirement: Revoke a Specific Session (+16 more)
 
 ### Community 65 - "session-controller.ts"
-Cohesion: 0.10
-Nodes (18): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+10 more)
+Cohesion: 0.09
+Nodes (21): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+13 more)
 
 ### Community 66 - "Notifications — API Contract"
 Cohesion: 0.08
@@ -624,8 +641,8 @@ Cohesion: 0.08
 Nodes (23): Endpoint: Get notification preferences, Endpoint: List notifications, Endpoint: Mark all notifications as read, Endpoint: Mark notification as read, Endpoint: Update notification preferences, Errors, Errors, Errors (+15 more)
 
 ### Community 68 - "SessionRepository"
-Cohesion: 0.13
-Nodes (7): ListSessions, ListSessionsInput, ListSessionsInputType, ListSessionsOutput, SessionOutput, SessionRepository, Session
+Cohesion: 0.23
+Nodes (4): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, NotificationEvent, NotificationEventPublisher
 
 ### Community 69 - "update-notification-preferences.ts"
 Cohesion: 0.14
@@ -644,8 +661,8 @@ Cohesion: 0.14
 Nodes (10): CreateProject, CreateProjectInput, CreateProjectInputType, CreateProjectOutput, TeamMemberQuery, UpdateProject, UpdateProjectInput, UpdateProjectInputType (+2 more)
 
 ### Community 73 - "IssueRepository"
-Cohesion: 0.13
-Nodes (10): ListIssues, ListIssuesQuery, ListIssuesQueryType, IssueFilters, IssueRepository, PaginatedResult, PaginationCursor, Issue (+2 more)
+Cohesion: 0.12
+Nodes (7): ListIssues, ListIssuesQuery, ListIssuesQueryType, EventPublisher, IssueFilters, IssueRepository, Issue
 
 ### Community 74 - "API Endpoints"
 Cohesion: 0.09
@@ -680,8 +697,8 @@ Cohesion: 0.10
 Nodes (20): Behaviour, Business Rules, Data Model, IssueLabel (junction), Label, Labels — Business Specification, Relationships, Requirement: AttachLabel (+12 more)
 
 ### Community 82 - "EventPublisher"
-Cohesion: 0.13
-Nodes (9): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, DeleteIssue, EventPublisher (+1 more)
+Cohesion: 0.25
+Nodes (3): organizationMemberRepository, NotOrganizationMemberError, NotOrganizationOwnerError
 
 ### Community 83 - "StateRepository"
 Cohesion: 0.11
@@ -692,12 +709,12 @@ Cohesion: 0.10
 Nodes (19): Auto-Subscription, Channel Types, Connection, Errors, Gateway — WebSocket Protocol Contract, Message: Authenticate, Message: Event, Message: Ping / Pong (+11 more)
 
 ### Community 85 - "Gateway — WebSocket Protocol Contract"
-Cohesion: 0.10
-Nodes (19): Auto-Subscription, Channel Types, Connection, Errors, Gateway — WebSocket Protocol Contract, Message: Authenticate, Message: Event, Message: Ping / Pong (+11 more)
+Cohesion: 0.06
+Nodes (33): Auto-Subscription, Channel Formats, Channel Types, Connection, Connection Lifecycle, Error Code Details, Errors — Standard Error Response, Event Types (+25 more)
 
 ### Community 86 - "change-issue-status.ts"
-Cohesion: 0.14
-Nodes (10): ChangeIssueStatus, ChangeIssueStatusInput, ChangeIssueStatusInputType, ChangeIssueStatusOutput, IssueStatusQuery, NotificationService, StatusType, StateHistoryService (+2 more)
+Cohesion: 0.16
+Nodes (9): ChangeIssueStatus, ChangeIssueStatusInput, ChangeIssueStatusInputType, ChangeIssueStatusOutput, IssueStatusQuery, NotificationService, StatusType, StateHistoryService (+1 more)
 
 ### Community 87 - "Endpoint: List Sessions"
 Cohesion: 0.11
@@ -728,8 +745,8 @@ Cohesion: 0.11
 Nodes (18): Auth — Session Management API Contract, Behavior, Endpoint: List Sessions, Endpoint: Revoke All Sessions, Endpoint: Revoke Session, Errors, Errors, Errors (+10 more)
 
 ### Community 94 - "EventPublisher"
-Cohesion: 0.18
-Nodes (9): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, RevokeAllSessions, RevokeAllSessionsInput (+1 more)
+Cohesion: 0.10
+Nodes (13): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, SessionRepository, RevokeAllSessions (+5 more)
 
 ### Community 95 - "errors.ts"
 Cohesion: 0.16
@@ -843,9 +860,9 @@ Nodes (13): Architecture, Backend, Backend — {hexagonal / clean} architecture,
 Cohesion: 0.14
 Nodes (14): scripts, build, db:generate, db:migrate, db:push, db:studio, dev, format (+6 more)
 
-### Community 123 - "refresh-token.ts"
-Cohesion: 0.24
-Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
+### Community 123 - "WebSocket Gateway — API Contract"
+Cohesion: 0.07
+Nodes (27): Channel Formats, Connection Lifecycle, Endpoint: Channel Subscription, Endpoint: Channel Unsubscription, Endpoint: Event Broadcasting (Server → Client), Endpoint: WebSocket Connection, Error Codes, Errors — Standard Error Response (+19 more)
 
 ### Community 124 - "ProjectRepository"
 Cohesion: 0.26
@@ -952,8 +969,8 @@ Cohesion: 0.15
 Nodes (12): API Layer, Business Logic, Data Layer, Events / Messaging, Integration — Cycle Module, Integration — Gateway Module, Integration — Work Module, Review (+4 more)
 
 ### Community 150 - "index.ts"
-Cohesion: 0.32
-Nodes (6): UserRepository, NewSession, sessions, NewUser, User, users
+Cohesion: 0.15
+Nodes (11): UserRepository, ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput, NewSession, sessions (+3 more)
 
 ### Community 151 - "NotCycleTeamMemberError"
 Cohesion: 0.21
@@ -1016,8 +1033,8 @@ Cohesion: 0.24
 Nodes (6): CreateNotification, CreateNotificationInput, CreateNotificationInputType, CreateNotificationOutput, CreateNotificationEvent, NotificationService
 
 ### Community 166 - "mark-all-notifications-read.ts"
-Cohesion: 0.23
-Nodes (4): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, NotificationEvent, NotificationEventPublisher
+Cohesion: 0.06
+Nodes (30): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+22 more)
 
 ### Community 167 - "validate-transition.ts"
 Cohesion: 0.23
@@ -1116,8 +1133,8 @@ Cohesion: 0.24
 Nodes (5): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, OrganizationNameConflictError
 
 ### Community 191 - "create-team.ts"
-Cohesion: 0.24
-Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
+Cohesion: 0.10
+Nodes (20): API Layer, AuthenticateConnection (Enhanced), Business Logic, ChannelValidator (Access Control), Contract Tests, Data Layer, Event Bridge Integration, Events / Messaging (+12 more)
 
 ### Community 192 - "get-project-progress.ts"
 Cohesion: 0.24
@@ -1239,9 +1256,9 @@ Nodes (8): Attach Label, Create Label, Delete Label, Detach Label, Get Issue Lab
 Cohesion: 0.25
 Nodes (8): Build & Start (Production), Database Setup, Environment Variables, Getting Started, Installation, Prerequisites, Run Development, Run Tests
 
-### Community 222 - "NotOrganizationMemberError"
-Cohesion: 0.25
-Nodes (3): organizationMemberRepository, NotOrganizationMemberError, NotOrganizationOwnerError
+### Community 222 - "Tasks — WebSocket Real-Time Kanban Backend"
+Cohesion: 0.12
+Nodes (16): Requirement: AutoSubscribe, Requirement: Channel Format Validation, Requirement: Team Channel Access, Requirement: Team Channel Subscription, Requirement: User Channel Access, Requirement: User Channel Subscription, Scenario: Auto-subscribe on authentication, Scenario: Invalid channel format (+8 more)
 
 ### Community 223 - "validators.ts"
 Cohesion: 0.46
@@ -1483,25 +1500,93 @@ Nodes (4): Error Handling, Error Response Examples, Error Types, Rate Limit Head
 Cohesion: 0.50
 Nodes (3): ErrorResponseSchema, RefreshTokenRequestSchema, RefreshTokenResponseSchema
 
+### Community 317 - "ADR-0001: In-Process Event Bridge (Work → Gateway)"
+Cohesion: 0.15
+Nodes (12): ADR-0001: In-Process Event Bridge (Work → Gateway), Alternatives Considered, Consequences, Context, Decision, Direct Database Polling, Kafka/RabbitMQ, Negative (+4 more)
+
+### Community 318 - "ADR-0002: Channel Access Validation via Port Queries"
+Cohesion: 0.15
+Nodes (12): ADR-0002: Channel Access Validation via Port Queries, Alternatives Considered, Client-Side Channel Restriction, Consequences, Context, Decision, Negative, Positive (+4 more)
+
+### Community 319 - "ADR-0003: Auto-Subscription on Authentication"
+Cohesion: 0.15
+Nodes (12): ADR-0003: Auto-Subscription on Authentication, Alternatives Considered, Background Auto-Subscription, Consequences, Context, Decision, Manual Subscription Only, Negative (+4 more)
+
+### Community 320 - "Review — WebSocket Real-Time Kanban Backend"
+Cohesion: 0.15
+Nodes (12): Backward Compatibility, Checklist, Edge Cases, Implementation Readiness, Leakage Check, Migration Rollback, Next Steps, Performance Bounds (+4 more)
+
+### Community 321 - "Tech Selection — WebSocket Real-Time Kanban Backend"
+Cohesion: 0.15
+Nodes (13): Requirement: Comment Event Broadcasting, Requirement: Label Event Broadcasting, Requirement: UserBroadcast, Requirement: Watcher Event Broadcasting, Scenario: Comment created event broadcast to issue channel, Scenario: Comment deleted event broadcast, Scenario: Comment updated event broadcast, Scenario: Label created event broadcast to team (+5 more)
+
+### Community 322 - "ADR Manifest — WebSocket Real-Time Kanban Backend"
+Cohesion: 0.18
+Nodes (10): Business Rules, Channel, Connection, Data Model, Event, Gateway — Business Specification, GatewayEvent, Relationships (+2 more)
+
+### Community 323 - "WebSocket Real-Time Backend Changes for Kanban"
+Cohesion: 0.22
+Nodes (8): ADR References, Configuration, Decision Summary, Existing Stack (Unchanged), Generated Files, Next Steps, Tech Selection — WebSocket Real-Time Kanban Backend, WebSocket-Specific Stack
+
+### Community 325 - "work/application/ports/event-publisher.ts"
+Cohesion: 0.15
+Nodes (8): CreateLabel, CreateLabelInput, CreateLabelInputType, Event, UpdateLabel, UpdateLabelInput, UpdateLabelInputType, LabelNameConflictError
+
+### Community 326 - "CommentRepository"
+Cohesion: 0.33
+Nodes (5): ADR Manifest — WebSocket Real-Time Kanban Backend, Decisions Not Recorded, In-Force ADRs Reviewed, New Durable ADRs Created, Review Summary
+
+### Community 327 - "SessionRepository"
+Cohesion: 0.33
+Nodes (5): Impact, Motivation, Problem Statement, Scope, WebSocket Real-Time Backend Changes for Kanban
+
+### Community 328 - "register-user.ts"
+Cohesion: 0.50
+Nodes (4): Requirement: AuthTimeout, Scenario: Authentication timeout, Scenario: Invalid token rejected, Scenario: Successful authentication within timeout
+
+### Community 329 - "create-team.ts"
+Cohesion: 0.24
+Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
+
+### Community 330 - "Requirement: Issue Channel Access"
+Cohesion: 0.50
+Nodes (4): Requirement: Issue Channel Access, Scenario: Issue assignee subscribes to issue channel, Scenario: Issue watcher subscribes to issue channel, Scenario: Non-watcher/non-assignee subscribes to issue channel
+
+### Community 331 - "channel.ts"
+Cohesion: 0.06
+Nodes (45): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+37 more)
+
+### Community 332 - "Requirement: Issue Channel Subscription"
+Cohesion: 0.50
+Nodes (4): Requirement: Issue Channel Subscription, Scenario: User subscribes to assigned issue channels, Scenario: User subscribes to watched issue channels, Scenario: User with no watched or assigned issues
+
+### Community 333 - "Requirement: Issue Event Broadcasting"
+Cohesion: 0.50
+Nodes (4): Requirement: Issue Event Broadcasting, Scenario: Issue created event broadcast to team, Scenario: Issue deleted event broadcast, Scenario: Issue updated event broadcast to team and issue channel
+
+### Community 334 - "Requirement: OnlineStatus"
+Cohesion: 0.50
+Nodes (4): Requirement: OnlineStatus, Scenario: User comes online, Scenario: User goes offline, Scenario: User stays online with remaining connections
+
 ## Knowledge Gaps
-- **2795 isolated node(s):** `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created`, `Decisions Not Recorded`, `Architecture Decisions` (+2790 more)
+- **2961 isolated node(s):** `Context`, `Decision`, `Positive`, `Negative`, `Risks` (+2956 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `index.ts` to `session-controller.ts`, `LabelRepository`, `TokenService`, `auth-controller.ts`, `login-user.ts`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `EventPublisher` connect `add-team-member.ts` to `TeamRepository`, `errors.ts`, `OrganizationMemberRepository`, `create-organization.ts`, `create-team.ts`?**
+- **Why does `env` connect `auth-controller.ts` to `session-controller.ts`, `LabelRepository`, `channel.ts`, `TokenService`, `login-user.ts`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `LabelRepository` connect `LabelRepository` to `IssueRepository`, `work/application/ports/event-publisher.ts`, `mark-all-notifications-read.ts`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **What connects `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created` to the rest of the system?**
-  _2795 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Context`, `Decision`, `Positive` to the rest of the system?**
+  _2961 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `index.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.05787545787545788 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected._
 - **Should `errors.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.055288461538461536 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07142857142857142 - nodes in this community are weakly interconnected._
 - **Should `comment-controller.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.05478750640040963 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05357142857142857 - nodes in this community are weakly interconnected._
 - **Should `index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.08941176470588236 - nodes in this community are weakly interconnected._
