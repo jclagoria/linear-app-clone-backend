@@ -1,31 +1,11 @@
-## Mandatory Project Rules
+<!-- headroom:rtk-instructions -->
+# RTK (Rust Token Killer) - Token-Optimized Commands
 
-Always follow this priority order when understanding code or making changes:
+When running shell commands, **always prefix with `rtk`**. This reduces context
+usage by 60-90% with zero behavior change. If rtk has no filter for a command,
+it passes through unchanged — so it is always safe to use.
 
-### 1. CodeGraph + Graphify (Code Intelligence)
-Before reading files with `read`, `grep`, or `find`, always use the graph tools first:
-
-- If `.codegraph/` exists → use **CodeGraph** (`codegraph_explore` or `codegraph explore`)
-- If `graphify-out/graph.json` exists → use **Graphify** first (`graphify query`, `graphify path`, `graphify explain`)
-
-**Never** assume anything about the implementation without consulting the graph first.
-
-### 2. Memory (Persistent Knowledge)
-Before answering about past decisions, conventions, architecture, user preferences, or project history:
-
-→ Use `memory_search` (from the headroom_memory MCP)
-
-After making important decisions, discovering conventions, or learning relevant facts:
-
-→ Use `memory_save` to persist the information.
-
-Memory is your **primary source of truth** for historical context.
-
-### 3. RTK - Optimized Commands (Token Savings)
-When you need to run terminal commands, **always use the `rtk` prefix**:
-
-```bash
-# Recommended examples
+## Key Commands
 ```bash
 # Git (59-80% savings)
 rtk git status          rtk git diff            rtk git log
@@ -54,7 +34,9 @@ rtk docker ps           rtk kubectl get         rtk docker logs <c>
 # Package managers (70-90% savings)
 rtk pip list            rtk pnpm install        rtk npm run <script>
 ```
-#### Rules
+
+## Rules
 - In command chains, prefix each segment: `rtk git add . && rtk git commit -m "msg"`
 - For debugging, use raw command without rtk prefix
 - `rtk proxy <cmd>` runs command without filtering but tracks usage
+<!-- /headroom:rtk-instructions -->
