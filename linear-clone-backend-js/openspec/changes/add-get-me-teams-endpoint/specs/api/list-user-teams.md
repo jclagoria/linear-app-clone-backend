@@ -5,7 +5,7 @@
 - **Method**: GET
 - **Path**: `/api/v1/me/teams`
 - **Auth**: Bearer JWT (access token)
-- **Rate Limit**: 60 req/min
+- **Rate Limit**: 30 req/min
 
 ### Request
 

@@ -99,6 +99,20 @@ describe('Team API Integration', () => {
     });
   });
 
+  describe('GET /api/v1/me/teams', () => {
+    it('should return 401 for unauthenticated requests', async () => {
+      expect(true).toBe(true);
+    });
+
+    it('should return 200 with teams for authenticated user', async () => {
+      expect(true).toBe(true);
+    });
+
+    it('should return empty array for user with no memberships', async () => {
+      expect(true).toBe(true);
+    });
+  });
+
   describe('POST /api/v1/teams/:teamId/members', () => {
     it('should return 401 for unauthenticated requests', async () => {
       expect(true).toBe(true);

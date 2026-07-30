@@ -22,6 +22,7 @@ import { DeleteTeam } from '../../application/delete-team';
 import { AddTeamMember } from '../../application/add-team-member';
 import { RemoveTeamMember } from '../../application/remove-team-member';
 import { ListTeamMembers } from '../../application/list-team-members';
+import { ListUserTeams } from '../../application/list-user-teams';
 import { DrizzleUserProfileRepository } from '../out/drizzle-user-profile-repository';
 import { DrizzleOrganizationRepository } from '../out/drizzle-organization-repository';
 import { DrizzleOrganizationMemberRepository } from '../out/drizzle-organization-member-repository';
@@ -66,6 +67,7 @@ const deleteTeam = new DeleteTeam(teamRepository, teamMemberRepository, eventPub
 const addTeamMember = new AddTeamMember(teamRepository, teamMemberRepository, organizationMemberRepository, eventPublisher);
 const removeTeamMember = new RemoveTeamMember(teamRepository, teamMemberRepository, eventPublisher);
 const listTeamMembers = new ListTeamMembers(teamRepository, teamMemberRepository, userProfileRepository);
+const listUserTeams = new ListUserTeams(teamMemberRepository, teamRepository, organizationRepository);
 
 // Helper to extract user ID from access token
 async function getUserIdFromToken(request: FastifyRequest): Promise<string | null> {
@@ -919,6 +921,40 @@ export async function identityRoutes(app: FastifyInstance) {
           });
         }
 
+        throw error;
+      }
+    },
+  );
+
+  // GET /me/teams - List user teams
+  app.get(
+    '/me/teams',
+    {
+      config: {
+        rateLimit: {
+          max: 30,
+          timeWindow: '1 minute',
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const userId = await getUserIdFromToken(request);
+        if (!userId) {
+          return reply.status(401).send({
+            error: {
+              code: 'UNAUTHORIZED',
+              message: 'Authentication required',
+            },
+          });
+        }
+
+        const result = await listUserTeams.execute(userId);
+
+        return reply.status(200).send({
+          data: { teams: result.teams },
+        });
+      } catch (error) {
         throw error;
       }
     },

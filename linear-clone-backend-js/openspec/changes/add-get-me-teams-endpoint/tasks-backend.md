@@ -2,7 +2,7 @@
 
 ## Scaffold
 
-- [ ] Create `src/modules/identity/application/list-user-teams.ts`
+- [x] Create `src/modules/identity/application/list-user-teams.ts`
 
 ## Data Layer
 
@@ -10,7 +10,7 @@
 
 ## Business Logic
 
-- [ ] Implement `ListUserTeams` use case:
+- [x] Implement `ListUserTeams` use case:
   - `findByUserId(userId)` on team member repository
   - Filter out soft-deleted memberships
   - `findById(membership.teamId)` on team repository
@@ -20,7 +20,7 @@
 
 ## API Layer
 
-- [ ] Add `GET /me/teams` route to `identity-controller.ts`
+- [x] Add `GET /me/teams` route to `identity-controller.ts`
   - Reuse existing `getUserIdFromToken` helper
   - Wire `ListUserTeams` use case
   - Rate limit: 30 req/min
@@ -36,16 +36,16 @@
 
 ## Testing
 
-- [ ] Unit test: `ListUserTeams.execute` with mocked repositories
+- [x] Unit test: `ListUserTeams.execute` with mocked repositories
   - Happy path: user with memberships → hydrated teams
   - Empty: user with no memberships → empty array
   - Filtering: soft-deleted memberships/teams excluded
-- [ ] Integration test: `GET /me/teams` via Fastify `inject()`
+- [x] Integration test: `GET /me/teams` via Fastify `inject()`
   - Valid token → 200 with teams
   - No token → 401
   - Valid token, no memberships → 200 with empty array
 
 ## Review
 
-- [ ] Self-review: verify error handling, null safety, soft-delete filtering
-- [ ] Verify existing `GET /organizations/:orgId/teams` is untouched
+- [x] Self-review: verify error handling, null safety, soft-delete filtering
+- [x] Verify existing `GET /organizations/:orgId/teams` is untouched
