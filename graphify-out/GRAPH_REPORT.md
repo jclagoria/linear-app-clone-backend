@@ -1,16 +1,16 @@
-# Graph Report - linear-app-clone-backend  (2026-07-29)
+# Graph Report - linear-app-clone-backend  (2026-07-30)
 
 ## Corpus Check
-- 521 files · ~230,624 words
+- 524 files · ~231,663 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 5343 nodes · 6791 edges · 349 communities (325 shown, 24 thin omitted)
+- 5361 nodes · 6831 edges · 349 communities (325 shown, 24 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8a5c6205`
+- Built from commit: `161a1237`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -18,7 +18,7 @@
 - linear-clone-backend-js/AGENTS.md
 - RTK (Rust Token Killer) - Token-Optimized Commands
 - gateway/index.ts
-- label-controller.ts
+- EventPublisher
 - work/domain/errors.ts
 - watcher-controller.ts
 - errors/index.ts
@@ -26,7 +26,7 @@
 - issue-controller.ts
 - identity-controller.ts
 - Work Module — Backend Design
-- EventPublisher
+- IssueRepository
 - controller.ts
 - Workflow Module — API Contract
 - Behaviour
@@ -57,7 +57,7 @@
 - Behaviour
 - Gateway — WebSocket Protocol Contract
 - auth-controller.ts
-- identity/domain/errors.ts
+- TeamMemberRepository
 - Labels — API Contract
 - Issues — API Contract
 - Cycles — API Contract
@@ -92,7 +92,7 @@
 - Notifications — API Contract
 - refresh-token.ts
 - update-notification-preferences.ts
-- add-team-member.ts
+- identity/domain/errors.ts
 - project/domain/errors.ts
 - create-project.ts
 - API Endpoints
@@ -215,7 +215,7 @@
 - Projects API
 - Workflow API
 - register-user.ts
-- create-organization.ts
+- EventPublisher
 - create-team.ts
 - get-project-progress.ts
 - get-state-history.ts
@@ -248,7 +248,7 @@
 - Cycles API
 - Labels API
 - Getting Started
-- NotOrganizationMemberError
+- OrganizationRepository
 - validators.ts
 - 1. Auth Module
 - 8. Gateway Module
@@ -340,11 +340,11 @@
 - list-team-members.contract.test.ts
 - list-teams.contract.test.ts
 - update-profile.contract.test.ts
-- work/application/ports/event-publisher.ts
-- CommentRepository
+- label-controller.ts
+- assign-issue.ts
 - Identity — Backend Design
 - Data Model
-- app.ts
+- Verification Report: add-get-me-teams-endpoint
 - SessionRepository
 - Tasks — Add GET /api/v1/me/teams Endpoint (Backend)
 - Review — Add GET /api/v1/me/teams Endpoint
@@ -357,13 +357,13 @@
 1. `EventPublisher` - 32 edges
 2. `SessionRepository` - 29 edges
 3. `LabelRepository` - 25 edges
-4. `BaseError` - 23 edges
-5. `CycleRepository` - 22 edges
-6. `API Endpoints` - 22 edges
-7. `TeamMemberRepository` - 21 edges
-8. `StateRepository` - 21 edges
-9. `OrganizationMemberRepository` - 20 edges
-10. `TeamRepository` - 20 edges
+4. `TeamMemberRepository` - 23 edges
+5. `BaseError` - 23 edges
+6. `CycleRepository` - 22 edges
+7. `TeamRepository` - 22 edges
+8. `API Endpoints` - 22 edges
+9. `StateRepository` - 21 edges
+10. `OrganizationMemberRepository` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `authRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
@@ -374,8 +374,8 @@
   linear-clone-backend-js/src/modules/cycle/adapters/in/cycle-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
 - `start()` --calls--> `setupGateway()`  [EXTRACTED]
   linear-clone-backend-js/src/server.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
-- `identityRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/identity/adapters/in/identity-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `notificationRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/notification/adapters/in/notification-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
 
 ## Import Cycles
 - None detected.
@@ -391,20 +391,20 @@ Cohesion: 0.50
 Nodes (3): Key Commands, RTK (Rust Token Killer) - Token-Optimized Commands, Rules
 
 ### Community 2 - "gateway/index.ts"
-Cohesion: 0.06
-Nodes (45): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+37 more)
+Cohesion: 0.05
+Nodes (47): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+39 more)
 
-### Community 3 - "label-controller.ts"
-Cohesion: 0.06
-Nodes (30): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+22 more)
+### Community 3 - "EventPublisher"
+Cohesion: 0.08
+Nodes (14): AttachLabel, AttachLabelInput, AttachLabelInputType, IssueTeamQuery, TeamMemberQuery, DeleteIssue, DeleteLabel, DetachLabel (+6 more)
 
 ### Community 4 - "work/domain/errors.ts"
-Cohesion: 0.06
-Nodes (32): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+24 more)
+Cohesion: 0.05
+Nodes (35): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+27 more)
 
 ### Community 5 - "watcher-controller.ts"
 Cohesion: 0.06
-Nodes (28): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+20 more)
+Nodes (31): sessionRoutes(), FastifyInstance, AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery (+23 more)
 
 ### Community 6 - "errors/index.ts"
 Cohesion: 0.09
@@ -416,19 +416,19 @@ Nodes (48): Behaviour, Business Rules, Channel, Data Model, Feature: Auto-Subscr
 
 ### Community 8 - "issue-controller.ts"
 Cohesion: 0.05
-Nodes (48): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+40 more)
+Nodes (47): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+39 more)
 
 ### Community 9 - "identity-controller.ts"
-Cohesion: 0.06
-Nodes (41): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+33 more)
+Cohesion: 0.07
+Nodes (42): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+34 more)
 
 ### Community 10 - "Work Module — Backend Design"
 Cohesion: 0.05
 Nodes (41): 1. Extend Existing Module Pattern, 2. Reuse Existing Infrastructure, 3. Soft-Delete for Comments and Labels, 4. Unique Constraints, Add Watcher, API Contracts, Architecture Decisions, Attach Label to Issue (+33 more)
 
-### Community 11 - "EventPublisher"
-Cohesion: 0.07
-Nodes (18): DeleteIssue, ListIssues, ListIssuesQuery, ListIssuesQueryType, EventPublisher, IssueFilters, IssueRepository, PaginatedResult (+10 more)
+### Community 11 - "IssueRepository"
+Cohesion: 0.13
+Nodes (10): ListIssues, ListIssuesQuery, ListIssuesQueryType, IssueFilters, IssueRepository, PaginatedResult, PaginationCursor, Issue (+2 more)
 
 ### Community 12 - "controller.ts"
 Cohesion: 0.08
@@ -467,8 +467,8 @@ Cohesion: 0.05
 Nodes (38): Behaviour, Business Rules, Data Model, `notification_preferences`, `notifications`, Notifications — Business Specification, Relationships, Requirement: Create notification on cycle completion (+30 more)
 
 ### Community 21 - "OrganizationMemberRepository"
-Cohesion: 0.09
-Nodes (15): DeleteOrganization, DeleteOrganizationInput, GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListTeamsInput, ListUserOrganizations, ListUserOrganizationsInput (+7 more)
+Cohesion: 0.13
+Nodes (10): GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput, ListUserOrganizationsOutput, OrganizationMemberRepository, NewOrganizationMember (+2 more)
 
 ### Community 22 - "Behaviour"
 Cohesion: 0.05
@@ -511,8 +511,8 @@ Cohesion: 0.06
 Nodes (35): Behaviour, Business Rules, Data Model, Project, Project Module — Business Specification, Relationships, Requirement: AddIssueToProject, Requirement: ChangeProjectStatus (+27 more)
 
 ### Community 32 - "LabelRepository"
-Cohesion: 0.10
-Nodes (14): GetIssueLabels, ListLabels, LabelRepository, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES, IssueStatus (+6 more)
+Cohesion: 0.09
+Nodes (16): GetIssueLabels, ListLabels, LabelRepository, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES, IssueStatus (+8 more)
 
 ### Community 33 - "Behaviour"
 Cohesion: 0.06
@@ -547,12 +547,12 @@ Cohesion: 0.06
 Nodes (33): Auto-Subscription, Channel Formats, Channel Types, Connection, Connection Lifecycle, Error Code Details, Errors — Standard Error Response, Event Types (+25 more)
 
 ### Community 41 - "auth-controller.ts"
-Cohesion: 0.11
-Nodes (22): authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser, logoutUser (+14 more)
+Cohesion: 0.10
+Nodes (24): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser (+16 more)
 
-### Community 42 - "identity/domain/errors.ts"
-Cohesion: 0.11
-Nodes (12): DeleteTeamInput, GetTeamDetailsInput, ListTeamMembersInput, TeamMemberRepository, RemoveTeamMemberInput, LastAdminRemovalError, NotTeamAdminError, NotTeamMemberError (+4 more)
+### Community 42 - "TeamMemberRepository"
+Cohesion: 0.16
+Nodes (6): GetTeamDetails, GetTeamDetailsInput, TeamMemberRepository, NewTeamMember, TeamMember, teamMembers
 
 ### Community 43 - "Labels — API Contract"
 Cohesion: 0.06
@@ -580,7 +580,7 @@ Nodes (31): Data Schema: IssueLabel (junction), Data Schema: Label, Endpoint: At
 
 ### Community 49 - "create-issue.ts"
 Cohesion: 0.09
-Nodes (15): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, CreateIssue, CreateIssueInput (+7 more)
+Nodes (15): CreateIssue, CreateIssueInput, CreateIssueInputType, CreateIssueOutput, ProjectQuery, TeamKeyQuery, TeamMemberQuery, ProjectQuery (+7 more)
 
 ### Community 50 - "Team — API Contract"
 Cohesion: 0.06
@@ -631,8 +631,8 @@ Cohesion: 0.12
 Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
 
 ### Community 62 - "identity/domain/index.ts"
-Cohesion: 0.11
-Nodes (15): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, ListTeamMembers, UserProfileRepository, ProfileNotFoundError, organizationMembers, NewOrganization (+7 more)
+Cohesion: 0.10
+Nodes (14): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, ListTeamMembers, ListTeamMembersInput, UserProfileRepository, UpdateUserProfile, UpdateUserProfileInput (+6 more)
 
 ### Community 63 - "dependencies"
 Cohesion: 0.07
@@ -690,9 +690,9 @@ Nodes (10): TokenService, RefreshToken, RefreshTokenInput, RefreshTokenInputType
 Cohesion: 0.14
 Nodes (12): DEFAULT_TYPES, GetNotificationPreferences, GetNotificationPreferencesOutput, NotificationPreferencesRepository, DEFAULT_TYPES, UpdateNotificationPreferences, UpdateNotificationPreferencesInput, UpdateNotificationPreferencesInputType (+4 more)
 
-### Community 77 - "add-team-member.ts"
-Cohesion: 0.12
-Nodes (11): AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, Event, EventPublisher, UpdateUserProfile, UpdateUserProfileInput, UpdateUserProfileInputType (+3 more)
+### Community 77 - "identity/domain/errors.ts"
+Cohesion: 0.09
+Nodes (14): organizationMemberRepository, AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, RemoveTeamMemberInput, AlreadyTeamMemberError, InvalidAvatarUrlError, LastAdminRemovalError (+6 more)
 
 ### Community 78 - "project/domain/errors.ts"
 Cohesion: 0.15
@@ -791,8 +791,8 @@ Cohesion: 0.18
 Nodes (8): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError
 
 ### Community 102 - "TeamRepository"
-Cohesion: 0.12
-Nodes (6): DeleteTeam, GetTeamDetails, ListTeams, TeamRepository, RemoveTeamMember, Team
+Cohesion: 0.20
+Nodes (6): ListTeams, ListTeamsInput, TeamRepository, NewTeam, Team, teams
 
 ### Community 103 - "Auth — API Contract"
 Cohesion: 0.11
@@ -1182,13 +1182,13 @@ Nodes (10): Create Transition, Create Workflow State, Delete Transition, Delete 
 Cohesion: 0.24
 Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
-### Community 200 - "create-organization.ts"
-Cohesion: 0.24
-Nodes (5): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, OrganizationNameConflictError
+### Community 200 - "EventPublisher"
+Cohesion: 0.10
+Nodes (12): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, DeleteOrganization, DeleteOrganizationInput, DeleteTeam, DeleteTeamInput (+4 more)
 
 ### Community 201 - "create-team.ts"
-Cohesion: 0.24
-Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
+Cohesion: 0.20
+Nodes (6): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, OrganizationNotFoundError, TeamKeyConflictError
 
 ### Community 202 - "get-project-progress.ts"
 Cohesion: 0.24
@@ -1314,9 +1314,9 @@ Nodes (8): Attach Label, Create Label, Delete Label, Detach Label, Get Issue Lab
 Cohesion: 0.25
 Nodes (8): Build & Start (Production), Database Setup, Environment Variables, Getting Started, Installation, Prerequisites, Run Development, Run Tests
 
-### Community 233 - "NotOrganizationMemberError"
-Cohesion: 0.25
-Nodes (3): organizationMemberRepository, NotOrganizationMemberError, NotOrganizationOwnerError
+### Community 233 - "OrganizationRepository"
+Cohesion: 0.18
+Nodes (7): ListUserTeams, ListUserTeamsOutput, ListUserTeamsOutputTeam, OrganizationRepository, NewOrganization, Organization, organizations
 
 ### Community 234 - "validators.ts"
 Cohesion: 0.46
@@ -1590,13 +1590,13 @@ Nodes (4): Error Handling, Error Response Examples, Error Types, Rate Limit Head
 Cohesion: 0.50
 Nodes (3): ErrorResponseSchema, RefreshTokenRequestSchema, RefreshTokenResponseSchema
 
-### Community 337 - "work/application/ports/event-publisher.ts"
-Cohesion: 0.15
-Nodes (8): CreateLabel, CreateLabelInput, CreateLabelInputType, Event, UpdateLabel, UpdateLabelInput, UpdateLabelInputType, LabelNameConflictError
+### Community 337 - "label-controller.ts"
+Cohesion: 0.08
+Nodes (26): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+18 more)
 
-### Community 338 - "CommentRepository"
-Cohesion: 0.19
-Nodes (5): ListIssueComments, CommentRepository, IssueComment, issueComments, NewIssueComment
+### Community 338 - "assign-issue.ts"
+Cohesion: 0.17
+Nodes (8): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, IssueNotFoundError, NotTeamMemberError
 
 ### Community 339 - "Identity — Backend Design"
 Cohesion: 0.13
@@ -1606,9 +1606,9 @@ Nodes (14): API Contracts, Architecture Decisions, Business Logic, Data Model, G
 Cohesion: 0.14
 Nodes (13): Behaviour, Business Rules, Data Model, Identity — Business Specification, Organization, Relationships, Requirement: AuthenticatedAccess, Scenario: Unauthenticated request (+5 more)
 
-### Community 341 - "app.ts"
-Cohesion: 0.23
-Nodes (8): app, sessionRoutes(), FastifyInstance, setupGateway(), start(), env, pool, schema
+### Community 341 - "Verification Report: add-get-me-teams-endpoint"
+Cohesion: 0.22
+Nodes (8): 1. Completeness — 8/8 Tasks Complete ✅, 2. Correctness — 3/3 Scenarios ✅, 3. Coherence — All Design Decisions Followed ✅, Final Assessment, Issues, SUGGESTION, Summary, Verification Report: add-get-me-teams-endpoint
 
 ### Community 343 - "Tasks — Add GET /api/v1/me/teams Endpoint (Backend)"
 Cohesion: 0.20
@@ -1635,24 +1635,24 @@ Cohesion: 0.33
 Nodes (5): Endpoint: List User Teams, Errors, Identity — API Contract, Request, Response
 
 ## Knowledge Gaps
-- **3034 isolated node(s):** `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created`, `Decisions Not Recorded`, `Architecture Decisions` (+3029 more)
+- **3027 isolated node(s):** `Request`, `Response`, `Errors`, `Scaffold`, `Data Layer` (+3022 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `app.ts` to `login-user.ts`, `gateway/index.ts`, `session-controller.ts`, `auth-controller.ts`, `refresh-token.ts`?**
+- **Why does `env` connect `auth-controller.ts` to `LabelRepository`, `login-user.ts`, `gateway/index.ts`, `session-controller.ts`, `refresh-token.ts`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `OrganizationNotFoundError` connect `create-team.ts` to `TeamRepository`, `EventPublisher`, `identity-controller.ts`, `identity/domain/errors.ts`, `OrganizationMemberRepository`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `LogoutUser` connect `EventPublisher` to `auth-controller.ts`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **What connects `Review Summary`, `In-Force ADRs Reviewed`, `New Durable ADRs Created` to the rest of the system?**
-  _3034 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Request`, `Response`, `Errors` to the rest of the system?**
+  _3027 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `linear-clone-backend-js/AGENTS.md` be split into smaller, more focused modules?**
   _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
 - **Should `gateway/index.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.05742393045069778 - nodes in this community are weakly interconnected._
-- **Should `label-controller.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.06290471785383904 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0547680412371134 - nodes in this community are weakly interconnected._
+- **Should `EventPublisher` be split into smaller, more focused modules?**
+  _Cohesion score 0.08250355618776671 - nodes in this community are weakly interconnected._
 - **Should `work/domain/errors.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.06219426974143955 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.054274084124830396 - nodes in this community are weakly interconnected._
