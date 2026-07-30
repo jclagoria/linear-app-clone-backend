@@ -8,7 +8,8 @@ context: |
   Architecture: documented in docs/architecture-backend.md
   Deployment flow: documented in docs/deployment.md
 
-  # API Contract (OpenAPI 3.1 — Design-First): docs/api/openapi.yaml
+  API Contract (OpenAPI 3.1 — Design-First): docs/api/openapi.yaml
+  API async Contract AsyncAPI 3.0 spec for WebSocket gateway: docs/api/asyncapi.yaml
 
   Tech Research Digest: .agents/skills/repomix-reference/references/tech-research-digest.md
 

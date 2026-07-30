@@ -1,214 +1,217 @@
-# Graph Report - /home/jlagoria/mnt/second/dev/proyects/personal-site/linear-app-clone-backend/linear-clone-backend-js  (2026-07-29)
+# Graph Report - .  (2026-07-30)
 
 ## Corpus Check
-- 2 files · ~226,339 words
+- 16 files · ~230,040 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2021 nodes · 3777 edges · 179 communities (105 shown, 74 thin omitted)
-- Extraction: 91% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 261 edges (avg confidence: 0.94)
+- 2067 nodes · 3849 edges · 180 communities (106 shown, 74 thin omitted)
+- Extraction: 91% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 262 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
+- message-handler.ts, MessageHandler, .constructor()
+- ADR 0002 — Use JWT Dual Token Strategy, ADR 000...
+- comment-controller.ts, commentRepository, comme...
+- AddWatcherRequestSchema, WatcherIdParamsSchema,...
+- CreateLabelRequestSchema, IssueLabelParamsSchem...
+- base-error.ts, BaseError, .constructor()
+- work/adapters/in/dto.ts, AddWatcherRequest, Ass...
+- identity/adapters/in/dto.ts, AddTeamMemberReque...
+- .constructor(), get-issue-labels.ts, GetIssueLa...
+- controller.ts, createTransition, createWorkflow...
+- drizzle-kit, eslint, eslint-config-prettier
+- Identity Drizzle Repositories, delete-team.ts, ...
+- project/adapters/in/dto.ts, AddIssueRequest, Ad...
+- Requirement: AuthenticatedAccess, Business Rule...
+- create-transition.ts, CreateTransition, .constr...
+- create-issue.ts, CreateIssue, .constructor()
+- DrizzleProjectRepository, ProjectController (Fa...
+- logout-user.ts, LogoutUser, .constructor()
+- cycle-controller.ts, activateCycle, completeCycle
+- activate-cycle.ts, ActivateCycle, .constructor()
+- get-user-profile.ts, GetUserProfile, .construct...
+- Issue Comment Entity, Issue Watcher Entity, Lab...
+- auth-controller.ts, authRoutes(), eventPublisher
+- .constructor(), .execute(), AddIssueToProjectInput
+- Cascade Soft-Deletion, Soft Deletion Strategy, ...
+- notification/adapters/in/dto.ts, ListNotificati...
+- app.ts, app, session-controller.ts
+- token-service.ts, TokenService, .generateAccess...
+- work-to-gateway-bridge.test.ts, assign-issue.ts...
+- get-notification-preferences.ts, DEFAULT_TYPES,...
+- get-organization-details.ts, GetOrganizationDet...
+- add-issue-to-project.ts, AddIssueToProject, Add...
+- create-project.ts, CreateProject, .constructor()
+- list-issues.ts, ListIssues, .constructor()
+- WorkflowController (Fastify Routes), ADR-0001: ...
+- dist, ES2022, node_modules
+- list-sessions.ts, ListSessions, .constructor()
+- CreateWorkflowState, .constructor(), .execute()
+- create-organization.ts, CreateOrganization, .co...
+- change-issue-status.ts, ChangeIssueStatus, .con...
+- ADR: Team Entity Placement in Identity Module, ...
+- delete-cycle.ts, DeleteCycle, .constructor()
+- cycle-repository.ts, CycleFilters, CycleRepository
+- mark-notification-read.ts, MarkNotificationRead...
+- Gateway Channel, Issue Channel, Team Channel
+- authorization-middleware.ts, organizationMember...
+- ListTeamMembers, .constructor(), .execute()
+- Cycle Entity, Issue Entity, Label Entity
+- create-workflow-state.ts, CreateWorkflowStateIn...
+- DuplicateTransitionError, .constructor(), State...
+- bcrypt, drizzle-orm, fastify
+- auth/adapters/in/dto.ts, AuthResponse, AuthResp...
+- .constructor(), mark-all-notifications-read.ts,...
+- ADR-001: Use ws Library for WebSocket Server, A...
+- BaseError, BusinessRuleError, ConflictError
+- scripts, build, db:generate
+- project-repository.ts, PaginatedResult, Project...
+- login-user.ts, LoginUser, .constructor()
+- user-repository.ts, UserRepository, .create()
+- get-cycle.ts, GetCycle, .constructor()
+- notification-repository.ts, NotificationReposit...
+- attach-label.ts, AttachLabel, .constructor()
+- create-team.ts, CreateTeam, .constructor()
+- create-notification.ts, CreateNotification, .ex...
+- validate-transition.ts, ValidateTransition, .co...
+- list-notifications.ts, ListNotifications, .cons...
+- Hexagonal Architecture (Ports and Adapters), Sh...
+- ADR-0001 In-Process Event Bridge, ADR-0002 Chan...
+- package.json, author, description
+- register-user.ts, ConflictError, .constructor()
+- get-project-progress.ts, GetProjectProgress, .c...
+- get-state-history.ts, GetStateHistory, .constru...
+- Default Workflow (Embedded), Workflow Module, W...
+- Comment Entity, Session Entity, Business Specif...
+- create-cycle.ts, CreateCycle, CreateCycleInputType
+- Code Intelligence Priority Order, CodeGraph, Gr...
+- Cycles API Contract, Cycle Entity, Cycle Module
+- IssueComment, IssueLabel, Label
+- validators.ts, CreateOrganizationSchema, Delete...
+- In-Memory Rate Limit Store (MVP), ADR: In-Memor...
+- OpenSpec Config, Backend Schema Definition, ADR...
+- CompletedCycleCannotBeActivatedError, .construc...
+- JWT Refresh Token Rotation, Auth Token Refresh ...
+- ADR-0001: Store-and-Forward Notifications, ADR-...
+- Tech Selection Template, Architecture Template,...
+- delete-project.ts, DeleteProject, .execute()
+- events.ts, CHANNEL_PATTERNS, createGatewayEvent...
+- Auth Cookie Migration API Spec, Auth Cookie Mig...
+- contract-refresh.test.ts, ErrorResponseSchema, ...
+- cycle-query.ts, CycleQuery, .findById()
+- ADR-0001: HttpOnly Cookie for Refresh Token, Co...
+- OpenSpec Artifact Workflow, OpenSpec Auth Regis...
+- Verification Report — add-get-me-teams-endpoint...
+- Active Cycle Status, Completed Cycle Status, Dr...
+- Session Eviction, Session Revocation, Session
+- Serena IDE Project Configuration, linear-clone-...
+- contract-logout.test.ts, ErrorResponseSchema, L...
+- auth-middleware.ts, authMiddleware(), tokenService
+- WebSocket Channel Types, Gateway Business Rules...
+- Gateway WebSocket Broadcasting Proposal, Notifi...
+- dotenv, dotenv
+- eslint.config.js, NOTE: @typescript-eslint/pars...
+- @fastify/cookie, @fastify/cookie
+- ioredis, ioredis
+- jose, jose
+- Issue Identifier, Team Key Format
+- Notification Preferences, Notification Types
+- ws, ws
+- zod, zod
+- POST /api/v1/auth/logout Route, LogoutService
+- add-team-member.contract.test.ts, AddTeamMember...
+- create-organization.contract.test.ts, Organizat...
+- create-team.contract.test.ts, CreateTeamRespons...
+- get-organization.contract.test.ts, Organization...
+- get-profile.contract.test.ts, UserProfileRespon...
+- get-team-details.contract.test.ts, TeamDetailsR...
+- list-organizations.contract.test.ts, ListOrgani...
+- list-team-members.contract.test.ts, ListTeamMem...
+- list-teams.contract.test.ts, ListTeamsResponseS...
+- update-profile.contract.test.ts, UpdateProfileR...
+- OpenSpec Config: Issue CRUD & Status
+- Review: Issue CRUD & Status
+- Refresh Token HttpOnly Cookie Migration Proposal
 - WebSocket Gateway
-- Authentication Architecture
-- Error Taxonomy
-- Issue Watchers
-- Workflow Engine
-- Identity & Team DTOs
-- Soft Delete Pattern
-- Workflow Controller
-- Dev Dependencies
-- Project DTOs
-- Workflow Transitions
-- Team Membership
-- Project Module
-- Team Deletion
-- Auth Logout
-- Cycle Controller
-- Cycle Lifecycle
-- Issue DTOs
-- Work Module Specs
-- Auth Controller
-- Project Use Cases
-- Notification DTOs
-- Authorization
-- App Entry & Sessions
-- Token Service
-- Project Module
-- Identity Module
-- Notification Module
-- Auth Module
-- Auth Module
-- Notification Module
-- Project Module
-- Project Module
-- Openspec Module
-- Dist
-- Identity Module
-- Notification Module
-- Workflow Module
-- Work Module
-- Openspec Module
-- Cycle Module
-- Cycle Module
-- Openspec Module
-- Identity Module
-- Openspec Module
-- Identity Module
-- Workflow Module
-- Workflow Module
-- Bcrypt
-- Auth Module
-- Openspec Module
-- Openspec Module
-- Scripts
-- Project Module
-- Auth Module
-- Auth Module
-- Auth Module
-- Cycle Module
-- Notification Module
-- Notification Module
-- Notification Module
-- Workflow Module
-- Notification Module
-- Openspec Module
-- Openspec Module
-- Package
-- Auth Module
-- Identity Module
-- Project Module
-- Workflow Module
-- Openspec Module
-- Openspec Module
-- Cycle Module
-- Identity Module
-- Priority
-- Openspec Module
-- Openspec Module
-- Identity Module
-- Identity Module
-- Openspec Module
-- Openspec Module
-- Cycle Module
-- Auth Module
-- Forward
-- Openspec Module
-- Project Module
-- Events
-- Openspec Module
-- Auth Module
-- Cycle Module
-- Identity Module
-- 0001
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Config
-- Auth Module
-- Identity Module
-- Types
-- Proposal
-- Dotenv
-- Orm
-- Config
-- Ioredis
-- Jose
-- Openspec Module
-- Openspec Module
-- Ws
+- WebSocket Auth Timeout
+- Auto-Subscribe on Auth
+- User Channel
+- User Online Status
+- Project Management
+- Project Progress Calculation
+- Project Status Lifecycle
+- Notification Business Rules
+- ADR: Custom Error Class Hierarchy
+- ADR: Team Key Uniqueness Strategy
+- Team & Membership Backend Design
+- WebSocket Change OpenSpec Config
+- WebSocket Real-Time Backend Proposal
+- Auth Session Management OpenSpec Config
+- Auth Token Refresh & Logout OpenSpec Config
+- JWT (jose) + bcrypt
+- Fastify 5
+- Node.js 24 LTS
+- PostgreSQL 16
+- Redis 7
+- Vitest
 - Zod
-- Auth Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Identity Module
-- Yaml
-- Review
-- Proposal
-- Gateway
-- Timeout
-- Subscribe
-- User
-- Status
-- Projects
-- Progress
-- Lifecycle
-- Rules
-- Hierarchy
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Openspec Module
-- Auth Module
-- Auth Module
-- Identity Module
-- Identity Module
-- Stack
+- Business Cycles
+- Cycle Issue Assignment Rule
+- Issue Management
+- Issue Priority Levels
+- Issue Soft Delete
+- Sub-Issues
+- Label Management
+- Notification System
+- Notification Expiration
+- WebSocket Notification Delivery
+- Session Management
+- Team Management
+- Last Admin Protection
+- Watcher Mutation Events
+- Custom Workflow
+- Canceled Transition Always Valid
+- POST /api/v1/auth/refresh Route
+- Auth Module Application Ports
+- Identity Auth & Authorization Middleware
+- In-Memory Event Publisher
+- Identity Application Ports
+- Gateway Tech Stack
 
 ## God Nodes (most connected - your core abstractions)
 1. `EventPublisher` - 32 edges
 2. `SessionRepository` - 29 edges
 3. `LabelRepository` - 25 edges
-4. `BaseError` - 23 edges
-5. `CycleRepository` - 22 edges
-6. `TeamMemberRepository` - 21 edges
-7. `StateRepository` - 21 edges
-8. `OrganizationMemberRepository` - 20 edges
-9. `TeamRepository` - 20 edges
+4. `TeamMemberRepository` - 23 edges
+5. `BaseError` - 23 edges
+6. `CycleRepository` - 22 edges
+7. `TeamRepository` - 22 edges
+8. `StateRepository` - 21 edges
+9. `OrganizationMemberRepository` - 20 edges
 10. `IssueRepository` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Hexagonal Architecture (Use Case + Port/Adapter)` --conceptually_related_to--> `Identity Module`  [INFERRED]
+  openspec/changes/add-get-me-teams-endpoint/adr/manifest.md → docs/backend/README.md
+- `Tech Stack Confirmed: Node.js 24, Fastify 5, PostgreSQL 16, Drizzle ORM, Redis 7, JWT (jose)+bcrypt, Docker` --conceptually_related_to--> `Identity Module`  [INFERRED]
+  openspec/changes/add-get-me-teams-endpoint/tech-stack.md → docs/backend/README.md
 - `Backend Modules Technology Agnostic Specification` --references--> `Token Refresh Rotation (single-use)`  [EXTRACTED]
   docs/backend/README.md → openspec/changes/archive/2026-07-12-auth-registration-login/design-backend.md
 - `ADR 0003 — Use PostgreSQL with Drizzle ORM` --references--> `PostgreSQL with Drizzle ORM`  [EXTRACTED]
   openspec/changes/archive/2026-07-12-auth-registration-login/adr/0003-postgresql-with-drizzle.md → docs/stack-backend.md
 - `ADR 0004 — Use Redis for Session Storage` --references--> `Redis for Session Storage`  [EXTRACTED]
   openspec/changes/archive/2026-07-12-auth-registration-login/adr/0004-redis-for-sessions.md → docs/stack-backend.md
-- `ADR 0005 — Use bcrypt for Password Hashing` --references--> `bcrypt Password Hashing`  [EXTRACTED]
-  openspec/changes/archive/2026-07-12-auth-registration-login/adr/0005-bcrypt-password-hashing.md → docs/stack-backend.md
-- `Auth Business Specification` --references--> `Session Management Pattern (10 max, evict oldest)`  [EXTRACTED]
-  openspec/changes/archive/2026-07-12-auth-registration-login/specs/business/auth.md → docs/backend/README.md
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
+- **Add GET /api/v1/me/teams Endpoint (Complete Change)** — openspec_changes_add_get_me_teams_endpoint_proposal, openspec_changes_add_get_me_teams_endpoint_design_backend, openspec_changes_add_get_me_teams_endpoint_specs_api_list_user_teams, openspec_changes_add_get_me_teams_endpoint_specs_business_user_teams, openspec_changes_add_get_me_teams_endpoint_tasks_backend, openspec_changes_add_get_me_teams_endpoint_tech_stack, openspec_changes_add_get_me_teams_endpoint_adr_manifest, openspec_changes_add_get_me_teams_endpoint_review, openspec_changes_add_get_me_teams_endpoint_verification_report, design_listuserteams, design_me_teams_endpoint, spec_listuserteams_operation [EXTRACTED 1.00]
+- **Hexagonal Architecture Applied** — openspec_changes_add_get_me_teams_endpoint_adr_manifest_hexagonal_architecture, design_listuserteams, design_team_member_repository, design_team_repository, design_organization_repository [EXTRACTED 1.00]
 - **Backend Module System under Hexagonal Architecture** — hexagonal_architecture_pattern, module_auth, module_identity, module_work, module_workflow, module_project, module_cycle, module_notification, module_gateway, module_shared [EXTRACTED 1.00]
 - **Auth Module Architecture Decision Records** — openspec_changes_archive_2026_07_12_auth_registration_login_adr_0001_hexagonal_architecture, adr_0002_jwt_dual_token, adr_0003_postgresql_drizzle, adr_0004_redis_sessions, adr_0005_bcrypt, openspec_changes_archive_2026_07_12_auth_registration_login_adr_manifest, openspec_changes_archive_2026_07_12_auth_registration_login_design_backend_auth, specs_api_auth, specs_business_auth, openspec_changes_archive_2026_07_12_auth_registration_login_proposal_auth_registration, openspec_changes_archive_2026_07_12_auth_registration_login_review_auth_registration [EXTRACTED 1.00]
-- **Technology Stack & Infrastructure Documentation** — fastify_framework, postgresql_drizzle_orm, redis_session_storage, bcrypt_password_hashing, jwt_dual_token_strategy, docker_compose_deployment, rest_api_contract, websocket_gateway_contract [EXTRACTED 1.00]
+- **Technology Stack & Infrastructure Documentation** — fastify_framework, postgresql_drizzle_orm, redis_session_storage, bcrypt_password_hashing, jwt_dual_token_strategy, docker_compose_deployment, websocket_gateway_contract [EXTRACTED 1.00]
 - **Auth Infrastructure Pattern** — postgresql_drizzle_orm, redis_session_storage, jwt_dual_token_strategy, bcrypt_password_hashing [INFERRED 0.85]
 - **Session Management Implementation Flow** — openspec_changes_archive_2026_07_13_auth_session_management_proposal_2026_07_13_session, openspec_changes_archive_2026_07_13_auth_session_management_design_backend_2026_07_13_session, specs_api_sessions_2026_07_13, specs_business_sessions_2026_07_13, openspec_changes_archive_2026_07_13_auth_session_management_tasks_backend_2026_07_13_session, openspec_changes_archive_2026_07_13_auth_session_management_review_2026_07_13_session [INFERRED 0.95]
 - **Token Refresh Implementation Flow** — openspec_changes_archive_2026_07_13_auth_token_refresh_logout_proposal_2026_07_13_token_refresh, openspec_changes_archive_2026_07_13_auth_token_refresh_logout_design_backend_2026_07_13_token_refresh, specs_api_auth_2026_07_13_token_refresh, specs_business_auth_2026_07_13_token_refresh, openspec_changes_archive_2026_07_13_auth_token_refresh_logout_review_2026_07_13_token_refresh [INFERRED 0.95]
@@ -240,399 +243,403 @@
 - **hyper_gateway_event_broadcast_flow** — business_gateway_event, business_gateway_channel, business_gateway_subscription, business_gateway_connection [INFERRED 1.00]
 - **hyper_workflow_issue_status_history** — openspec_specs_business_issues_issue [INFERRED 1.00]
 
-## Communities (179 total, 74 thin omitted)
+## Communities (180 total, 74 thin omitted)
 
-### Community 0 - "WebSocket Gateway"
+### Community 0 - "message-handler.ts, MessageHandler, .constructor()"
 Cohesion: 0.06
 Nodes (45): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+37 more)
 
-### Community 1 - "Authentication Architecture"
+### Community 1 - "ADR 0002 — Use JWT Dual Token Strategy, ADR 000..."
 Cohesion: 0.06
 Nodes (71): ADR 0002 — Use JWT Dual Token Strategy, ADR 0003 — Use PostgreSQL with Drizzle ORM, ADR 0004 — Use Redis for Session Storage, ADR 0005 — Use bcrypt for Password Hashing, Auth Registration Login Change, Auth Session Management Change, Auth Token Refresh & Logout Change, bcrypt Password Hashing (+63 more)
 
-### Community 2 - "Error Taxonomy"
+### Community 2 - "comment-controller.ts, commentRepository, comme..."
+Cohesion: 0.05
+Nodes (34): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+26 more)
+
+### Community 3 - "AddWatcherRequestSchema, WatcherIdParamsSchema,..."
 Cohesion: 0.06
 Nodes (29): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+21 more)
 
-### Community 3 - "Issue Watchers"
+### Community 4 - "CreateLabelRequestSchema, IssueLabelParamsSchem..."
+Cohesion: 0.07
+Nodes (32): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+24 more)
+
+### Community 5 - "base-error.ts, BaseError, .constructor()"
 Cohesion: 0.09
 Nodes (18): BaseError, BusinessRuleError, ConflictError, errorHandler(), ForbiddenError, InternalError, NotFoundError, RateLimitError (+10 more)
 
-### Community 4 - "Workflow Engine"
+### Community 6 - "work/adapters/in/dto.ts, AddWatcherRequest, Ass..."
 Cohesion: 0.05
 Nodes (47): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+39 more)
 
-### Community 5 - "Identity & Team DTOs"
-Cohesion: 0.06
-Nodes (41): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+33 more)
-
-### Community 6 - "Soft Delete Pattern"
+### Community 7 - "identity/adapters/in/dto.ts, AddTeamMemberReque..."
 Cohesion: 0.07
-Nodes (18): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, DeleteIssue, ListIssues (+10 more)
+Nodes (42): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+34 more)
 
-### Community 7 - "Workflow Controller"
+### Community 8 - ".constructor(), get-issue-labels.ts, GetIssueLa..."
+Cohesion: 0.08
+Nodes (16): GetIssueLabels, ListLabels, LabelRepository, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES, IssueStatus (+8 more)
+
+### Community 9 - "controller.ts, createTransition, createWorkflow..."
 Cohesion: 0.08
 Nodes (40): createTransition, createWorkflowState, deleteTransition, deleteWorkflowState, getStateHistory, getUserIdFromToken(), historyRepository, listTransitions (+32 more)
 
-### Community 8 - "Dev Dependencies"
+### Community 10 - "drizzle-kit, eslint, eslint-config-prettier"
 Cohesion: 0.05
 Nodes (41): drizzle-kit, eslint, eslint-config-prettier, @eslint/js, eslint-plugin-boundaries, eslint-plugin-prettier, devDependencies, drizzle-kit (+33 more)
 
-### Community 9 - "Project DTOs"
+### Community 11 - "Identity Drizzle Repositories, delete-team.ts, ..."
 Cohesion: 0.09
-Nodes (17): GetIssueLabels, ListLabels, LabelRepository, issueComments, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES (+9 more)
+Nodes (17): Identity Drizzle Repositories, DeleteTeamInput, GetTeamDetails, GetTeamDetailsInput, ListTeamMembersInput, ListTeams, ListTeamsInput, TeamRepository (+9 more)
 
-### Community 10 - "Workflow Transitions"
+### Community 12 - "project/adapters/in/dto.ts, AddIssueRequest, Ad..."
 Cohesion: 0.08
 Nodes (36): AddIssueRequest, AddIssueRequestSchema, ChangeProjectStatusRequest, ChangeProjectStatusRequestSchema, CreateProjectRequest, CreateProjectRequestSchema, ListProjectsQuery, ListProjectsQuerySchema (+28 more)
 
-### Community 11 - "Team Membership"
-Cohesion: 0.09
-Nodes (28): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser (+20 more)
+### Community 13 - "Requirement: AuthenticatedAccess, Business Rule..."
+Cohesion: 0.07
+Nodes (35): Requirement: AuthenticatedAccess, Business Rules: Membership required, soft-delete exclusion, unique team key per org, Data Model: User → TeamMember → Team → Organization, JWT Bearer Token Authentication (getUserIdFromToken), ListUserTeams Use Case, GET /api/v1/me/teams Endpoint, N+1 Query Acceptable (< 20 teams), Design Decision: No pagination (users typically belong to < 20 teams) (+27 more)
 
-### Community 12 - "Project Module"
-Cohesion: 0.09
-Nodes (24): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+16 more)
-
-### Community 13 - "Team Deletion"
-Cohesion: 0.10
-Nodes (14): CreateLabel, CreateLabelInput, CreateLabelInputType, DeleteLabel, DetachLabel, DetachLabelInput, DetachLabelInputType, Event (+6 more)
-
-### Community 14 - "Auth Logout"
+### Community 14 - "create-transition.ts, CreateTransition, .constr..."
 Cohesion: 0.09
 Nodes (12): CreateTransition, CreateTransitionInput, DeleteTransition, DeleteTransitionInput, DeleteWorkflowState, DeleteWorkflowStateInput, ListTransitions, ListTransitionsInput (+4 more)
 
-### Community 15 - "Cycle Controller"
-Cohesion: 0.11
-Nodes (12): DeleteTeamInput, GetTeamDetailsInput, ListTeamMembersInput, TeamMemberRepository, RemoveTeamMemberInput, LastAdminRemovalError, NotTeamAdminError, NotTeamMemberError (+4 more)
-
-### Community 16 - "Cycle Lifecycle"
-Cohesion: 0.08
-Nodes (25): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+17 more)
-
-### Community 17 - "Issue DTOs"
-Cohesion: 0.09
-Nodes (17): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, UserProfileRepository, UpdateUserProfile, UpdateUserProfileInput, UpdateUserProfileInputType, UpdateUserProfileOutput (+9 more)
-
-### Community 18 - "Work Module Specs"
-Cohesion: 0.09
-Nodes (31): DrizzleProjectRepository, ProjectController (Fastify Routes), ADR-0001: Use Enum for Project Status Instead of Workflow Join Table, ADR-0002: Compute Project Progress on Read Instead of Storing, ADR-0003: Canceled as Terminal Status Instead of Hard Delete, Projects API Contract, PRJ-DEL: No Hard Delete, PRJ-S1: Project Creation Default Status (+23 more)
-
-### Community 19 - "Auth Controller"
+### Community 15 - "create-issue.ts, CreateIssue, .constructor()"
 Cohesion: 0.08
 Nodes (16): CreateIssue, CreateIssueInput, CreateIssueInputType, CreateIssueOutput, ProjectQuery, TeamKeyQuery, TeamMemberQuery, ProjectQuery (+8 more)
 
-### Community 20 - "Project Use Cases"
+### Community 16 - "DrizzleProjectRepository, ProjectController (Fa..."
+Cohesion: 0.09
+Nodes (31): DrizzleProjectRepository, ProjectController (Fastify Routes), ADR-0001: Use Enum for Project Status Instead of Workflow Join Table, ADR-0002: Compute Project Progress on Read Instead of Storing, ADR-0003: Canceled as Terminal Status Instead of Hard Delete, Projects API Contract, PRJ-DEL: No Hard Delete, PRJ-S1: Project Creation Default Status (+23 more)
+
+### Community 17 - "logout-user.ts, LogoutUser, .constructor()"
 Cohesion: 0.13
 Nodes (13): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, RevokeAllSessions, RevokeAllSessionsInput (+5 more)
 
-### Community 21 - "Notification DTOs"
+### Community 18 - "cycle-controller.ts, activateCycle, completeCycle"
 Cohesion: 0.10
 Nodes (27): activateCycle, completeCycle, createCycle, cycleRepository, cycleRoutes(), deleteCycle, eventPublisher, getCycle (+19 more)
 
-### Community 22 - "Authorization"
-Cohesion: 0.10
-Nodes (10): CreateComment, CreateCommentInput, CreateCommentInputType, IssueTeamQuery, NotificationService, TeamMemberQuery, ListIssueComments, CommentRepository (+2 more)
-
-### Community 23 - "App Entry & Sessions"
+### Community 19 - "activate-cycle.ts, ActivateCycle, .constructor()"
 Cohesion: 0.12
 Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
 
-### Community 24 - "Token Service"
+### Community 20 - "get-user-profile.ts, GetUserProfile, .construct..."
+Cohesion: 0.11
+Nodes (14): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, UserProfileRepository, UpdateUserProfile, UpdateUserProfileInput, UpdateUserProfileInputType, UpdateUserProfileOutput (+6 more)
+
+### Community 21 - "Issue Comment Entity, Issue Watcher Entity, Lab..."
 Cohesion: 0.10
 Nodes (27): Issue Comment Entity, Issue Watcher Entity, Label Entity, Review: Work Module Comments, Labels, and Watchers, API Spec: Issue Comments, API Spec: Labels, API Spec: Issue Watchers, Business Spec: Issue Comments (+19 more)
 
-### Community 25 - "Project Module"
+### Community 22 - "auth-controller.ts, authRoutes(), eventPublisher"
+Cohesion: 0.11
+Nodes (22): authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser, logoutUser (+14 more)
+
+### Community 23 - ".constructor(), .execute(), AddIssueToProjectInput"
 Cohesion: 0.12
 Nodes (11): AddIssueToProjectInput, ChangeProjectStatus, ChangeProjectStatusInput, ChangeProjectStatusInputType, VALID_TRANSITIONS, ProjectEvent, ProjectEventPublisher, IssueUpdateQuery (+3 more)
 
-### Community 26 - "Identity Module"
-Cohesion: 0.11
-Nodes (13): Cascade Soft-Deletion, Soft Deletion Strategy, ADR: Soft Deletion Strategy for All Entities, GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput (+5 more)
+### Community 24 - "Cascade Soft-Deletion, Soft Deletion Strategy, ..."
+Cohesion: 0.12
+Nodes (12): Cascade Soft-Deletion, Soft Deletion Strategy, ADR: Soft Deletion Strategy for All Entities, DeleteOrganization, DeleteOrganizationInput, ListUserTeams, ListUserTeamsOutput, ListUserTeamsOutputTeam (+4 more)
 
-### Community 27 - "Notification Module"
+### Community 25 - "notification/adapters/in/dto.ts, ListNotificati..."
 Cohesion: 0.12
 Nodes (24): ListNotificationsQuery, ListNotificationsQuerySchema, MarkAllReadResponse, MarkReadResponse, NotificationIdParams, NotificationIdParamsSchema, NotificationListResponse, NotificationPreferencesResponse (+16 more)
 
-### Community 28 - "Auth Module"
-Cohesion: 0.10
-Nodes (19): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+11 more)
+### Community 26 - "app.ts, app, session-controller.ts"
+Cohesion: 0.11
+Nodes (20): app, ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema (+12 more)
 
-### Community 29 - "Auth Module"
+### Community 27 - "token-service.ts, TokenService, .generateAccess..."
 Cohesion: 0.12
 Nodes (10): TokenService, RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, ValidateToken (+2 more)
 
-### Community 30 - "Notification Module"
+### Community 28 - "work-to-gateway-bridge.test.ts, assign-issue.ts..."
+Cohesion: 0.12
+Nodes (10): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, DeleteIssue, Event (+2 more)
+
+### Community 29 - "get-notification-preferences.ts, DEFAULT_TYPES,..."
 Cohesion: 0.14
 Nodes (12): DEFAULT_TYPES, GetNotificationPreferences, GetNotificationPreferencesOutput, NotificationPreferencesRepository, DEFAULT_TYPES, UpdateNotificationPreferences, UpdateNotificationPreferencesInput, UpdateNotificationPreferencesInputType (+4 more)
 
-### Community 31 - "Project Module"
+### Community 30 - "get-organization-details.ts, GetOrganizationDet..."
+Cohesion: 0.13
+Nodes (10): GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput, ListUserOrganizationsOutput, OrganizationMemberRepository, NewOrganizationMember (+2 more)
+
+### Community 31 - "add-issue-to-project.ts, AddIssueToProject, Add..."
 Cohesion: 0.15
 Nodes (9): AddIssueToProject, AddIssueToProjectInputType, IssueQuery, CannotReopenCompletedProjectError, InvalidProjectStatusTransitionError, IssueAlreadyInProjectError, NotProjectTeamMemberError, ProjectCancelNotAdminError (+1 more)
 
-### Community 32 - "Project Module"
+### Community 32 - "create-project.ts, CreateProject, .constructor()"
 Cohesion: 0.14
 Nodes (10): CreateProject, CreateProjectInput, CreateProjectInputType, CreateProjectOutput, TeamMemberQuery, UpdateProject, UpdateProjectInput, UpdateProjectInputType (+2 more)
 
-### Community 33 - "Openspec Module"
+### Community 33 - "list-issues.ts, ListIssues, .constructor()"
+Cohesion: 0.13
+Nodes (10): ListIssues, ListIssuesQuery, ListIssuesQueryType, IssueFilters, IssueRepository, PaginatedResult, PaginationCursor, Issue (+2 more)
+
+### Community 34 - "WorkflowController (Fastify Routes), ADR-0001: ..."
 Cohesion: 0.13
 Nodes (22): WorkflowController (Fastify Routes), ADR-0001: Embed Default Workflow in Code Rather Than Database, ADR-0002: Append-Only State History for Audit Trail, ADR-0003: Cancel State Transitions Bypass All Validation, Workflow API Contract, Default Workflow Definition, Workflow Module Backend Design, StateHistory (+14 more)
 
-### Community 34 - "Dist"
+### Community 35 - "dist, ES2022, node_modules"
 Cohesion: 0.09
 Nodes (21): dist, ES2022, node_modules, src/**/*, compilerOptions, declaration, declarationMap, esModuleInterop (+13 more)
 
-### Community 35 - "Identity Module"
-Cohesion: 0.14
-Nodes (8): DeleteOrganization, DeleteOrganizationInput, ListTeams, ListTeamsInput, OrganizationMemberRepository, OrganizationNotFoundError, NewOrganizationMember, OrganizationMember
+### Community 36 - "list-sessions.ts, ListSessions, .constructor()"
+Cohesion: 0.13
+Nodes (7): ListSessions, ListSessionsInput, ListSessionsInputType, ListSessionsOutput, SessionOutput, SessionRepository, Session
 
-### Community 36 - "Notification Module"
-Cohesion: 0.15
-Nodes (10): MarkNotificationRead, MarkNotificationReadInput, MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError (+2 more)
-
-### Community 37 - "Workflow Module"
+### Community 37 - "CreateWorkflowState, .constructor(), .execute()"
 Cohesion: 0.11
 Nodes (6): CreateWorkflowState, ListWorkflowStates, ListWorkflowStatesInput, StateRepository, UpdateWorkflowState, WorkflowState
 
-### Community 38 - "Work Module"
+### Community 38 - "create-organization.ts, CreateOrganization, .co..."
+Cohesion: 0.12
+Nodes (9): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, DeleteTeam, Event, EventPublisher, RemoveTeamMember (+1 more)
+
+### Community 39 - "change-issue-status.ts, ChangeIssueStatus, .con..."
 Cohesion: 0.14
 Nodes (10): ChangeIssueStatus, ChangeIssueStatusInput, ChangeIssueStatusInputType, ChangeIssueStatusOutput, IssueStatusQuery, NotificationService, StatusType, StateHistoryService (+2 more)
 
-### Community 39 - "Openspec Module"
+### Community 40 - "ADR: Team Entity Placement in Identity Module, ..."
 Cohesion: 0.13
 Nodes (19): ADR: Team Entity Placement in Identity Module, ADR: Soft-Delete Cascade Strategy, Team & Membership Proposal, Team API Contract, Team Business Specification, Team & Membership Backend Tasks, Team & Membership Tech Stack, Team (+11 more)
 
-### Community 40 - "Cycle Module"
+### Community 41 - "delete-cycle.ts, DeleteCycle, .constructor()"
 Cohesion: 0.16
 Nodes (5): DeleteCycle, ActiveCycleCannotBeDeletedError, CycleNotFoundError, DraftCycleCannotBeCompletedError, EmptyCycleNameError
 
-### Community 41 - "Cycle Module"
+### Community 42 - "cycle-repository.ts, CycleFilters, CycleRepository"
 Cohesion: 0.18
 Nodes (8): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError
 
-### Community 42 - "Openspec Module"
+### Community 43 - "mark-notification-read.ts, MarkNotificationRead..."
+Cohesion: 0.18
+Nodes (8): MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError, NotificationNotOwnerError, NotificationType
+
+### Community 44 - "Gateway Channel, Issue Channel, Team Channel"
 Cohesion: 0.16
 Nodes (17): Gateway Channel, Issue Channel, Team Channel, Gateway Connection, Gateway Event, Gateway Subscription, Project Cancellation, Project (+9 more)
 
-### Community 43 - "Identity Module"
-Cohesion: 0.15
-Nodes (8): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, Event, EventPublisher, RemoveTeamMember, OrganizationNameConflictError
+### Community 45 - "authorization-middleware.ts, organizationMember..."
+Cohesion: 0.13
+Nodes (7): organizationMemberRepository, AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, AlreadyTeamMemberError, NotOrganizationMemberError, NotOrganizationOwnerError
 
-### Community 44 - "Openspec Module"
+### Community 46 - "ListTeamMembers, .constructor(), .execute()"
+Cohesion: 0.18
+Nodes (5): ListTeamMembers, TeamMemberRepository, NewTeamMember, TeamMember, teamMembers
+
+### Community 47 - "Cycle Entity, Issue Entity, Label Entity"
 Cohesion: 0.21
 Nodes (16): Cycle Entity, Issue Entity, Label Entity, Notification Entity, Team Entity, User Entity, Notification API Contract, API Contract Template (+8 more)
 
-### Community 45 - "Identity Module"
-Cohesion: 0.15
-Nodes (5): DeleteTeam, GetTeamDetails, ListTeamMembers, TeamRepository, Team
-
-### Community 46 - "Workflow Module"
+### Community 48 - "create-workflow-state.ts, CreateWorkflowStateIn..."
 Cohesion: 0.22
 Nodes (8): CreateWorkflowStateInput, UpdateWorkflowStateInput, WorkflowStateType, DuplicateStateNameError, MissingCompletedStateError, MissingUnstartedStateError, MultipleCanceledStatesError, NotTeamAdminError
 
-### Community 47 - "Workflow Module"
+### Community 49 - "DuplicateTransitionError, .constructor(), State..."
 Cohesion: 0.17
 Nodes (9): DuplicateTransitionError, StateInUseError, TransitionNotFoundError, NewStateHistoryEntry, stateHistory, NewWorkflowState, workflowStates, NewWorkflowTransition (+1 more)
 
-### Community 48 - "Bcrypt"
+### Community 50 - "bcrypt, drizzle-orm, fastify"
 Cohesion: 0.13
-Nodes (15): bcrypt, fastify, @fastify/cookie, @fastify/cors, @fastify/rate-limit, dependencies, bcrypt, fastify (+7 more)
+Nodes (15): bcrypt, drizzle-orm, fastify, @fastify/cors, @fastify/rate-limit, dependencies, bcrypt, drizzle-orm (+7 more)
 
-### Community 49 - "Auth Module"
+### Community 51 - "auth/adapters/in/dto.ts, AuthResponse, AuthResp..."
 Cohesion: 0.13
 Nodes (14): AuthResponse, AuthResponseSchema, ErrorResponse, ErrorResponseSchema, LoginRequest, LoginRequestSchema, RefreshRequest, RefreshRequestSchema (+6 more)
 
-### Community 50 - "Openspec Module"
+### Community 52 - ".constructor(), mark-all-notifications-read.ts,..."
+Cohesion: 0.18
+Nodes (6): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, MarkNotificationRead, MarkNotificationReadInput, NotificationEvent, NotificationEventPublisher
+
+### Community 53 - "ADR-001: Use ws Library for WebSocket Server, A..."
 Cohesion: 0.14
 Nodes (14): ADR-001: Use ws Library for WebSocket Server, ADR-002: Store Connection State In-Memory, ADR-003: In-Process EventEmitter for Broadcasting, AuthenticateConnection Use Case, BroadcastEvent Use Case, In-Memory Connection Registry, Gateway Backend Design, EventBus Port (EventEmitter adapter) (+6 more)
 
-### Community 51 - "Openspec Module"
+### Community 54 - "BaseError, BusinessRuleError, ConflictError"
 Cohesion: 0.15
 Nodes (14): BaseError, BusinessRuleError, ConflictError, ForbiddenError, InternalError, NotFoundError, RateLimitError, UnauthorizedError (+6 more)
 
-### Community 52 - "Scripts"
+### Community 55 - "scripts, build, db:generate"
 Cohesion: 0.14
 Nodes (14): scripts, build, db:generate, db:migrate, db:push, db:studio, dev, format (+6 more)
 
-### Community 53 - "Project Module"
+### Community 56 - "project-repository.ts, PaginatedResult, Project..."
 Cohesion: 0.26
 Nodes (7): PaginatedResult, ProjectFilters, ProjectRepository, NewProject, Project, projects, projectStatusEnum
 
-### Community 54 - "Auth Module"
+### Community 57 - "login-user.ts, LoginUser, .constructor()"
 Cohesion: 0.22
 Nodes (7): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError, hashToken(), verifyTokenHash()
 
-### Community 56 - "Auth Module"
+### Community 58 - "user-repository.ts, UserRepository, .create()"
 Cohesion: 0.32
 Nodes (6): UserRepository, NewSession, sessions, NewUser, User, users
 
-### Community 57 - "Cycle Module"
+### Community 59 - "get-cycle.ts, GetCycle, .constructor()"
 Cohesion: 0.21
 Nodes (3): GetCycle, ListCycles, NotCycleTeamMemberError
 
-### Community 58 - "Notification Module"
+### Community 60 - "notification-repository.ts, NotificationReposit..."
 Cohesion: 0.24
 Nodes (5): NotificationRepository, PaginatedResult, NewNotification, Notification, notifications
 
-### Community 59 - "Notification Module"
+### Community 61 - "attach-label.ts, AttachLabel, .constructor()"
+Cohesion: 0.19
+Nodes (6): AttachLabel, AttachLabelInput, AttachLabelInputType, IssueTeamQuery, TeamMemberQuery, LabelAlreadyAttachedError
+
+### Community 62 - "create-team.ts, CreateTeam, .constructor()"
+Cohesion: 0.20
+Nodes (6): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, OrganizationNotFoundError, TeamKeyConflictError
+
+### Community 63 - "create-notification.ts, CreateNotification, .ex..."
 Cohesion: 0.24
 Nodes (6): CreateNotification, CreateNotificationInput, CreateNotificationInputType, CreateNotificationOutput, CreateNotificationEvent, NotificationService
 
-### Community 60 - "Notification Module"
-Cohesion: 0.23
-Nodes (4): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, NotificationEvent, NotificationEventPublisher
-
-### Community 61 - "Workflow Module"
+### Community 64 - "validate-transition.ts, ValidateTransition, .co..."
 Cohesion: 0.23
 Nodes (8): ValidateTransition, ValidateTransitionInput, ValidateTransitionOutput, DEFAULT_WORKFLOW_STATES, DEFAULT_WORKFLOW_TRANSITIONS, DefaultState, DefaultTransition, isCanceledType()
 
-### Community 62 - "Notification Module"
+### Community 65 - "list-notifications.ts, ListNotifications, .cons..."
 Cohesion: 0.24
 Nodes (6): ListNotifications, ListNotificationsInput, ListNotificationsInputType, ListNotificationsOutput, NotificationItem, toItem()
 
-### Community 63 - "Openspec Module"
+### Community 66 - "Hexagonal Architecture (Ports and Adapters), Sh..."
 Cohesion: 0.20
 Nodes (10): Hexagonal Architecture (Ports and Adapters), Shared Entity Ownership (Field-Level), ADR: Hexagonal Architecture for Identity Module, ADR: Shared Entity Ownership Between Auth and Identity Modules, Identity User Profile & Organization Change, Identity Module Backend Design, Identity API Contract Spec, Identity Business Spec (+2 more)
 
-### Community 64 - "Openspec Module"
+### Community 67 - "ADR-0001 In-Process Event Bridge, ADR-0002 Chan..."
 Cohesion: 0.24
 Nodes (10): ADR-0001 In-Process Event Bridge, ADR-0002 Channel Access Validation, ADR-0003 Auto-Subscription on Authentication, WebSocket Change ADR Manifest, WebSocket Backend Design, WebSocket Change Review, WebSocket Gateway Protocol API Spec, WebSocket Realtime Business Rules (+2 more)
 
-### Community 65 - "Package"
+### Community 68 - "package.json, author, description"
 Cohesion: 0.20
 Nodes (9): author, description, keywords, license, main, name, packageManager, type (+1 more)
 
-### Community 66 - "Auth Module"
+### Community 69 - "register-user.ts, ConflictError, .constructor()"
 Cohesion: 0.24
 Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
-### Community 67 - "Identity Module"
-Cohesion: 0.24
-Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
-
-### Community 68 - "Project Module"
+### Community 70 - "get-project-progress.ts, GetProjectProgress, .c..."
 Cohesion: 0.24
 Nodes (3): GetProjectProgress, GetProjectProgressOutput, IssueQuery
 
-### Community 69 - "Workflow Module"
+### Community 71 - "get-state-history.ts, GetStateHistory, .constru..."
 Cohesion: 0.29
 Nodes (4): GetStateHistory, GetStateHistoryInput, HistoryRepository, StateHistoryEntry
 
-### Community 70 - "Openspec Module"
+### Community 72 - "Default Workflow (Embedded), Workflow Module, W..."
 Cohesion: 0.25
 Nodes (9): Default Workflow (Embedded), Workflow Module, WorkflowState Entity, Workflow State Type Enum, WorkflowTransition Entity, StateHistory Entity, Workflow Module API Endpoints, WorkflowResolutionService (+1 more)
 
-### Community 71 - "Openspec Module"
+### Community 73 - "Comment Entity, Session Entity, Business Specif..."
 Cohesion: 0.31
 Nodes (9): Comment Entity, Session Entity, Business Specification Template, Backend Tasks Template, Auth API Contract, Comments API Contract, Sessions API Contract, Auth Business Specification (+1 more)
 
-### Community 72 - "Cycle Module"
+### Community 74 - "create-cycle.ts, CreateCycle, CreateCycleInputType"
 Cohesion: 0.31
 Nodes (5): CreateCycle, CreateCycleInputType, CreateCycleOutput, CycleDateValidationError, CyclePastStartDateError
 
-### Community 73 - "Identity Module"
-Cohesion: 0.28
-Nodes (4): AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, AlreadyTeamMemberError
-
-### Community 74 - "Priority"
+### Community 75 - "Code Intelligence Priority Order, CodeGraph, Gr..."
 Cohesion: 0.25
 Nodes (8): Code Intelligence Priority Order, CodeGraph, Graphify, Headroom Memory MCP, Mandatory Project Rules, Memory as Primary Source of Truth, RTK (Rust Token Killer), Token-Optimized Commands Rule
 
-### Community 75 - "Openspec Module"
+### Community 76 - "Cycles API Contract, Cycle Entity, Cycle Module"
 Cohesion: 0.29
 Nodes (8): Cycles API Contract, Cycle Entity, Cycle Module, Cycle Module Backend Tasks, Cycle Status Enum (draft, active, completed), Cycle Use Cases, ADR-0001: Cycle Auto-Complete on Activation, ADR-0002: Cycle Status as Database Enum
 
-### Community 76 - "Openspec Module"
+### Community 77 - "IssueComment, IssueLabel, Label"
 Cohesion: 0.29
 Nodes (8): IssueComment, IssueLabel, Label, ADR: Extend Work Module with Subdomains, ADR: Soft-Delete for Comments and Labels, ADR: Flat Comment Threading, Work Module Comments/Labels/Watchers Backend Design, Work Module Comments/Labels/Watchers Proposal
 
-### Community 77 - "Identity Module"
-Cohesion: 0.25
-Nodes (3): organizationMemberRepository, NotOrganizationMemberError, NotOrganizationOwnerError
-
-### Community 78 - "Identity Module"
+### Community 78 - "validators.ts, CreateOrganizationSchema, Delete..."
 Cohesion: 0.46
 Nodes (6): CreateOrganizationSchema, DeleteOrganizationSchema, GetOrganizationDetailsSchema, GetUserProfileSchema, ListUserOrganizationsSchema, UpdateUserProfileSchema
 
-### Community 79 - "Openspec Module"
+### Community 79 - "In-Memory Rate Limit Store (MVP), ADR: In-Memor..."
 Cohesion: 0.29
 Nodes (7): In-Memory Rate Limit Store (MVP), ADR: In-Memory Rate Limit Store for MVP, Shared Error Types & Rate Limiting Change, Shared Module Backend Design (Errors & Rate Limiting), Error Contract API Spec, Shared Error Class Hierarchy, Shared Rate Limiting Module
 
-### Community 80 - "Openspec Module"
+### Community 80 - "OpenSpec Config, Backend Schema Definition, ADR..."
 Cohesion: 0.33
 Nodes (6): OpenSpec Config, Backend Schema Definition, ADR Template, Design Backend Template, Proposal Template, Review Template
 
-### Community 82 - "Auth Module"
+### Community 82 - "JWT Refresh Token Rotation, Auth Token Refresh ..."
 Cohesion: 0.40
 Nodes (5): JWT Refresh Token Rotation, Auth Token Refresh & Logout Change, Auth Token Refresh & Logout Tasks, RedisSessionStore Adapter, RefreshTokenService
 
-### Community 83 - "Forward"
+### Community 83 - "ADR-0001: Store-and-Forward Notifications, ADR-..."
 Cohesion: 0.40
 Nodes (5): ADR-0001: Store-and-Forward Notifications, ADR-0002: Synchronous Event Ingestion, Notification Data Model, Notification Module Backend Design, Notification Recipient Resolver
 
-### Community 84 - "Openspec Module"
+### Community 84 - "Tech Selection Template, Architecture Template,..."
 Cohesion: 0.40
 Nodes (5): Tech Selection Template, Architecture Template, Deployment Template, Technology Templates README, Stack Template
 
-### Community 86 - "Events"
+### Community 86 - "events.ts, CHANNEL_PATTERNS, createGatewayEvent..."
 Cohesion: 0.40
 Nodes (3): CHANNEL_PATTERNS, GATEWAY_EVENTS, GatewayEventEnvelope
 
-### Community 87 - "Openspec Module"
+### Community 87 - "Auth Cookie Migration API Spec, Auth Cookie Mig..."
 Cohesion: 0.50
 Nodes (4): Auth Cookie Migration API Spec, Auth Cookie Migration Business Spec, Auth Cookie Migration Backend Tasks, Auth Cookie Migration Tech Stack
 
-### Community 88 - "Auth Module"
+### Community 88 - "contract-refresh.test.ts, ErrorResponseSchema, ..."
 Cohesion: 0.50
 Nodes (3): ErrorResponseSchema, RefreshTokenRequestSchema, RefreshTokenResponseSchema
 
-### Community 90 - "Identity Module"
-Cohesion: 0.50
-Nodes (4): Identity Controller, Identity Auth & Authorization Middleware, Identity Drizzle Repositories, Identity Use Cases
-
-### Community 91 - "0001"
+### Community 90 - "ADR-0001: HttpOnly Cookie for Refresh Token, Co..."
 Cohesion: 0.67
 Nodes (3): ADR-0001: HttpOnly Cookie for Refresh Token, Cookie Migration Backend Design, Cookie Security Model
 
-### Community 92 - "Openspec Module"
+### Community 91 - "OpenSpec Artifact Workflow, OpenSpec Auth Regis..."
 Cohesion: 0.67
 Nodes (3): OpenSpec Artifact Workflow, OpenSpec Auth Registration Login Change Config, OpenSpec Schema Collection README
 
-### Community 93 - "Openspec Module"
+### Community 92 - "Verification Report — add-get-me-teams-endpoint..."
+Cohesion: 0.67
+Nodes (3): Verification Report — add-get-me-teams-endpoint, Suggestion: Fix rate limit mismatch (API spec says 60, design/impl use 30), Suggestion: Implement real integration tests (currently stubs)
+
+### Community 93 - "Active Cycle Status, Completed Cycle Status, Dr..."
 Cohesion: 0.67
 Nodes (3): Active Cycle Status, Completed Cycle Status, Draft Cycle Status
 
-### Community 94 - "Openspec Module"
+### Community 94 - "Session Eviction, Session Revocation, Session"
 Cohesion: 0.67
 Nodes (3): Session Eviction, Session Revocation, Session
 
-### Community 95 - "Config"
+### Community 95 - "Serena IDE Project Configuration, linear-clone-..."
 Cohesion: 0.67
 Nodes (3): Serena IDE Project Configuration, linear-clone-backend-js Project, TypeScript Language Server
 
-### Community 98 - "Types"
+### Community 98 - "WebSocket Channel Types, Gateway Business Rules..."
 Cohesion: 0.67
 Nodes (3): WebSocket Channel Types, Gateway Business Rules, WebSocket Protocol Contract
 
 ## Knowledge Gaps
-- **550 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+545 more)
+- **552 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+547 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **74 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `Team Membership` to `WebSocket Gateway`, `Project DTOs`, `Auth Module`, `Auth Module`, `Auth Module`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
-- **Why does `FastifyInstance` connect `Team Membership` to `WebSocket Gateway`, `Error Taxonomy`, `Issue Watchers`, `Workflow Engine`, `Identity & Team DTOs`, `Workflow Controller`, `Workflow Transitions`, `Project Module`, `Cycle Lifecycle`, `Notification DTOs`, `Notification Module`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `TokenService` connect `Auth Module` to `Auth Module`, `Auth Module`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+- **Why does `env` connect `app.ts, app, session-controller.ts` to `message-handler.ts, MessageHandler, .constructor()`, `.constructor(), get-issue-labels.ts, GetIssueLa...`, `auth-controller.ts, authRoutes(), eventPublisher`, `login-user.ts, LoginUser, .constructor()`, `token-service.ts, TokenService, .generateAccess...`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `FastifyInstance` connect `app.ts, app, session-controller.ts` to `message-handler.ts, MessageHandler, .constructor()`, `comment-controller.ts, commentRepository, comme...`, `AddWatcherRequestSchema, WatcherIdParamsSchema,...`, `CreateLabelRequestSchema, IssueLabelParamsSchem...`, `base-error.ts, BaseError, .constructor()`, `work/adapters/in/dto.ts, AddWatcherRequest, Ass...`, `controller.ts, createTransition, createWorkflow...`, `project/adapters/in/dto.ts, AddIssueRequest, Ad...`, `cycle-controller.ts, activateCycle, completeCycle`, `auth-controller.ts, authRoutes(), eventPublisher`, `notification/adapters/in/dto.ts, ListNotificati...`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `teamMembers` connect `ListTeamMembers, .constructor(), .execute()` to `comment-controller.ts, commentRepository, comme...`, `AddWatcherRequestSchema, WatcherIdParamsSchema,...`, `CreateLabelRequestSchema, IssueLabelParamsSchem...`, `work/adapters/in/dto.ts, AddWatcherRequest, Ass...`, `controller.ts, createTransition, createWorkflow...`, `project/adapters/in/dto.ts, AddIssueRequest, Ad...`, `cycle-controller.ts, activateCycle, completeCycle`, `get-user-profile.ts, GetUserProfile, .construct...`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `type` to the rest of the system?**
-  _550 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `WebSocket Gateway` be split into smaller, more focused modules?**
-  _Cohesion score 0.05742393045069778 - nodes in this community are weakly interconnected._
-- **Should `Authentication Architecture` be split into smaller, more focused modules?**
-  _Cohesion score 0.061569416498993966 - nodes in this community are weakly interconnected._
-- **Should `Error Taxonomy` be split into smaller, more focused modules?**
-  _Cohesion score 0.06108597285067873 - nodes in this community are weakly interconnected._
+  _552 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `message-handler.ts, MessageHandler, .constructor()` be split into smaller, more focused modules?**
+  _Cohesion score 0.05643896976483763 - nodes in this community are weakly interconnected._
+- **Should `ADR 0002 — Use JWT Dual Token Strategy, ADR 000...` be split into smaller, more focused modules?**
+  _Cohesion score 0.06116700201207243 - nodes in this community are weakly interconnected._
+- **Should `comment-controller.ts, commentRepository, comme...` be split into smaller, more focused modules?**
+  _Cohesion score 0.05357142857142857 - nodes in this community are weakly interconnected._

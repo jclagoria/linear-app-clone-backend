@@ -1237,6 +1237,60 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+  /api/v1/me/teams:
+    get:
+      summary: List teams for the current user
+      deprecated: false
+      description: >
+        Returns only the teams the authenticated user belongs to, with
+        organization context. No pagination — users typically belong to few
+        teams.
+      operationId: listUserTeams
+      tags:
+        - Teams
+        - Users
+      parameters: []
+      responses:
+        '200':
+          description: List of user teams
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      teams:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            name:
+                              type: string
+                            key:
+                              type: string
+                            orgId:
+                              type: string
+                              format: uuid
+                            orgName:
+                              type: string
+                example:
+                  data:
+                    teams:
+                      - id: 047d1d73-0b6f-4386-9acb-061b9cecea50
+                        name: Engineering
+                        key: ENG
+                        orgId: d48e1311-278d-4996-9fab-7f9435a1c9af
+                        orgName: Acme Corp
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+          description: Authentication required
+      security:
+        - BearerAuth: []
   /api/v1/issues:
     get:
       summary: List issues with optional filters
