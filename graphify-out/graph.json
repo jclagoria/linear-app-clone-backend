@@ -1,0 +1,363 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "AGENTS.md",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents",
+      "community": 1,
+      "community_name": "RTK (Rust Token Killer) - Token-Optimized Commands",
+      "norm_label": "agents.md"
+    },
+    {
+      "label": "RTK (Rust Token Killer) - Token-Optimized Commands",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "agents_rtk_rust_token_killer_token_optimized_commands",
+      "community": 1,
+      "community_name": "RTK (Rust Token Killer) - Token-Optimized Commands",
+      "norm_label": "rtk (rust token killer) - token-optimized commands"
+    },
+    {
+      "label": "Key Commands",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "agents_key_commands",
+      "community": 1,
+      "community_name": "RTK (Rust Token Killer) - Token-Optimized Commands",
+      "norm_label": "key commands"
+    },
+    {
+      "label": "Rules",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "agents_rules",
+      "community": 1,
+      "community_name": "RTK (Rust Token Killer) - Token-Optimized Commands",
+      "norm_label": "rules"
+    },
+    {
+      "label": "linear-clone-backend-js/AGENTS.md",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "linear-clone-backend-js/agents.md"
+    },
+    {
+      "label": "Mandatory Project Rules",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_mandatory_project_rules",
+      "community": 2,
+      "community_name": "Mandatory Project Rules",
+      "norm_label": "mandatory project rules"
+    },
+    {
+      "label": "1. CodeGraph + Graphify (Code Intelligence)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_1_codegraph_graphify_code_intelligence",
+      "community": 2,
+      "community_name": "Mandatory Project Rules",
+      "norm_label": "1. codegraph + graphify (code intelligence)"
+    },
+    {
+      "label": "2. Memory (Persistent Knowledge)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_2_memory_persistent_knowledge",
+      "community": 2,
+      "community_name": "Mandatory Project Rules",
+      "norm_label": "2. memory (persistent knowledge)"
+    },
+    {
+      "label": "3. RTK - Optimized Commands (Token Savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_3_rtk_optimized_commands_token_savings",
+      "community": 2,
+      "community_name": "Mandatory Project Rules",
+      "norm_label": "3. rtk - optimized commands (token savings)"
+    },
+    {
+      "label": "Git (59-80% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_git_59_80_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "git (59-80% savings)"
+    },
+    {
+      "label": "Files & Search (60-75% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_files_search_60_75_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "files & search (60-75% savings)"
+    },
+    {
+      "label": "Test (90-99% savings) \u2014 shows failures only",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_test_90_99_savings_shows_failures_only",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "test (90-99% savings) \u2014 shows failures only"
+    },
+    {
+      "label": "Build & Lint (80-90% savings) \u2014 shows errors only",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_build_lint_80_90_savings_shows_errors_only",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "build & lint (80-90% savings) \u2014 shows errors only"
+    },
+    {
+      "label": "Analysis (70-90% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_analysis_70_90_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "analysis (70-90% savings)"
+    },
+    {
+      "label": "GitHub (26-87% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_github_26_87_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "github (26-87% savings)"
+    },
+    {
+      "label": "Infrastructure (85% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L51",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_infrastructure_85_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "infrastructure (85% savings)"
+    },
+    {
+      "label": "Package managers (70-90% savings)",
+      "file_type": "document",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "linear_clone_backend_js_agents_package_managers_70_90_savings",
+      "community": 0,
+      "community_name": "linear-clone-backend-js/AGENTS.md",
+      "norm_label": "package managers (70-90% savings)"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents",
+      "target": "agents_rtk_rust_token_killer_token_optimized_commands",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_rtk_rust_token_killer_token_optimized_commands",
+      "target": "agents_key_commands",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_rtk_rust_token_killer_token_optimized_commands",
+      "target": "agents_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_analysis_70_90_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_build_lint_80_90_savings_shows_errors_only",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_files_search_60_75_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_git_59_80_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_github_26_87_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_infrastructure_85_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_mandatory_project_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_package_managers_70_90_savings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents",
+      "target": "linear_clone_backend_js_agents_test_90_99_savings_shows_failures_only",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents_mandatory_project_rules",
+      "target": "linear_clone_backend_js_agents_1_codegraph_graphify_code_intelligence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents_mandatory_project_rules",
+      "target": "linear_clone_backend_js_agents_2_memory_persistent_knowledge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "linear-clone-backend-js/AGENTS.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "linear_clone_backend_js_agents_mandatory_project_rules",
+      "target": "linear_clone_backend_js_agents_3_rtk_optimized_commands_token_savings",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "5ac3f47f49ae1815b232bac70ad314064ebe6435"
+}

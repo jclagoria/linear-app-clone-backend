@@ -1,11 +1,12 @@
-# Graph Report - .  (2026-07-28)
+# Graph Report - /home/jlagoria/mnt/second/dev/proyects/personal-site/linear-app-clone-backend/linear-clone-backend-js  (2026-07-29)
 
 ## Corpus Check
-- Large corpus: 530 files · ~225,113 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
+- 2 files · ~226,339 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2020 nodes · 3768 edges · 184 communities (106 shown, 78 thin omitted)
-- Extraction: 93% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 189 edges (avg confidence: 0.92)
+- 2021 nodes · 3777 edges · 179 communities (105 shown, 74 thin omitted)
+- Extraction: 91% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 261 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -34,153 +35,148 @@
 - Authorization
 - App Entry & Sessions
 - Token Service
-- Community 25
-- Community 26
-- Community 27
-- Community 28
-- Community 29
-- Community 30
-- Community 31
-- Community 32
-- Community 33
-- Community 34
-- Community 35
-- Community 36
-- Community 37
-- Community 38
-- Community 39
-- Community 40
-- Community 41
-- Community 42
-- Community 43
-- Community 44
-- Community 45
-- Community 46
-- Community 47
-- Community 48
-- Community 49
-- Community 50
-- Community 51
-- Community 52
-- Community 53
-- Community 54
-- Community 55
-- Community 56
-- Community 57
-- Community 58
-- Community 59
-- Community 60
-- Community 61
-- Community 62
-- Community 63
-- Community 64
-- Community 65
-- Community 66
-- Community 67
-- Community 68
-- Community 69
-- Community 70
-- Community 71
-- Community 72
-- Community 73
-- Community 74
-- Community 75
-- Community 76
-- Community 77
-- Community 78
-- Community 79
-- Community 80
-- Community 81
-- Community 82
-- Community 83
-- Community 84
-- Community 85
-- Community 86
-- Community 87
-- Community 88
-- Community 89
-- Community 90
-- Community 91
-- Community 92
-- Community 93
-- Community 94
-- Community 95
-- Community 96
-- Community 97
-- Community 98
-- Community 99
-- Community 100
-- Community 101
-- Community 102
-- Community 103
-- Community 104
-- Community 105
-- Community 106
-- Community 107
-- Community 108
-- Community 109
-- Community 110
-- Community 111
-- Community 112
-- Community 113
-- Community 114
-- Community 115
-- Community 116
-- Community 117
-- Community 118
-- Community 119
-- Community 120
-- Community 121
-- Community 122
-- Community 123
-- Community 124
-- Community 125
-- Community 126
-- Community 127
-- Community 128
-- Community 129
-- Community 130
-- Community 131
-- Community 132
-- Community 134
-- Community 135
-- Community 136
-- Community 137
-- Community 138
-- Community 139
-- Community 140
-- Community 141
-- Community 142
-- Community 143
-- Community 144
-- Community 145
-- Community 146
-- Community 147
-- Community 148
-- Community 149
-- Community 150
-- Community 151
-- Community 152
-- Community 153
-- Community 154
-- Community 155
-- Community 156
-- Community 157
-- Community 158
-- Community 159
-- Community 160
-- Community 161
-- Community 162
-- Community 163
-- Community 164
-- Community 165
-- Community 166
-- Community 167
-- Community 168
-- Community 169
-- Community 172
-- Community 173
-- Community 183
+- Project Module
+- Identity Module
+- Notification Module
+- Auth Module
+- Auth Module
+- Notification Module
+- Project Module
+- Project Module
+- Openspec Module
+- Dist
+- Identity Module
+- Notification Module
+- Workflow Module
+- Work Module
+- Openspec Module
+- Cycle Module
+- Cycle Module
+- Openspec Module
+- Identity Module
+- Openspec Module
+- Identity Module
+- Workflow Module
+- Workflow Module
+- Bcrypt
+- Auth Module
+- Openspec Module
+- Openspec Module
+- Scripts
+- Project Module
+- Auth Module
+- Auth Module
+- Auth Module
+- Cycle Module
+- Notification Module
+- Notification Module
+- Notification Module
+- Workflow Module
+- Notification Module
+- Openspec Module
+- Openspec Module
+- Package
+- Auth Module
+- Identity Module
+- Project Module
+- Workflow Module
+- Openspec Module
+- Openspec Module
+- Cycle Module
+- Identity Module
+- Priority
+- Openspec Module
+- Openspec Module
+- Identity Module
+- Identity Module
+- Openspec Module
+- Openspec Module
+- Cycle Module
+- Auth Module
+- Forward
+- Openspec Module
+- Project Module
+- Events
+- Openspec Module
+- Auth Module
+- Cycle Module
+- Identity Module
+- 0001
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Config
+- Auth Module
+- Identity Module
+- Types
+- Proposal
+- Dotenv
+- Orm
+- Config
+- Ioredis
+- Jose
+- Openspec Module
+- Openspec Module
+- Ws
+- Zod
+- Auth Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Identity Module
+- Yaml
+- Review
+- Proposal
+- Gateway
+- Timeout
+- Subscribe
+- User
+- Status
+- Projects
+- Progress
+- Lifecycle
+- Rules
+- Hierarchy
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Openspec Module
+- Auth Module
+- Auth Module
+- Identity Module
+- Identity Module
+- Stack
 
 ## God Nodes (most connected - your core abstractions)
 1. `EventPublisher` - 32 edges
@@ -239,40 +235,40 @@
 - **he_openspec_schema_system** — openspec_config_yaml, openspec_schemas_backend_schema_schema_yaml, openspec_schemas_backend_schema_templates_proposal, openspec_schemas_backend_schema_templates_design_backend, openspec_schemas_backend_schema_templates_adr, openspec_schemas_backend_schema_templates_review [1.0]
 - **Authentication domain** — openspec_specs_api_auth, openspec_specs_api_sessions, openspec_specs_business_auth, entity_session, entity_user [INFERRED 0.95]
 - **Comments domain** — openspec_specs_api_comments, openspec_specs_business_comments, entity_comment, entity_issue, entity_user [INFERRED 0.95]
-- **Real-time event delivery system** — openspec_specs_api_websocket-protocol, openspec_specs_api_notifications, openspec_specs_api_issues, openspec_specs_api_comments, openspec_specs_api_labels, openspec_specs_api_watchers [INFERRED 0.92]
+- **Real-time event delivery system** — openspec_specs_api_websocket-protocol, openspec_specs_api_issues, openspec_specs_api_comments, openspec_specs_api_labels, openspec_specs_api_watchers [INFERRED 0.92]
 - **hyper_cycle_issue_team_assignment** — openspec_specs_business_cycles_cycle, openspec_specs_business_issues_issue, openspec_specs_business_team_team [INFERRED 1.00]
 - **hyper_gateway_event_broadcast_flow** — business_gateway_event, business_gateway_channel, business_gateway_subscription, business_gateway_connection [INFERRED 1.00]
-- **hyper_workflow_issue_status_history** — openspec_specs_business_workflow_state, openspec_specs_business_workflow_transition, openspec_specs_business_workflow_state_history, openspec_specs_business_issues_issue [INFERRED 1.00]
+- **hyper_workflow_issue_status_history** — openspec_specs_business_issues_issue [INFERRED 1.00]
 
-## Communities (184 total, 78 thin omitted)
+## Communities (179 total, 74 thin omitted)
 
 ### Community 0 - "WebSocket Gateway"
-Cohesion: 0.05
-Nodes (46): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+38 more)
+Cohesion: 0.06
+Nodes (45): MessageHandler, GatewayWebSocketServer, AuthenticateConnection, autoSubscribeUserChannels(), BroadcastEvent, HandleDisconnect, ManageSubscription, AuthenticateResult (+37 more)
 
 ### Community 1 - "Authentication Architecture"
 Cohesion: 0.06
 Nodes (71): ADR 0002 — Use JWT Dual Token Strategy, ADR 0003 — Use PostgreSQL with Drizzle ORM, ADR 0004 — Use Redis for Session Storage, ADR 0005 — Use bcrypt for Password Hashing, Auth Registration Login Change, Auth Session Management Change, Auth Token Refresh & Logout Change, bcrypt Password Hashing (+63 more)
 
 ### Community 2 - "Error Taxonomy"
+Cohesion: 0.06
+Nodes (29): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+21 more)
+
+### Community 3 - "Issue Watchers"
 Cohesion: 0.09
 Nodes (18): BaseError, BusinessRuleError, ConflictError, errorHandler(), ForbiddenError, InternalError, NotFoundError, RateLimitError (+10 more)
 
-### Community 3 - "Issue Watchers"
-Cohesion: 0.06
-Nodes (28): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+20 more)
-
 ### Community 4 - "Workflow Engine"
-Cohesion: 0.07
-Nodes (46): WorkflowController (Fastify Routes), ADR-0001: Embed Default Workflow in Code Rather Than Database, ADR-0002: Append-Only State History for Audit Trail, ADR-0003: Cancel State Transitions Bypass All Validation, Workflow API Contract, Default Workflow Definition, Workflow Module Backend Design, Comment Entity (+38 more)
+Cohesion: 0.05
+Nodes (47): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+39 more)
 
 ### Community 5 - "Identity & Team DTOs"
 Cohesion: 0.06
 Nodes (41): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+33 more)
 
 ### Community 6 - "Soft Delete Pattern"
-Cohesion: 0.08
-Nodes (19): Cascade Soft-Deletion, Soft Deletion Strategy, ADR: Soft Deletion Strategy for All Entities, DeleteOrganization, DeleteOrganizationInput, GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput (+11 more)
+Cohesion: 0.07
+Nodes (18): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery, DeleteIssue, ListIssues (+10 more)
 
 ### Community 7 - "Workflow Controller"
 Cohesion: 0.08
@@ -283,364 +279,360 @@ Cohesion: 0.05
 Nodes (41): drizzle-kit, eslint, eslint-config-prettier, @eslint/js, eslint-plugin-boundaries, eslint-plugin-prettier, devDependencies, drizzle-kit (+33 more)
 
 ### Community 9 - "Project DTOs"
+Cohesion: 0.09
+Nodes (17): GetIssueLabels, ListLabels, LabelRepository, issueComments, IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES (+9 more)
+
+### Community 10 - "Workflow Transitions"
 Cohesion: 0.08
 Nodes (36): AddIssueRequest, AddIssueRequestSchema, ChangeProjectStatusRequest, ChangeProjectStatusRequestSchema, CreateProjectRequest, CreateProjectRequestSchema, ListProjectsQuery, ListProjectsQuerySchema (+28 more)
 
-### Community 10 - "Workflow Transitions"
-Cohesion: 0.09
-Nodes (12): CreateTransition, CreateTransitionInput, DeleteTransition, DeleteTransitionInput, DeleteWorkflowState, DeleteWorkflowStateInput, ListTransitions, ListTransitionsInput (+4 more)
-
 ### Community 11 - "Team Membership"
 Cohesion: 0.09
-Nodes (12): AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, GetTeamDetails, GetTeamDetailsInput, TeamMemberRepository, AlreadyTeamMemberError, NotTeamMemberError (+4 more)
+Nodes (28): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser (+20 more)
 
 ### Community 12 - "Project Module"
 Cohesion: 0.09
-Nodes (31): DrizzleProjectRepository, ProjectController (Fastify Routes), ADR-0001: Use Enum for Project Status Instead of Workflow Join Table, ADR-0002: Compute Project Progress on Read Instead of Storing, ADR-0003: Canceled as Terminal Status Instead of Hard Delete, Projects API Contract, PRJ-DEL: No Hard Delete, PRJ-S1: Project Creation Default Status (+23 more)
+Nodes (24): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+16 more)
 
 ### Community 13 - "Team Deletion"
-Cohesion: 0.09
-Nodes (14): DeleteTeam, DeleteTeamInput, Event, EventPublisher, RemoveTeamMember, RemoveTeamMemberInput, UpdateUserProfile, UpdateUserProfileInput (+6 more)
+Cohesion: 0.10
+Nodes (14): CreateLabel, CreateLabelInput, CreateLabelInputType, DeleteLabel, DetachLabel, DetachLabelInput, DetachLabelInputType, Event (+6 more)
 
 ### Community 14 - "Auth Logout"
-Cohesion: 0.13
-Nodes (13): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, RevokeAllSessions, RevokeAllSessionsInput (+5 more)
+Cohesion: 0.09
+Nodes (12): CreateTransition, CreateTransitionInput, DeleteTransition, DeleteTransitionInput, DeleteWorkflowState, DeleteWorkflowStateInput, ListTransitions, ListTransitionsInput (+4 more)
 
 ### Community 15 - "Cycle Controller"
-Cohesion: 0.10
-Nodes (27): activateCycle, completeCycle, createCycle, cycleRepository, cycleRoutes(), deleteCycle, eventPublisher, getCycle (+19 more)
+Cohesion: 0.11
+Nodes (12): DeleteTeamInput, GetTeamDetailsInput, ListTeamMembersInput, TeamMemberRepository, RemoveTeamMemberInput, LastAdminRemovalError, NotTeamAdminError, NotTeamMemberError (+4 more)
 
 ### Community 16 - "Cycle Lifecycle"
-Cohesion: 0.12
-Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
+Cohesion: 0.08
+Nodes (25): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+17 more)
 
 ### Community 17 - "Issue DTOs"
 Cohesion: 0.09
-Nodes (27): AssignIssueRequestSchema, ChangeIssueStatusRequestSchema, CreateIssueRequestSchema, IdParamsSchema, ListIssuesQuerySchema, UpdateIssueRequestSchema, assignIssue, changeIssueStatus (+19 more)
+Nodes (17): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, UserProfileRepository, UpdateUserProfile, UpdateUserProfileInput, UpdateUserProfileInputType, UpdateUserProfileOutput (+9 more)
 
 ### Community 18 - "Work Module Specs"
-Cohesion: 0.10
-Nodes (27): Issue Comment Entity, Issue Watcher Entity, Label Entity, Review: Work Module Comments, Labels, and Watchers, API Spec: Issue Comments, API Spec: Labels, API Spec: Issue Watchers, Business Spec: Issue Comments (+19 more)
+Cohesion: 0.09
+Nodes (31): DrizzleProjectRepository, ProjectController (Fastify Routes), ADR-0001: Use Enum for Project Status Instead of Workflow Join Table, ADR-0002: Compute Project Progress on Read Instead of Storing, ADR-0003: Canceled as Terminal Status Instead of Hard Delete, Projects API Contract, PRJ-DEL: No Hard Delete, PRJ-S1: Project Creation Default Status (+23 more)
 
 ### Community 19 - "Auth Controller"
-Cohesion: 0.11
-Nodes (22): authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionRefreshTokenHash(), listSessions, LoginRequestSchema, loginUser, logoutUser (+14 more)
+Cohesion: 0.08
+Nodes (16): CreateIssue, CreateIssueInput, CreateIssueInputType, CreateIssueOutput, ProjectQuery, TeamKeyQuery, TeamMemberQuery, ProjectQuery (+8 more)
 
 ### Community 20 - "Project Use Cases"
-Cohesion: 0.12
-Nodes (11): AddIssueToProjectInput, ChangeProjectStatus, ChangeProjectStatusInput, ChangeProjectStatusInputType, VALID_TRANSITIONS, ProjectEvent, ProjectEventPublisher, IssueUpdateQuery (+3 more)
+Cohesion: 0.13
+Nodes (13): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, RevokeAllSessions, RevokeAllSessionsInput (+5 more)
 
 ### Community 21 - "Notification DTOs"
-Cohesion: 0.12
-Nodes (24): ListNotificationsQuery, ListNotificationsQuerySchema, MarkAllReadResponse, MarkReadResponse, NotificationIdParams, NotificationIdParamsSchema, NotificationListResponse, NotificationPreferencesResponse (+16 more)
+Cohesion: 0.10
+Nodes (27): activateCycle, completeCycle, createCycle, cycleRepository, cycleRoutes(), deleteCycle, eventPublisher, getCycle (+19 more)
 
 ### Community 22 - "Authorization"
 Cohesion: 0.10
-Nodes (13): organizationMemberRepository, Identity Controller, Identity Auth & Authorization Middleware, Identity Drizzle Repositories, CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput (+5 more)
+Nodes (10): CreateComment, CreateCommentInput, CreateCommentInputType, IssueTeamQuery, NotificationService, TeamMemberQuery, ListIssueComments, CommentRepository (+2 more)
 
 ### Community 23 - "App Entry & Sessions"
-Cohesion: 0.11
-Nodes (20): app, ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema (+12 more)
+Cohesion: 0.12
+Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
 
 ### Community 24 - "Token Service"
+Cohesion: 0.10
+Nodes (27): Issue Comment Entity, Issue Watcher Entity, Label Entity, Review: Work Module Comments, Labels, and Watchers, API Spec: Issue Comments, API Spec: Labels, API Spec: Issue Watchers, Business Spec: Issue Comments (+19 more)
+
+### Community 25 - "Project Module"
+Cohesion: 0.12
+Nodes (11): AddIssueToProjectInput, ChangeProjectStatus, ChangeProjectStatusInput, ChangeProjectStatusInputType, VALID_TRANSITIONS, ProjectEvent, ProjectEventPublisher, IssueUpdateQuery (+3 more)
+
+### Community 26 - "Identity Module"
+Cohesion: 0.11
+Nodes (13): Cascade Soft-Deletion, Soft Deletion Strategy, ADR: Soft Deletion Strategy for All Entities, GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput (+5 more)
+
+### Community 27 - "Notification Module"
+Cohesion: 0.12
+Nodes (24): ListNotificationsQuery, ListNotificationsQuerySchema, MarkAllReadResponse, MarkReadResponse, NotificationIdParams, NotificationIdParamsSchema, NotificationListResponse, NotificationPreferencesResponse (+16 more)
+
+### Community 28 - "Auth Module"
+Cohesion: 0.10
+Nodes (19): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+11 more)
+
+### Community 29 - "Auth Module"
 Cohesion: 0.12
 Nodes (10): TokenService, RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, ValidateToken (+2 more)
 
-### Community 25 - "Community 25"
+### Community 30 - "Notification Module"
 Cohesion: 0.14
 Nodes (12): DEFAULT_TYPES, GetNotificationPreferences, GetNotificationPreferencesOutput, NotificationPreferencesRepository, DEFAULT_TYPES, UpdateNotificationPreferences, UpdateNotificationPreferencesInput, UpdateNotificationPreferencesInputType (+4 more)
 
-### Community 26 - "Community 26"
-Cohesion: 0.13
-Nodes (10): ListIssues, ListIssuesQuery, ListIssuesQueryType, IssueFilters, IssueRepository, PaginatedResult, PaginationCursor, Issue (+2 more)
-
-### Community 27 - "Community 27"
+### Community 31 - "Project Module"
 Cohesion: 0.15
 Nodes (9): AddIssueToProject, AddIssueToProjectInputType, IssueQuery, CannotReopenCompletedProjectError, InvalidProjectStatusTransitionError, IssueAlreadyInProjectError, NotProjectTeamMemberError, ProjectCancelNotAdminError (+1 more)
 
-### Community 28 - "Community 28"
+### Community 32 - "Project Module"
 Cohesion: 0.14
 Nodes (10): CreateProject, CreateProjectInput, CreateProjectInputType, CreateProjectOutput, TeamMemberQuery, UpdateProject, UpdateProjectInput, UpdateProjectInputType (+2 more)
 
-### Community 29 - "Community 29"
-Cohesion: 0.12
-Nodes (22): Gateway Channel, Issue Channel, Team Channel, Gateway Connection, Gateway Event, Gateway Subscription, Project Cancellation, Project (+14 more)
+### Community 33 - "Openspec Module"
+Cohesion: 0.13
+Nodes (22): WorkflowController (Fastify Routes), ADR-0001: Embed Default Workflow in Code Rather Than Database, ADR-0002: Append-Only State History for Audit Trail, ADR-0003: Cancel State Transitions Bypass All Validation, Workflow API Contract, Default Workflow Definition, Workflow Module Backend Design, StateHistory (+14 more)
 
-### Community 30 - "Community 30"
+### Community 34 - "Dist"
 Cohesion: 0.09
 Nodes (21): dist, ES2022, node_modules, src/**/*, compilerOptions, declaration, declarationMap, esModuleInterop (+13 more)
 
-### Community 31 - "Community 31"
-Cohesion: 0.13
-Nodes (7): ListSessions, ListSessionsInput, ListSessionsInputType, ListSessionsOutput, SessionOutput, SessionRepository, Session
-
-### Community 32 - "Community 32"
+### Community 35 - "Identity Module"
 Cohesion: 0.14
-Nodes (7): DeleteLabel, DetachLabel, DetachLabelInput, DetachLabelInputType, Event, EventPublisher, LabelNotFoundError
+Nodes (8): DeleteOrganization, DeleteOrganizationInput, ListTeams, ListTeamsInput, OrganizationMemberRepository, OrganizationNotFoundError, NewOrganizationMember, OrganizationMember
 
-### Community 33 - "Community 33"
-Cohesion: 0.14
-Nodes (10): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, ListTeamMembers, ListTeamMembersInput, UserProfileRepository, ProfileNotFoundError, NewUser (+2 more)
+### Community 36 - "Notification Module"
+Cohesion: 0.15
+Nodes (10): MarkNotificationRead, MarkNotificationReadInput, MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError (+2 more)
 
-### Community 34 - "Community 34"
-Cohesion: 0.10
-Nodes (20): AddWatcherRequest, AssignIssueRequest, ChangeIssueStatusRequest, CommentIdParams, CommentResponse, CreateCommentRequest, CreateIssueRequest, CreateLabelRequest (+12 more)
-
-### Community 35 - "Community 35"
-Cohesion: 0.17
-Nodes (12): IssueLabel, issueLabels, NewIssueLabel, DEFAULT_STATUSES, IssueStatus, issueStatuses, NewIssueStatus, labels (+4 more)
-
-### Community 36 - "Community 36"
+### Community 37 - "Workflow Module"
 Cohesion: 0.11
 Nodes (6): CreateWorkflowState, ListWorkflowStates, ListWorkflowStatesInput, StateRepository, UpdateWorkflowState, WorkflowState
 
-### Community 37 - "Community 37"
-Cohesion: 0.13
-Nodes (19): CreateLabelRequestSchema, IssueLabelParamsSchema, LabelIdParamsSchema, UpdateLabelRequestSchema, attachLabel, createLabel, deleteLabel, detachLabel (+11 more)
-
-### Community 38 - "Community 38"
+### Community 38 - "Work Module"
 Cohesion: 0.14
 Nodes (10): ChangeIssueStatus, ChangeIssueStatusInput, ChangeIssueStatusInputType, ChangeIssueStatusOutput, IssueStatusQuery, NotificationService, StatusType, StateHistoryService (+2 more)
 
-### Community 39 - "Community 39"
+### Community 39 - "Openspec Module"
 Cohesion: 0.13
 Nodes (19): ADR: Team Entity Placement in Identity Module, ADR: Soft-Delete Cascade Strategy, Team & Membership Proposal, Team API Contract, Team Business Specification, Team & Membership Backend Tasks, Team & Membership Tech Stack, Team (+11 more)
 
-### Community 40 - "Community 40"
+### Community 40 - "Cycle Module"
 Cohesion: 0.16
 Nodes (5): DeleteCycle, ActiveCycleCannotBeDeletedError, CycleNotFoundError, DraftCycleCannotBeCompletedError, EmptyCycleNameError
 
-### Community 41 - "Community 41"
+### Community 41 - "Cycle Module"
 Cohesion: 0.18
 Nodes (8): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError
 
-### Community 42 - "Community 42"
-Cohesion: 0.18
-Nodes (8): MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError, NotificationNotOwnerError, NotificationType
+### Community 42 - "Openspec Module"
+Cohesion: 0.16
+Nodes (17): Gateway Channel, Issue Channel, Team Channel, Gateway Connection, Gateway Event, Gateway Subscription, Project Cancellation, Project (+9 more)
 
-### Community 43 - "Community 43"
-Cohesion: 0.13
-Nodes (10): CreateIssue, CreateIssueInput, CreateIssueInputType, CreateIssueOutput, ProjectQuery, TeamKeyQuery, TeamMemberQuery, EmptyTitleError (+2 more)
-
-### Community 44 - "Community 44"
+### Community 43 - "Identity Module"
 Cohesion: 0.15
-Nodes (4): GetIssueLabels, ListLabels, LabelRepository, Label
+Nodes (8): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, Event, EventPublisher, RemoveTeamMember, OrganizationNameConflictError
 
-### Community 45 - "Community 45"
-Cohesion: 0.15
-Nodes (16): commentRepository, commentRoutes(), createComment, deleteComment, eventPublisher, getUserIdFromToken(), issueRepository, issueTeamQuery (+8 more)
-
-### Community 46 - "Community 46"
+### Community 44 - "Openspec Module"
 Cohesion: 0.21
-Nodes (7): DeleteComment, UpdateComment, UpdateCommentInput, UpdateCommentInputType, CommentNotFoundError, CommentNotOwnedByUserError, InvalidPriorityError
+Nodes (16): Cycle Entity, Issue Entity, Label Entity, Notification Entity, Team Entity, User Entity, Notification API Contract, API Contract Template (+8 more)
 
-### Community 47 - "Community 47"
-Cohesion: 0.19
-Nodes (5): ListIssueComments, CommentRepository, IssueComment, issueComments, NewIssueComment
+### Community 45 - "Identity Module"
+Cohesion: 0.15
+Nodes (5): DeleteTeam, GetTeamDetails, ListTeamMembers, TeamRepository, Team
 
-### Community 48 - "Community 48"
-Cohesion: 0.20
-Nodes (6): ListTeams, ListTeamsInput, TeamRepository, NewTeam, Team, teams
-
-### Community 49 - "Community 49"
+### Community 46 - "Workflow Module"
 Cohesion: 0.22
 Nodes (8): CreateWorkflowStateInput, UpdateWorkflowStateInput, WorkflowStateType, DuplicateStateNameError, MissingCompletedStateError, MissingUnstartedStateError, MultipleCanceledStatesError, NotTeamAdminError
 
-### Community 50 - "Community 50"
+### Community 47 - "Workflow Module"
 Cohesion: 0.17
 Nodes (9): DuplicateTransitionError, StateInUseError, TransitionNotFoundError, NewStateHistoryEntry, stateHistory, NewWorkflowState, workflowStates, NewWorkflowTransition (+1 more)
 
-### Community 51 - "Community 51"
+### Community 48 - "Bcrypt"
 Cohesion: 0.13
-Nodes (15): bcrypt, fastify, @fastify/cors, @fastify/rate-limit, ioredis, dependencies, bcrypt, fastify (+7 more)
+Nodes (15): bcrypt, fastify, @fastify/cookie, @fastify/cors, @fastify/rate-limit, dependencies, bcrypt, fastify (+7 more)
 
-### Community 52 - "Community 52"
+### Community 49 - "Auth Module"
 Cohesion: 0.13
 Nodes (14): AuthResponse, AuthResponseSchema, ErrorResponse, ErrorResponseSchema, LoginRequest, LoginRequestSchema, RefreshRequest, RefreshRequestSchema (+6 more)
 
-### Community 53 - "Community 53"
-Cohesion: 0.18
-Nodes (6): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, MarkNotificationRead, MarkNotificationReadInput, NotificationEvent, NotificationEventPublisher
-
-### Community 54 - "Community 54"
-Cohesion: 0.19
-Nodes (7): CreateLabel, CreateLabelInput, CreateLabelInputType, UpdateLabel, UpdateLabelInput, UpdateLabelInputType, LabelNameConflictError
-
-### Community 55 - "Community 55"
+### Community 50 - "Openspec Module"
 Cohesion: 0.14
 Nodes (14): ADR-001: Use ws Library for WebSocket Server, ADR-002: Store Connection State In-Memory, ADR-003: In-Process EventEmitter for Broadcasting, AuthenticateConnection Use Case, BroadcastEvent Use Case, In-Memory Connection Registry, Gateway Backend Design, EventBus Port (EventEmitter adapter) (+6 more)
 
-### Community 56 - "Community 56"
+### Community 51 - "Openspec Module"
 Cohesion: 0.15
 Nodes (14): BaseError, BusinessRuleError, ConflictError, ForbiddenError, InternalError, NotFoundError, RateLimitError, UnauthorizedError (+6 more)
 
-### Community 57 - "Community 57"
+### Community 52 - "Scripts"
 Cohesion: 0.14
 Nodes (14): scripts, build, db:generate, db:migrate, db:push, db:studio, dev, format (+6 more)
 
-### Community 58 - "Community 58"
+### Community 53 - "Project Module"
 Cohesion: 0.26
 Nodes (7): PaginatedResult, ProjectFilters, ProjectRepository, NewProject, Project, projects, projectStatusEnum
 
-### Community 59 - "Community 59"
-Cohesion: 0.18
-Nodes (7): CreateComment, CreateCommentInput, CreateCommentInputType, IssueTeamQuery, NotificationService, TeamMemberQuery, EmptyBodyError
-
-### Community 60 - "Community 60"
+### Community 54 - "Auth Module"
 Cohesion: 0.22
 Nodes (7): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError, hashToken(), verifyTokenHash()
 
-### Community 61 - "Community 61"
+### Community 56 - "Auth Module"
 Cohesion: 0.32
 Nodes (6): UserRepository, NewSession, sessions, NewUser, User, users
 
-### Community 62 - "Community 62"
+### Community 57 - "Cycle Module"
 Cohesion: 0.21
 Nodes (3): GetCycle, ListCycles, NotCycleTeamMemberError
 
-### Community 63 - "Community 63"
+### Community 58 - "Notification Module"
 Cohesion: 0.24
 Nodes (5): NotificationRepository, PaginatedResult, NewNotification, Notification, notifications
 
-### Community 64 - "Community 64"
-Cohesion: 0.19
-Nodes (6): AttachLabel, AttachLabelInput, AttachLabelInputType, IssueTeamQuery, TeamMemberQuery, LabelAlreadyAttachedError
-
-### Community 65 - "Community 65"
+### Community 59 - "Notification Module"
 Cohesion: 0.24
 Nodes (6): CreateNotification, CreateNotificationInput, CreateNotificationInputType, CreateNotificationOutput, CreateNotificationEvent, NotificationService
 
-### Community 66 - "Community 66"
-Cohesion: 0.20
-Nodes (6): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutput, NotificationService, TeamMemberQuery
+### Community 60 - "Notification Module"
+Cohesion: 0.23
+Nodes (4): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, NotificationEvent, NotificationEventPublisher
 
-### Community 67 - "Community 67"
-Cohesion: 0.20
-Nodes (6): ProjectQuery, TeamQuery, UpdateIssue, UpdateIssueInput, UpdateIssueInputType, UpdateIssueOutput
-
-### Community 68 - "Community 68"
+### Community 61 - "Workflow Module"
 Cohesion: 0.23
 Nodes (8): ValidateTransition, ValidateTransitionInput, ValidateTransitionOutput, DEFAULT_WORKFLOW_STATES, DEFAULT_WORKFLOW_TRANSITIONS, DefaultState, DefaultTransition, isCanceledType()
 
-### Community 69 - "Community 69"
+### Community 62 - "Notification Module"
 Cohesion: 0.24
 Nodes (6): ListNotifications, ListNotificationsInput, ListNotificationsInputType, ListNotificationsOutput, NotificationItem, toItem()
 
-### Community 70 - "Community 70"
+### Community 63 - "Openspec Module"
 Cohesion: 0.20
 Nodes (10): Hexagonal Architecture (Ports and Adapters), Shared Entity Ownership (Field-Level), ADR: Hexagonal Architecture for Identity Module, ADR: Shared Entity Ownership Between Auth and Identity Modules, Identity User Profile & Organization Change, Identity Module Backend Design, Identity API Contract Spec, Identity Business Spec (+2 more)
 
-### Community 71 - "Community 71"
+### Community 64 - "Openspec Module"
 Cohesion: 0.24
 Nodes (10): ADR-0001 In-Process Event Bridge, ADR-0002 Channel Access Validation, ADR-0003 Auto-Subscription on Authentication, WebSocket Change ADR Manifest, WebSocket Backend Design, WebSocket Change Review, WebSocket Gateway Protocol API Spec, WebSocket Realtime Business Rules (+2 more)
 
-### Community 72 - "Community 72"
+### Community 65 - "Package"
 Cohesion: 0.20
 Nodes (9): author, description, keywords, license, main, name, packageManager, type (+1 more)
 
-### Community 73 - "Community 73"
+### Community 66 - "Auth Module"
 Cohesion: 0.24
 Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
-### Community 74 - "Community 74"
+### Community 67 - "Identity Module"
 Cohesion: 0.24
-Nodes (5): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, OrganizationNameConflictError
+Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
 
-### Community 75 - "Community 75"
+### Community 68 - "Project Module"
 Cohesion: 0.24
 Nodes (3): GetProjectProgress, GetProjectProgressOutput, IssueQuery
 
-### Community 76 - "Community 76"
+### Community 69 - "Workflow Module"
 Cohesion: 0.29
 Nodes (4): GetStateHistory, GetStateHistoryInput, HistoryRepository, StateHistoryEntry
 
-### Community 77 - "Community 77"
+### Community 70 - "Openspec Module"
 Cohesion: 0.25
 Nodes (9): Default Workflow (Embedded), Workflow Module, WorkflowState Entity, Workflow State Type Enum, WorkflowTransition Entity, StateHistory Entity, Workflow Module API Endpoints, WorkflowResolutionService (+1 more)
 
-### Community 78 - "Community 78"
-Cohesion: 0.28
-Nodes (9): IssueComment, IssueLabel, IssueWatcher, Label, ADR: Extend Work Module with Subdomains, ADR: Soft-Delete for Comments and Labels, ADR: Flat Comment Threading, Work Module Comments/Labels/Watchers Backend Design (+1 more)
+### Community 71 - "Openspec Module"
+Cohesion: 0.31
+Nodes (9): Comment Entity, Session Entity, Business Specification Template, Backend Tasks Template, Auth API Contract, Comments API Contract, Sessions API Contract, Auth Business Specification (+1 more)
 
-### Community 79 - "Community 79"
-Cohesion: 0.22
-Nodes (9): ADR-0001: Store-and-Forward Notifications, ADR-0002: Synchronous Event Ingestion, Notification API Contract, Notification Data Model, Notification Module Backend Design, Notification Recipient Resolver, WebSocket Channel Types, Gateway Business Rules (+1 more)
-
-### Community 80 - "Community 80"
+### Community 72 - "Cycle Module"
 Cohesion: 0.31
 Nodes (5): CreateCycle, CreateCycleInputType, CreateCycleOutput, CycleDateValidationError, CyclePastStartDateError
 
-### Community 81 - "Community 81"
+### Community 73 - "Identity Module"
+Cohesion: 0.28
+Nodes (4): AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, AlreadyTeamMemberError
+
+### Community 74 - "Priority"
+Cohesion: 0.25
+Nodes (8): Code Intelligence Priority Order, CodeGraph, Graphify, Headroom Memory MCP, Mandatory Project Rules, Memory as Primary Source of Truth, RTK (Rust Token Killer), Token-Optimized Commands Rule
+
+### Community 75 - "Openspec Module"
 Cohesion: 0.29
 Nodes (8): Cycles API Contract, Cycle Entity, Cycle Module, Cycle Module Backend Tasks, Cycle Status Enum (draft, active, completed), Cycle Use Cases, ADR-0001: Cycle Auto-Complete on Activation, ADR-0002: Cycle Status as Database Enum
 
-### Community 82 - "Community 82"
+### Community 76 - "Openspec Module"
+Cohesion: 0.29
+Nodes (8): IssueComment, IssueLabel, Label, ADR: Extend Work Module with Subdomains, ADR: Soft-Delete for Comments and Labels, ADR: Flat Comment Threading, Work Module Comments/Labels/Watchers Backend Design, Work Module Comments/Labels/Watchers Proposal
+
+### Community 77 - "Identity Module"
+Cohesion: 0.25
+Nodes (3): organizationMemberRepository, NotOrganizationMemberError, NotOrganizationOwnerError
+
+### Community 78 - "Identity Module"
 Cohesion: 0.46
 Nodes (6): CreateOrganizationSchema, DeleteOrganizationSchema, GetOrganizationDetailsSchema, GetUserProfileSchema, ListUserOrganizationsSchema, UpdateUserProfileSchema
 
-### Community 83 - "Community 83"
+### Community 79 - "Openspec Module"
 Cohesion: 0.29
 Nodes (7): In-Memory Rate Limit Store (MVP), ADR: In-Memory Rate Limit Store for MVP, Shared Error Types & Rate Limiting Change, Shared Module Backend Design (Errors & Rate Limiting), Error Contract API Spec, Shared Error Class Hierarchy, Shared Rate Limiting Module
 
-### Community 85 - "Community 85"
+### Community 80 - "Openspec Module"
 Cohesion: 0.33
 Nodes (6): OpenSpec Config, Backend Schema Definition, ADR Template, Design Backend Template, Proposal Template, Review Template
 
-### Community 87 - "Community 87"
+### Community 82 - "Auth Module"
 Cohesion: 0.40
 Nodes (5): JWT Refresh Token Rotation, Auth Token Refresh & Logout Change, Auth Token Refresh & Logout Tasks, RedisSessionStore Adapter, RefreshTokenService
 
-### Community 88 - "Community 88"
+### Community 83 - "Forward"
+Cohesion: 0.40
+Nodes (5): ADR-0001: Store-and-Forward Notifications, ADR-0002: Synchronous Event Ingestion, Notification Data Model, Notification Module Backend Design, Notification Recipient Resolver
+
+### Community 84 - "Openspec Module"
 Cohesion: 0.40
 Nodes (5): Tech Selection Template, Architecture Template, Deployment Template, Technology Templates README, Stack Template
 
-### Community 90 - "Community 90"
+### Community 86 - "Events"
 Cohesion: 0.40
 Nodes (3): CHANNEL_PATTERNS, GATEWAY_EVENTS, GatewayEventEnvelope
 
-### Community 91 - "Community 91"
+### Community 87 - "Openspec Module"
 Cohesion: 0.50
 Nodes (4): Auth Cookie Migration API Spec, Auth Cookie Migration Business Spec, Auth Cookie Migration Backend Tasks, Auth Cookie Migration Tech Stack
 
-### Community 92 - "Community 92"
+### Community 88 - "Auth Module"
 Cohesion: 0.50
 Nodes (3): ErrorResponseSchema, RefreshTokenRequestSchema, RefreshTokenResponseSchema
 
-### Community 94 - "Community 94"
+### Community 90 - "Identity Module"
+Cohesion: 0.50
+Nodes (4): Identity Controller, Identity Auth & Authorization Middleware, Identity Drizzle Repositories, Identity Use Cases
+
+### Community 91 - "0001"
 Cohesion: 0.67
 Nodes (3): ADR-0001: HttpOnly Cookie for Refresh Token, Cookie Migration Backend Design, Cookie Security Model
 
-### Community 95 - "Community 95"
+### Community 92 - "Openspec Module"
 Cohesion: 0.67
 Nodes (3): OpenSpec Artifact Workflow, OpenSpec Auth Registration Login Change Config, OpenSpec Schema Collection README
 
-### Community 96 - "Community 96"
+### Community 93 - "Openspec Module"
 Cohesion: 0.67
 Nodes (3): Active Cycle Status, Completed Cycle Status, Draft Cycle Status
 
-### Community 97 - "Community 97"
+### Community 94 - "Openspec Module"
 Cohesion: 0.67
 Nodes (3): Session Eviction, Session Revocation, Session
+
+### Community 95 - "Config"
+Cohesion: 0.67
+Nodes (3): Serena IDE Project Configuration, linear-clone-backend-js Project, TypeScript Language Server
+
+### Community 98 - "Types"
+Cohesion: 0.67
+Nodes (3): WebSocket Channel Types, Gateway Business Rules, WebSocket Protocol Contract
 
 ## Knowledge Gaps
 - **550 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+545 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **78 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **74 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `App Entry & Sessions` to `WebSocket Gateway`, `Community 35`, `Auth Controller`, `Token Service`, `Community 60`?**
-  _High betweenness centrality (0.050) - this node is a cross-community bridge._
-- **Why does `FastifyInstance` connect `App Entry & Sessions` to `WebSocket Gateway`, `Error Taxonomy`, `Issue Watchers`, `Identity & Team DTOs`, `Community 37`, `Workflow Controller`, `Project DTOs`, `Community 45`, `Cycle Controller`, `Issue DTOs`, `Auth Controller`, `Notification DTOs`?**
+- **Why does `env` connect `Team Membership` to `WebSocket Gateway`, `Project DTOs`, `Auth Module`, `Auth Module`, `Auth Module`?**
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
+- **Why does `FastifyInstance` connect `Team Membership` to `WebSocket Gateway`, `Error Taxonomy`, `Issue Watchers`, `Workflow Engine`, `Identity & Team DTOs`, `Workflow Controller`, `Workflow Transitions`, `Project Module`, `Cycle Lifecycle`, `Notification DTOs`, `Notification Module`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `TokenService` connect `Token Service` to `Community 73`, `Community 60`?**
+- **Why does `TokenService` connect `Auth Module` to `Auth Module`, `Auth Module`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `type` to the rest of the system?**
   _550 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `WebSocket Gateway` be split into smaller, more focused modules?**
-  _Cohesion score 0.0547680412371134 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05742393045069778 - nodes in this community are weakly interconnected._
 - **Should `Authentication Architecture` be split into smaller, more focused modules?**
   _Cohesion score 0.061569416498993966 - nodes in this community are weakly interconnected._
 - **Should `Error Taxonomy` be split into smaller, more focused modules?**
-  _Cohesion score 0.08941176470588236 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06108597285067873 - nodes in this community are weakly interconnected._
