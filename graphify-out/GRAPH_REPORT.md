@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 5361 nodes · 6831 edges · 349 communities (325 shown, 24 thin omitted)
+- 5361 nodes · 6825 edges · 349 communities (325 shown, 24 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `161a1237`
+- Built from commit: `9b7fa223`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -357,10 +357,10 @@
 1. `EventPublisher` - 32 edges
 2. `SessionRepository` - 29 edges
 3. `LabelRepository` - 25 edges
-4. `TeamMemberRepository` - 23 edges
-5. `BaseError` - 23 edges
-6. `CycleRepository` - 22 edges
-7. `TeamRepository` - 22 edges
+4. `TeamMemberRepository` - 24 edges
+5. `TeamRepository` - 23 edges
+6. `BaseError` - 23 edges
+7. `CycleRepository` - 22 edges
 8. `API Endpoints` - 22 edges
 9. `StateRepository` - 21 edges
 10. `OrganizationMemberRepository` - 20 edges
@@ -374,8 +374,8 @@
   linear-clone-backend-js/src/modules/cycle/adapters/in/cycle-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
 - `start()` --calls--> `setupGateway()`  [EXTRACTED]
   linear-clone-backend-js/src/server.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
-- `notificationRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
-  linear-clone-backend-js/src/modules/notification/adapters/in/notification-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
+- `identityRoutes()` --references--> `FastifyInstance`  [EXTRACTED]
+  linear-clone-backend-js/src/modules/identity/adapters/in/identity-controller.ts → linear-clone-backend-js/src/modules/gateway/setup.ts
 
 ## Import Cycles
 - None detected.
@@ -419,7 +419,7 @@ Cohesion: 0.05
 Nodes (47): AddWatcherRequest, AssignIssueRequest, AssignIssueRequestSchema, ChangeIssueStatusRequest, ChangeIssueStatusRequestSchema, CommentIdParams, CommentResponse, CreateCommentRequest (+39 more)
 
 ### Community 9 - "identity-controller.ts"
-Cohesion: 0.07
+Cohesion: 0.06
 Nodes (42): AddTeamMemberRequest, AddTeamMemberRequestSchema, CreateOrganizationRequest, CreateOrganizationRequestSchema, CreateTeamRequest, CreateTeamRequestSchema, ErrorResponse, OrganizationIdParams (+34 more)
 
 ### Community 10 - "Work Module — Backend Design"
@@ -467,8 +467,8 @@ Cohesion: 0.05
 Nodes (38): Behaviour, Business Rules, Data Model, `notification_preferences`, `notifications`, Notifications — Business Specification, Relationships, Requirement: Create notification on cycle completion (+30 more)
 
 ### Community 21 - "OrganizationMemberRepository"
-Cohesion: 0.13
-Nodes (10): GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput, ListUserOrganizationsOutput, OrganizationMemberRepository, NewOrganizationMember (+2 more)
+Cohesion: 0.12
+Nodes (11): GetOrganizationDetails, GetOrganizationDetailsInput, GetOrganizationDetailsOutput, ListUserOrganizations, ListUserOrganizationsInput, ListUserOrganizationsOutput, OrganizationMemberRepository, OrganizationNotFoundError (+3 more)
 
 ### Community 22 - "Behaviour"
 Cohesion: 0.05
@@ -552,7 +552,7 @@ Nodes (24): app, authRoutes(), eventPublisher, getAuthInfo(), getCurrentSessionR
 
 ### Community 42 - "TeamMemberRepository"
 Cohesion: 0.16
-Nodes (6): GetTeamDetails, GetTeamDetailsInput, TeamMemberRepository, NewTeamMember, TeamMember, teamMembers
+Nodes (6): DeleteTeam, DeleteTeamInput, TeamMemberRepository, NewTeamMember, TeamMember, teamMembers
 
 ### Community 43 - "Labels — API Contract"
 Cohesion: 0.06
@@ -631,8 +631,8 @@ Cohesion: 0.12
 Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
 
 ### Community 62 - "identity/domain/index.ts"
-Cohesion: 0.10
-Nodes (14): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, ListTeamMembers, ListTeamMembersInput, UserProfileRepository, UpdateUserProfile, UpdateUserProfileInput (+6 more)
+Cohesion: 0.14
+Nodes (10): GetUserProfile, GetUserProfileInput, GetUserProfileOutput, ListTeamMembers, ListTeamMembersInput, UserProfileRepository, ProfileNotFoundError, NewUser (+2 more)
 
 ### Community 63 - "dependencies"
 Cohesion: 0.07
@@ -691,8 +691,8 @@ Cohesion: 0.14
 Nodes (12): DEFAULT_TYPES, GetNotificationPreferences, GetNotificationPreferencesOutput, NotificationPreferencesRepository, DEFAULT_TYPES, UpdateNotificationPreferences, UpdateNotificationPreferencesInput, UpdateNotificationPreferencesInputType (+4 more)
 
 ### Community 77 - "identity/domain/errors.ts"
-Cohesion: 0.09
-Nodes (14): organizationMemberRepository, AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, RemoveTeamMemberInput, AlreadyTeamMemberError, InvalidAvatarUrlError, LastAdminRemovalError (+6 more)
+Cohesion: 0.08
+Nodes (15): organizationMemberRepository, AddTeamMember, AddTeamMemberInput, AddTeamMemberInputType, GetTeamDetailsInput, RemoveTeamMemberInput, AlreadyTeamMemberError, InvalidAvatarUrlError (+7 more)
 
 ### Community 78 - "project/domain/errors.ts"
 Cohesion: 0.15
@@ -791,8 +791,8 @@ Cohesion: 0.18
 Nodes (8): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError
 
 ### Community 102 - "TeamRepository"
-Cohesion: 0.20
-Nodes (6): ListTeams, ListTeamsInput, TeamRepository, NewTeam, Team, teams
+Cohesion: 0.16
+Nodes (7): GetTeamDetails, ListTeams, ListTeamsInput, TeamRepository, NewTeam, Team, teams
 
 ### Community 103 - "Auth — API Contract"
 Cohesion: 0.11
@@ -1183,12 +1183,12 @@ Cohesion: 0.24
 Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
 ### Community 200 - "EventPublisher"
-Cohesion: 0.10
-Nodes (12): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, DeleteOrganization, DeleteOrganizationInput, DeleteTeam, DeleteTeamInput (+4 more)
+Cohesion: 0.11
+Nodes (12): CreateOrganization, CreateOrganizationInput, CreateOrganizationInputType, CreateOrganizationOutput, Event, EventPublisher, RemoveTeamMember, UpdateUserProfile (+4 more)
 
 ### Community 201 - "create-team.ts"
-Cohesion: 0.20
-Nodes (6): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, OrganizationNotFoundError, TeamKeyConflictError
+Cohesion: 0.24
+Nodes (5): CreateTeam, CreateTeamInput, CreateTeamInputType, CreateTeamOutput, TeamKeyConflictError
 
 ### Community 202 - "get-project-progress.ts"
 Cohesion: 0.24
@@ -1315,8 +1315,8 @@ Cohesion: 0.25
 Nodes (8): Build & Start (Production), Database Setup, Environment Variables, Getting Started, Installation, Prerequisites, Run Development, Run Tests
 
 ### Community 233 - "OrganizationRepository"
-Cohesion: 0.18
-Nodes (7): ListUserTeams, ListUserTeamsOutput, ListUserTeamsOutputTeam, OrganizationRepository, NewOrganization, Organization, organizations
+Cohesion: 0.13
+Nodes (9): DeleteOrganization, DeleteOrganizationInput, ListUserTeams, ListUserTeamsOutput, ListUserTeamsOutputTeam, OrganizationRepository, NewOrganization, Organization (+1 more)
 
 ### Community 234 - "validators.ts"
 Cohesion: 0.46
@@ -1635,7 +1635,7 @@ Cohesion: 0.33
 Nodes (5): Endpoint: List User Teams, Errors, Identity — API Contract, Request, Response
 
 ## Knowledge Gaps
-- **3027 isolated node(s):** `Request`, `Response`, `Errors`, `Scaffold`, `Data Layer` (+3022 more)
+- **3043 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+3038 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1643,16 +1643,16 @@ Nodes (5): Endpoint: List User Teams, Errors, Identity — API Contract, Request
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `env` connect `auth-controller.ts` to `LabelRepository`, `login-user.ts`, `gateway/index.ts`, `session-controller.ts`, `refresh-token.ts`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `OrganizationNotFoundError` connect `create-team.ts` to `TeamRepository`, `EventPublisher`, `identity-controller.ts`, `identity/domain/errors.ts`, `OrganizationMemberRepository`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `SessionRepository` connect `SessionRepository` to `session-controller.ts`, `refresh-token.ts`, `EventPublisher`, `login-user.ts`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **What connects `Request`, `Response`, `Errors` to the rest of the system?**
-  _3027 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `InvalidCycleStatusTransitionError` connect `activate-cycle.test.ts` to `cycle-controller.ts`, `CycleRepository`, `cycle/domain/errors.ts`, `TeamMemberQuery`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **What connects `name`, `version`, `type` to the rest of the system?**
+  _3043 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `linear-clone-backend-js/AGENTS.md` be split into smaller, more focused modules?**
   _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
 - **Should `gateway/index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.0547680412371134 - nodes in this community are weakly interconnected._
 - **Should `EventPublisher` be split into smaller, more focused modules?**
   _Cohesion score 0.08250355618776671 - nodes in this community are weakly interconnected._
-- **Should `work/domain/errors.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.054274084124830396 - nodes in this community are weakly interconnected._
