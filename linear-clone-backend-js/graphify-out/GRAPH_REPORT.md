@@ -4,12 +4,12 @@
 - cluster-only mode — file stats not available
 
 ## Summary
-- 2030 nodes · 3806 edges · 182 communities (106 shown, 76 thin omitted)
+- 2030 nodes · 3806 edges · 182 communities (108 shown, 74 thin omitted)
 - Extraction: 91% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 259 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4c9c7557`
+- Built from commit: `cef126ba`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,7 @@
 - Project Module Backend Design
 - workflow/domain/errors.ts
 - cycle-controller.ts
-- create-cycle.ts
+- TeamMemberQuery
 - identity/domain/index.ts
 - Backend Design: Issue CRUD & Status
 - auth-controller.ts
@@ -42,7 +42,7 @@
 - session-controller.ts
 - EventPublisher
 - watcher-controller.ts
-- TokenService
+- refresh-token.ts
 - update-notification-preferences.ts
 - OrganizationMemberRepository
 - project/domain/errors.ts
@@ -72,7 +72,7 @@
 - ProjectRepository
 - login-user.ts
 - auth/domain/index.ts
-- list-cycles.ts
+- NotCycleTeamMemberError
 - NotificationRepository
 - add-watcher.ts
 - attach-label.ts
@@ -89,14 +89,14 @@
 - get-project-progress.ts
 - Workflow Module
 - Comments API Contract
-- refresh-token.ts
+- register-user.ts
 - Code Intelligence Priority Order
 - Cycle Module
 - IssueComment
 - validators.ts
 - In-Memory Rate Limit Store (MVP)
 - Backend Schema Definition
-- DeleteCycle
+- create-cycle.ts
 - RedisSessionStore Adapter
 - Notification Module Backend Design
 - Tech Selection Template
@@ -115,10 +115,10 @@
 - auth-middleware.ts
 - WebSocket Protocol Contract
 - Gateway WebSocket Broadcasting Proposal
-- drizzle-orm
+- ioredis
 - eslint.config.js
 - @fastify/cookie
-- GetCycle
+- activate-cycle.test.ts
 - jose
 - Issue Identifier
 - Notification Preferences
@@ -247,7 +247,7 @@
 - **hyper_gateway_event_broadcast_flow** — business_gateway_event, business_gateway_channel, business_gateway_subscription, business_gateway_connection [INFERRED 1.00]
 - **hyper_workflow_issue_status_history** — openspec_specs_business_issues_issue [INFERRED 1.00]
 
-## Communities (182 total, 76 thin omitted)
+## Communities (182 total, 74 thin omitted)
 
 ### Community 0 - "gateway/index.ts"
 Cohesion: 0.05
@@ -317,9 +317,9 @@ Nodes (8): CreateWorkflowStateInput, UpdateWorkflowStateInput, WorkflowStateType
 Cohesion: 0.10
 Nodes (27): activateCycle, completeCycle, createCycle, cycleRepository, cycleRoutes(), deleteCycle, eventPublisher, getCycle (+19 more)
 
-### Community 17 - "create-cycle.ts"
+### Community 17 - "TeamMemberQuery"
 Cohesion: 0.12
-Nodes (13): ActivateCycle, NotificationService, CompleteCycle, CreateCycle, CreateCycleInput, CreateCycleInputType, CreateCycleOutput, CycleEvent (+5 more)
+Nodes (11): ActivateCycle, NotificationService, CompleteCycle, NotificationService, CreateCycleInput, CycleEvent, CycleEventPublisher, TeamMemberQuery (+3 more)
 
 ### Community 18 - "identity/domain/index.ts"
 Cohesion: 0.11
@@ -350,8 +350,8 @@ Cohesion: 0.12
 Nodes (24): ListNotificationsQuery, ListNotificationsQuerySchema, MarkAllReadResponse, MarkReadResponse, NotificationIdParams, NotificationIdParamsSchema, NotificationListResponse, NotificationPreferencesResponse (+16 more)
 
 ### Community 25 - "session-controller.ts"
-Cohesion: 0.09
-Nodes (20): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+12 more)
+Cohesion: 0.10
+Nodes (19): ErrorResponseSchema, eventPublisher, listSessions, ListSessionsResponseSchema, TODO: This needs to be fixed to properly identify the current session., revokeAllSessions, RevokeAllSessionsResponseSchema, revokeSession (+11 more)
 
 ### Community 26 - "EventPublisher"
 Cohesion: 0.12
@@ -361,9 +361,9 @@ Nodes (10): AssignIssue, AssignIssueInput, AssignIssueInputType, AssignIssueOutp
 Cohesion: 0.11
 Nodes (18): AddWatcherRequestSchema, WatcherIdParamsSchema, addWatcher, eventPublisher, getUserIdFromToken(), issueTeamQuery, listWatchers, removeWatcher (+10 more)
 
-### Community 28 - "TokenService"
+### Community 28 - "refresh-token.ts"
 Cohesion: 0.12
-Nodes (9): TokenService, ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput, ValidateToken, ValidateTokenInput (+1 more)
+Nodes (10): TokenService, RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, ValidateToken (+2 more)
 
 ### Community 29 - "update-notification-preferences.ts"
 Cohesion: 0.14
@@ -395,15 +395,15 @@ Nodes (21): dist, ES2022, node_modules, src/**/*, compilerOptions, declaration, 
 
 ### Community 36 - "SessionRepository"
 Cohesion: 0.13
-Nodes (6): ListSessions, ListSessionsInput, ListSessionsOutput, SessionOutput, SessionRepository, Session
+Nodes (7): ListSessions, ListSessionsInput, ListSessionsInputType, ListSessionsOutput, SessionOutput, SessionRepository, Session
 
 ### Community 37 - "StateRepository"
 Cohesion: 0.11
 Nodes (6): CreateWorkflowState, ListWorkflowStates, ListWorkflowStatesInput, StateRepository, UpdateWorkflowState, WorkflowState
 
 ### Community 38 - "EventPublisher"
-Cohesion: 0.16
-Nodes (9): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, NotFoundError, RevokeSession (+1 more)
+Cohesion: 0.18
+Nodes (9): LogoutUser, LogoutUserInput, LogoutUserInputType, LogoutUserOutput, Event, EventPublisher, RevokeAllSessions, RevokeAllSessionsInput (+1 more)
 
 ### Community 39 - "EventPublisher"
 Cohesion: 0.12
@@ -418,16 +418,16 @@ Cohesion: 0.13
 Nodes (19): ADR: Team Entity Placement in Identity Module, ADR: Soft-Delete Cascade Strategy, Team & Membership Proposal, Team API Contract, Team Business Specification, Team & Membership Backend Tasks, Team & Membership Tech Stack, Team (+11 more)
 
 ### Community 42 - "cycle/domain/errors.ts"
-Cohesion: 0.12
-Nodes (9): NotificationService, ActiveCycleCannotBeDeletedError, CompletedCycleCannotBeActivatedError, CycleDateValidationError, CycleNotFoundError, CyclePastStartDateError, DraftCycleCannotBeCompletedError, EmptyCycleNameError (+1 more)
+Cohesion: 0.16
+Nodes (5): DeleteCycle, ActiveCycleCannotBeDeletedError, CycleNotFoundError, DraftCycleCannotBeCompletedError, EmptyCycleNameError
 
 ### Community 43 - "CycleRepository"
-Cohesion: 0.16
-Nodes (9): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError (+1 more)
+Cohesion: 0.18
+Nodes (8): CycleFilters, CycleRepository, PaginatedResult, Cycle, cycles, cycleStatusEnum, NewCycle, CycleNotActiveForIssueAssignmentError
 
 ### Community 44 - "notification/domain/index.ts"
-Cohesion: 0.15
-Nodes (10): MarkNotificationRead, MarkNotificationReadInput, MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError (+2 more)
+Cohesion: 0.18
+Nodes (8): MarkNotificationReadInputType, MarkNotificationReadOutput, InvalidFilterError, InvalidNotificationTypeError, NOTIFICATION_TYPES, NotificationNotFoundError, NotificationNotOwnerError, NotificationType
 
 ### Community 45 - "Issue"
 Cohesion: 0.16
@@ -447,15 +447,15 @@ Nodes (16): Cycle Entity, Issue Entity, Label Entity, Notification Entity, Team 
 
 ### Community 49 - "dependencies"
 Cohesion: 0.13
-Nodes (15): bcrypt, fastify, @fastify/cors, @fastify/rate-limit, ioredis, dependencies, bcrypt, fastify (+7 more)
+Nodes (15): bcrypt, drizzle-orm, fastify, @fastify/cors, @fastify/rate-limit, dependencies, bcrypt, drizzle-orm (+7 more)
 
 ### Community 50 - "auth/adapters/in/dto.ts"
 Cohesion: 0.13
 Nodes (14): AuthResponse, AuthResponseSchema, ErrorResponse, ErrorResponseSchema, LoginRequest, LoginRequestSchema, RefreshRequest, RefreshRequestSchema (+6 more)
 
 ### Community 51 - "mark-all-notifications-read.ts"
-Cohesion: 0.23
-Nodes (4): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, NotificationEvent, NotificationEventPublisher
+Cohesion: 0.18
+Nodes (6): MarkAllNotificationsRead, MarkAllNotificationsReadOutput, MarkNotificationRead, MarkNotificationReadInput, NotificationEvent, NotificationEventPublisher
 
 ### Community 52 - "Gateway Backend Design"
 Cohesion: 0.14
@@ -474,12 +474,16 @@ Cohesion: 0.26
 Nodes (7): PaginatedResult, ProjectFilters, ProjectRepository, NewProject, Project, projects, projectStatusEnum
 
 ### Community 56 - "login-user.ts"
-Cohesion: 0.24
-Nodes (5): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError
+Cohesion: 0.22
+Nodes (7): LoginUser, LoginUserInput, LoginUserInputType, LoginUserOutput, UnauthorizedError, hashToken(), verifyTokenHash()
 
 ### Community 57 - "auth/domain/index.ts"
 Cohesion: 0.32
 Nodes (6): UserRepository, NewSession, sessions, NewUser, User, users
+
+### Community 58 - "NotCycleTeamMemberError"
+Cohesion: 0.21
+Nodes (3): GetCycle, ListCycles, NotCycleTeamMemberError
 
 ### Community 59 - "NotificationRepository"
 Cohesion: 0.24
@@ -545,9 +549,9 @@ Nodes (9): Default Workflow (Embedded), Workflow Module, WorkflowState Entity, W
 Cohesion: 0.31
 Nodes (9): Comment Entity, Session Entity, Business Specification Template, Backend Tasks Template, Auth API Contract, Comments API Contract, Sessions API Contract, Auth Business Specification (+1 more)
 
-### Community 75 - "refresh-token.ts"
-Cohesion: 0.19
-Nodes (8): RefreshToken, RefreshTokenInput, RefreshTokenInputType, RefreshTokenOutput, TokenExpiredError, TokenRevokedError, hashToken(), verifyTokenHash()
+### Community 75 - "register-user.ts"
+Cohesion: 0.24
+Nodes (5): ConflictError, RegisterUser, RegisterUserInput, RegisterUserInputType, RegisterUserOutput
 
 ### Community 76 - "Code Intelligence Priority Order"
 Cohesion: 0.25
@@ -572,6 +576,10 @@ Nodes (7): In-Memory Rate Limit Store (MVP), ADR: In-Memory Rate Limit Store for
 ### Community 81 - "Backend Schema Definition"
 Cohesion: 0.33
 Nodes (6): OpenSpec Config, Backend Schema Definition, ADR Template, Design Backend Template, Proposal Template, Review Template
+
+### Community 82 - "create-cycle.ts"
+Cohesion: 0.31
+Nodes (5): CreateCycle, CreateCycleInputType, CreateCycleOutput, CycleDateValidationError, CyclePastStartDateError
 
 ### Community 83 - "RedisSessionStore Adapter"
 Cohesion: 0.40
@@ -628,16 +636,16 @@ Nodes (3): WebSocket Channel Types, Gateway Business Rules, WebSocket Protocol C
 ## Knowledge Gaps
 - **538 isolated node(s):** `name`, `version`, `type`, `description`, `main` (+533 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **76 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **74 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `env` connect `gateway/index.ts` to `refresh-token.ts`, `auth-controller.ts`, `label-controller.ts`, `login-user.ts`, `session-controller.ts`?**
+- **Why does `env` connect `gateway/index.ts` to `auth-controller.ts`, `label-controller.ts`, `login-user.ts`, `session-controller.ts`, `refresh-token.ts`?**
   _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **Why does `FastifyInstance` connect `gateway/index.ts` to `comment-controller.ts`, `errors/index.ts`, `issue-controller.ts`, `controller.ts`, `project-controller.ts`, `cycle-controller.ts`, `auth-controller.ts`, `label-controller.ts`, `notification-controller.ts`, `session-controller.ts`, `watcher-controller.ts`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `TokenService` connect `TokenService` to `login-user.ts`, `refresh-token.ts`, `SessionRepository`?**
+- **Why does `TokenService` connect `refresh-token.ts` to `login-user.ts`, `register-user.ts`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `type` to the rest of the system?**
   _538 weakly-connected nodes found - possible documentation gaps or missing edges._
